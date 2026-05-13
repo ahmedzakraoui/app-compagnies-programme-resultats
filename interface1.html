@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saisie du Programme - Bureau</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/interface1.css" />
+  </head>
+  <body>
+    <nav class="navbar mb-4">
+      <div class="container">
+        <span class="navbar-brand fw-bold text-primary">CNSS <span class="text-dark">Programme</span></span>
+        <span id="bureau-info" class="badge bg-secondary">Bureau : --</span>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="row g-4">
+        <!-- Formulaire de Saisie -->
+        <div class="col-md-5">
+          <div class="card card-custom p-4">
+            <h5 class="fw-bold mb-3">Nouvelle Campagne</h5>
+            <form id="form-programme">
+              <div class="mb-3">
+                <label class="form-label">Type de Campagne</label>
+                <select id="type_campagne" class="form-select" required>
+                  <option value="قطاعية">قطاعية</option>
+                  <option value="جغرافية">جغرافية</option>
+                  <option value="لا شيء">لا شيء</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Zone / Activité</label>
+                <input type="text" id="activite_zone" class="form-control" placeholder="Ex: Zone Industrielle" required />
+              </div>
+              <div class="row mb-3">
+                <div class="col">
+                  <label class="form-label">Date Début</label>
+                  <input type="date" id="date_debut" class="form-control" required />
+                </div>
+                <div class="col">
+                  <label class="form-label">Date Fin</label>
+                  <input type="date" id="date_fin" class="form-control" required />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Nombre de Contrôleurs</label>
+                <input type="number" id="nb_controleurs" class="form-control" min="1" required />
+              </div>
+              <button type="submit" class="btn btn-primary w-100" id="btn-submit">
+                <span id="btn-text">Ajouter au Programme</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Tableau d'affichage -->
+        <div class="col-md-7">
+          <div class="card card-custom p-4">
+            <h5 class="fw-bold mb-3">Programmes du Bureau</h5>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Type</th>
+                    <th>Type d'activité / Zone Géo</th>
+                    <th>Période</th>
+                    <th>Effectif</th>
+                  </tr>
+                </thead>
+                <tbody id="table-body">
+                  <!-- Les lignes s'ajouteront ici -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/interface1.js"></script>
+  </body>
+</html>

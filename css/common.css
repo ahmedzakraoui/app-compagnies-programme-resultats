@@ -1,0 +1,9 @@
+:root {
+    --primary: #0d6efd;
+    --success: #198754;
+    --danger: #dc3545;
+    --light-bg: #f4f7f6;
+}
+body { background-color: var(--light-bg); font-family: 'Inter', sans-serif; }
+.card-custom { border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+.nav-link.active { border-bottom: 3px solid var(--primary); font-weight: bold; }
