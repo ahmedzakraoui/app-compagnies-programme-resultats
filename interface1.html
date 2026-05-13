@@ -4,25 +4,68 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Saisie du Programme - Bureau</title>
+    <link rel="icon" href="images/cnss_logo.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/interface1.css" />
   </head>
-  <body>
-    <nav class="navbar mb-4">
-      <div class="container">
-        <span class="navbar-brand fw-bold text-primary">CNSS <span class="text-dark">Programme</span></span>
-        <span id="bureau-info" class="badge bg-secondary">Bureau : --</span>
-      </div>
-    </nav>
+  <body class="page-programme">
+    <div class="composed-backdrop" aria-hidden="true"></div>
+    <div class="composed-grid-pattern" aria-hidden="true"></div>
 
-    <div class="container">
-      <div class="row g-4">
+    <header class="composed-topbar">
+      <nav class="navbar composed-nav py-2">
+        <div class="container composed-nav-inner">
+          <div class="composed-brand">
+            <img
+              src="images/cnss_logo.svg"
+              alt=""
+              class="composed-brand-logo"
+              width="44"
+              height="44"
+              decoding="async"
+            />
+            <span class="navbar-brand mb-0 fw-bold composed-brand-text">
+              CNSS <span class="composed-brand-muted ms-2">Programme des campagnes de contrôle</span>
+            </span>
+          </div>
+          <span id="bureau-info" class="badge composed-badge-bureau">Bureau : --</span>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container composed-main">
+      <div class="row g-4 composed-bento">
         <!-- Formulaire de Saisie -->
         <div class="col-md-5">
-          <div class="card card-custom p-4">
-            <h5 class="fw-bold mb-3">Nouvelle Campagne</h5>
-            <form id="form-programme">
+          <div class="card card-custom card-composed h-100">
+            <div class="card-composed-accent" aria-hidden="true"></div>
+            <div class="card-composed-body p-4 p-lg-4">
+            <div class="composed-card-head mb-4">
+              <span class="composed-card-icon" aria-hidden="true"></span>
+              <div>
+                <h2 class="h5 fw-bold mb-0">Nouvelle campagne</h2>
+              </div>
+            </div>
+
+            <div class="form-campagne-reveal" id="form-campagne-reveal">
+              <div class="btn-cta-wave-halo">
+                <button type="button" id="btn-open-campagne-form" class="btn-cta-wave" aria-expanded="false">
+                  <span class="btn-cta-wave__inner">
+                    <span class="btn-cta-wave__icon" aria-hidden="true">+</span>
+                    <span class="btn-cta-wave__label">Ajouter une campagne</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-campagne-panel" id="form-campagne-panel" hidden>
+            <form id="form-programme" novalidate>
               <div class="mb-3">
                 <label class="form-label">Type de Campagne</label>
                 <select id="type_campagne" class="form-select" required>
@@ -31,18 +74,27 @@
                   <option value="لا شيء">لا شيء</option>
                 </select>
               </div>
-              <div class="mb-3">
+              <div class="mb-3" id="zone-activite-block" hidden>
                 <label class="form-label">Zone / Activité</label>
-                <input type="text" id="activite_zone" class="form-control" placeholder="Ex: Zone Industrielle" required />
+                <div id="zone-sectorielle-wrap" class="d-none">
+                  <select id="activite_sectorielle" class="form-select">
+                    <option value="Industrielle">Industrielle</option>
+                    <option value="Agriculture">Agriculture</option>
+                    <option value="Services">Services</option>
+                  </select>
+                </div>
+                <div id="zone-geographique-wrap" class="d-none">
+                  <input type="text" id="activite_zone_geo" class="form-control" placeholder="Saisir la zone géographique" />
+                </div>
               </div>
               <div class="row mb-3">
                 <div class="col">
                   <label class="form-label">Date Début</label>
-                  <input type="date" id="date_debut" class="form-control" required />
+                  <input type="text" id="date_debut" class="form-control fp-date-input" placeholder="Choisir…" autocomplete="off" required />
                 </div>
                 <div class="col">
                   <label class="form-label">Date Fin</label>
-                  <input type="date" id="date_fin" class="form-control" required />
+                  <input type="text" id="date_fin" class="form-control fp-date-input" placeholder="Choisir…" autocomplete="off" required />
                 </div>
               </div>
               <div class="mb-3">
@@ -50,19 +102,28 @@
                 <input type="number" id="nb_controleurs" class="form-control" min="1" required />
               </div>
               <button type="submit" class="btn btn-primary w-100" id="btn-submit">
-                <span id="btn-text">Ajouter au Programme</span>
+                <span id="btn-text">Ajouter au programme</span>
               </button>
             </form>
+            </div>
+            </div>
           </div>
         </div>
 
         <!-- Tableau d'affichage -->
         <div class="col-md-7">
-          <div class="card card-custom p-4">
-            <h5 class="fw-bold mb-3">Programmes du Bureau</h5>
-            <div class="table-responsive">
-              <table class="table table-hover align-middle">
-                <thead class="table-light">
+          <div class="card card-custom card-composed card-composed--wide h-100">
+            <div class="card-composed-accent card-composed-accent--secondary" aria-hidden="true"></div>
+            <div class="card-composed-body p-4 p-lg-4 d-flex flex-column">
+            <div class="composed-card-head mb-4">
+              <span class="composed-card-icon composed-card-icon--table" aria-hidden="true"></span>
+              <div>
+                <h2 class="h5 fw-bold mb-0">Programmes du bureau</h2>
+              </div>
+            </div>
+            <div class="table-responsive composed-table-wrap flex-grow-1">
+              <table class="table table-hover align-middle composed-table mb-0">
+                <thead>
                   <tr>
                     <th>Type</th>
                     <th>Type d'activité / Zone Géo</th>
@@ -75,11 +136,15 @@
                 </tbody>
               </table>
             </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="js/api.js"></script>
     <script src="js/interface1.js"></script>
   </body>
