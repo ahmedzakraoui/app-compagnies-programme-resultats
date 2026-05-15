@@ -23,9 +23,9 @@ Le super admin voit un tableau qui collecte toutes les info et résultats de cha
 Appscript
 
 Mise à jour du déploiement effectuée.
-Version 4 du 13 mai 2026, 12:17
+Version 6 du 15 mai 2026, 11:11
 ID de déploiement
-AKfycbz8q3K4tba6iBTGztbl8675EOyMYop7tWYeF1TUxHw4kxAsQB5KiRMlIqomBjPSx7vv
+AKfycbzNdOMKMx-w1lU0rgJWlDzCxt4X9T6fL7TfsEZFAI2CGU-IYG0wBuwQOjks3ikAbs5M
 Application Web
 URL
-https://script.google.com/macros/s/AKfycbz8q3K4tba6iBTGztbl8675EOyMYop7tWYeF1TUxHw4kxAsQB5KiRMlIqomBjPSx7vv/exec
+https://script.google.com/macros/s/AKfycbzNdOMKMx-w1lU0rgJWlDzCxt4X9T6fL7TfsEZFAI2CGU-IYG0wBuwQOjks3ikAbs5M/exec

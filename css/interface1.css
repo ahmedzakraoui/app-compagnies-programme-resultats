@@ -290,6 +290,50 @@
     vertical-align: middle;
 }
 
+/* Campagne avec au moins une ligne dans Resultats — tons logo CNSS (vert + lime) */
+.page-programme .composed-table tbody tr.programme-row-with-resultats td {
+    font-weight: 700;
+    color: var(--cp-accent);
+    letter-spacing: 0.01em;
+}
+
+.page-programme .composed-table tbody tr.programme-row-with-resultats td:nth-child(2) {
+    color: var(--cp-accent-mid);
+}
+
+.page-programme .composed-table tbody tr.programme-row-with-resultats td small {
+    color: var(--cp-accent-2);
+    font-weight: 700;
+}
+
+.page-programme .composed-table tbody tr.programme-row-with-resultats td.text-center {
+    color: var(--cp-accent-lime);
+    font-weight: 800;
+}
+
+.page-programme .composed-table tbody tr.programme-row-with-resultats .programme-type-badge {
+    background: linear-gradient(135deg, rgba(4, 143, 64, 0.22), rgba(165, 202, 31, 0.28)) !important;
+    color: var(--cp-accent) !important;
+    border: 1px solid rgba(4, 143, 64, 0.35);
+    font-weight: 800;
+}
+
+.page-programme .composed-table tbody tr.programme-row-with-resultats:hover td {
+    color: var(--cp-accent);
+}
+
+.page-programme .composed-table tbody tr.programme-row-with-resultats:hover td:nth-child(2) {
+    color: #0d5c2e;
+}
+
+.page-programme .composed-table tbody tr.programme-row-with-resultats:hover td small {
+    color: #0d5c2e;
+}
+
+.page-programme .composed-table tbody tr.programme-row-with-resultats:hover td.text-center {
+    color: #8fb018;
+}
+
 table {
     font-size: inherit;
 }
@@ -562,4 +606,172 @@ table {
     .form-campagne-panel:not([hidden]) {
         animation: none;
     }
+}
+
+/* ------------------------------------------------------------------ */
+/* Lignes programme cliquables + modal statistiques                    */
+/* ------------------------------------------------------------------ */
+
+.page-programme .programme-row-clickable {
+    cursor: pointer;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.page-programme .programme-row-clickable:hover {
+    background-color: rgba(4, 143, 64, 0.08) !important;
+    box-shadow: inset 3px 0 0 var(--cp-accent);
+}
+
+.page-programme .programme-row-clickable:focus-visible {
+    outline: 2px solid var(--cp-accent);
+    outline-offset: -2px;
+}
+
+.stats-modal-content {
+    border-radius: 18px;
+    border: 1px solid var(--cp-border-strong);
+    box-shadow: var(--cp-shadow), 0 28px 64px -20px rgba(12, 53, 32, 0.35);
+    overflow: hidden;
+}
+
+.stats-popup-section-title {
+    color: var(--cp-ink);
+    letter-spacing: -0.01em;
+}
+
+.stats-popup-section-id {
+    font-weight: 600;
+    font-size: 0.92em;
+}
+
+.stats-programme-box {
+    border: 1px solid var(--cp-border-strong);
+    border-radius: 12px;
+    padding: 0.65rem 1rem;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+.stats-programme-line-table {
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-collapse: separate;
+    border-spacing: 1.15rem 0;
+    table-layout: fixed;
+}
+
+.stats-programme-line-table td {
+    border: none !important;
+    padding: 0.4rem 0;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--cp-ink);
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.stats-programme-cell-effectif {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--cp-muted);
+}
+
+#modal-prog-period {
+    word-break: break-word;
+    hyphens: auto;
+}
+
+.stats-popup-stats-heading {
+    margin-top: 0.65rem;
+    margin-bottom: 0.45rem;
+}
+
+.stats-table-scroll {
+    max-height: min(60vh, 520px);
+    border-radius: 12px;
+    border: 1px solid var(--cp-border);
+    background: rgba(255, 255, 255, 0.65);
+    position: relative;
+    min-height: 200px;
+}
+
+.stats-table-scroll.is-stats-loading .stats-campagne-table {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.stats-modal-loader {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.stats-table-scroll.is-stats-loading .stats-modal-loader {
+    display: flex;
+}
+
+.stats-campagne-table {
+    font-size: 0.78rem;
+    min-width: 920px;
+    --bs-table-border-color: var(--cp-border-strong);
+}
+
+.stats-campagne-thead th {
+    vertical-align: middle;
+    font-weight: 700;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(236, 252, 240, 0.98), rgba(220, 238, 224, 0.92));
+    color: var(--cp-ink);
+    white-space: normal;
+    line-height: 1.25;
+    padding: 0.5rem 0.4rem;
+}
+
+.stats-th-group {
+    background: linear-gradient(180deg, rgba(4, 143, 64, 0.12), rgba(165, 202, 31, 0.08)) !important;
+    font-size: 0.76rem;
+}
+
+.stats-th-sub {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--cp-muted);
+}
+
+.stats-campagne-table tbody td {
+    padding: 0.35rem;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.stats-campagne-table tbody .form-control {
+    border-radius: 8px;
+    border-color: var(--cp-border-strong);
+    min-width: 4.5rem;
+}
+
+.stats-campagne-table tbody .form-control:focus {
+    border-color: var(--cp-accent);
+    box-shadow: 0 0 0 2px var(--cp-focus-ring);
+}
+
+.stats-campagne-table tbody input[readonly].form-control {
+    cursor: default;
+    opacity: 1;
+    color: var(--cp-ink);
+}
+
+.stats-campagne-table tbody input[readonly].form-control:focus {
+    border-color: var(--cp-border-strong);
+    box-shadow: none;
 }

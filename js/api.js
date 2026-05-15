@@ -1,15 +1,24 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8q3K4tba6iBTGztbl8675EOyMYop7tWYeF1TUxHw4kxAsQB5KiRMlIqomBjPSx7vv/exec";
+const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbzNdOMKMx-w1lU0rgJWlDzCxt4X9T6fL7TfsEZFAI2CGU-IYG0wBuwQOjks3ikAbs5M/exec";
 
-// Envoyer des données vers une feuille spécifique
+/**
+ * Client navigateur — ne pas mettre de code Google Apps Script (doPost/doGet) ici.
+ * Le serveur est dans google-apps-script/Code.gs (à coller dans Apps Script + redéployer).
+ */
 async function saveData(sheetName, arrayValues) {
     try {
+        const body = JSON.stringify({
+            sheet: sheetName,
+            values: arrayValues,
+        });
         const response = await fetch(SCRIPT_URL, {
             method: "POST",
-            body: JSON.stringify({
-                sheet: sheetName,
-                values: arrayValues
-            })
+            headers: { "Content-Type": "text/plain" },
+            body,
         });
+        if (!response.ok) {
+            console.error("Enregistrement HTTP:", response.status, await response.text().catch(() => ""));
+            return false;
+        }
         return true;
     } catch (error) {
         console.error("Erreur d'envoi:", error);
@@ -17,11 +26,15 @@ async function saveData(sheetName, arrayValues) {
     }
 }
 
-// Récupérer les données d'une feuille
 async function fetchData(sheetName) {
     try {
-        const response = await fetch(`${SCRIPT_URL}?sheet=${sheetName}`);
-        return await response.json();
+        const response = await fetch(`${SCRIPT_URL}?sheet=${encodeURIComponent(sheetName)}`);
+        if (!response.ok) {
+            console.error("Lecture HTTP:", response.status, sheetName);
+            return [];
+        }
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
     } catch (error) {
         console.error("Erreur de récupération:", error);
         return [];

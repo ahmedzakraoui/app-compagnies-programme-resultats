@@ -13,6 +13,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     const inputDateDebut = document.getElementById('date_debut');
     const inputDateFin = document.getElementById('date_fin');
 
+    const statsModalEl = document.getElementById('modal-stats-campagne');
+    const statsModal = typeof bootstrap !== 'undefined' ? bootstrap.Modal.getOrCreateInstance(statsModalEl) : null;
+    const btnStatsSave = document.getElementById('modal-stats-save');
+    const statsTablePanel = document.getElementById('stats-table-panel');
+    const statsModalLoader = document.getElementById('stats-modal-loader');
+
+    function setStatsModalLoading(isLoading) {
+        if (statsTablePanel) statsTablePanel.classList.toggle('is-stats-loading', Boolean(isLoading));
+        if (statsModalLoader) statsModalLoader.setAttribute('aria-hidden', isLoading ? 'false' : 'true');
+        if (btnStatsSave) btnStatsSave.disabled = Boolean(isLoading);
+    }
+
+    let currentProgrammeRow = null;
+    /** Dernière ligne Resultats chargée : col. A (ID_Resultat), pour ré-enregistrer la même ligne si besoin */
+    let currentResultatId = null;
+    /** Évite qu’un `finally` d’une ouverture précédente enlève le loader pendant une ouverture plus récente */
+    let statsModalOpenGeneration = 0;
+
+    function isResultatsHeaderRow(r) {
+        if (!Array.isArray(r) || r.length < 2) return false;
+        const c0 = String(r[0]).trim();
+        const c1 = String(r[1]).trim();
+        return c0 === "ID_Resultat" || c1 === "ID_Programme";
+    }
+
     const choiceSelectOpts = {
         searchEnabled: false,
         shouldSort: false,
@@ -117,6 +142,113 @@ document.addEventListener('DOMContentLoaded', async () => {
         return true;
     }
 
+    function statVal(id) {
+        const el = document.getElementById(id);
+        return el ? el.value.trim() : '';
+    }
+
+    function setStatVal(id, v) {
+        const el = document.getElementById(id);
+        if (el) el.value = v === undefined || v === null ? '' : String(v);
+    }
+
+    /**
+     * Feuille Resultats (colonnes) :
+     * ID_Resultat, ID_Programme, Sal_Aff, Sal_NonAff, NonSal_Aff, NonSal_NonAff,
+     * Trav_Declares, Trav_NonDeclares, Mt_Reconnu, Mt_NonReconnu, Controleurs_participants
+     * عدد المراقبين المشاركين (res-participants) : indépendant de l’effectif du programme.
+     */
+    async function loadStatsFromSheet(programmeId, prog) {
+        currentResultatId = null;
+        const rows = await fetchData('Resultats');
+        if (String(currentProgrammeRow?.[0]) !== String(programmeId)) return;
+        const list = Array.isArray(rows) ? rows : [];
+        const matches = list.filter(
+            (r) =>
+                r &&
+                !isResultatsHeaderRow(r) &&
+                r.length >= 10 &&
+                String(r[1]).trim() === String(programmeId).trim()
+        );
+        const data = matches.length ? matches[matches.length - 1] : null;
+
+        if (data && data.length >= 10) {
+            currentResultatId = data[0] != null && String(data[0]).trim() !== "" ? String(data[0]).trim() : null;
+            setStatVal('res-type-hamla', prog[2]);
+            setStatVal('res-activite-zone', prog[3]);
+            setStatVal('res-w-in', data[2]);
+            setStatVal('res-w-ni', data[3]);
+            setStatVal('res-nw-in', data[4]);
+            setStatVal('res-nw-ni', data[5]);
+            setStatVal('res-emp-dec', data[6]);
+            setStatVal('res-emp-ndec', data[7]);
+            setStatVal('res-manq-tot', '');
+            setStatVal('res-manq-ok', data[8]);
+            setStatVal('res-manq-nok', data[9]);
+            setStatVal('res-participants', data.length > 10 ? data[10] : '');
+        } else {
+            setStatVal('res-type-hamla', prog[2]);
+            setStatVal('res-activite-zone', prog[3]);
+            setStatVal('res-w-in', '');
+            setStatVal('res-w-ni', '');
+            setStatVal('res-nw-in', '');
+            setStatVal('res-nw-ni', '');
+            setStatVal('res-emp-dec', '');
+            setStatVal('res-emp-ndec', '');
+            setStatVal('res-manq-tot', '');
+            setStatVal('res-manq-ok', '');
+            setStatVal('res-manq-nok', '');
+            setStatVal('res-participants', '');
+        }
+    }
+
+    async function openStatsModal(programmeRow) {
+        if (!statsModal) {
+            alert('Interface modal indisponible (Bootstrap JS).');
+            return;
+        }
+        const openGen = ++statsModalOpenGeneration;
+        setStatsModalLoading(true);
+        try {
+            currentProgrammeRow = programmeRow;
+            const pid = String(programmeRow[0] ?? '').trim();
+            document.querySelectorAll('.modal-stats-pid').forEach((el) => {
+                el.textContent = pid;
+            });
+            const elType = document.getElementById('modal-prog-type');
+            const elZone = document.getElementById('modal-prog-zone');
+            const elPeriod = document.getElementById('modal-prog-period');
+            const elEff = document.getElementById('modal-prog-effectif');
+            if (elType) elType.textContent = programmeRow[2] ?? '';
+            if (elZone) elZone.textContent = programmeRow[3] ?? '';
+            if (elPeriod) elPeriod.textContent = `${programmeRow[4] ?? ''} ⟼ ${programmeRow[5] ?? ''}`;
+            if (elEff) elEff.textContent = programmeRow[6] != null ? String(programmeRow[6]) : '';
+            statsModal.show();
+            await loadStatsFromSheet(programmeRow[0], programmeRow);
+        } finally {
+            if (openGen === statsModalOpenGeneration) setStatsModalLoading(false);
+        }
+    }
+
+    function buildResultatsRow() {
+        if (!currentProgrammeRow) return null;
+        const nz = (v) => (v === '' || v === undefined ? '0' : v);
+        const idResultat = currentResultatId && String(currentResultatId).trim() !== '' ? String(currentResultatId).trim() : `R${Date.now()}`;
+        return [
+            idResultat,
+            String(currentProgrammeRow[0]).trim(),
+            nz(statVal('res-w-in')),
+            nz(statVal('res-w-ni')),
+            nz(statVal('res-nw-in')),
+            nz(statVal('res-nw-ni')),
+            nz(statVal('res-emp-dec')),
+            nz(statVal('res-emp-ndec')),
+            nz(statVal('res-manq-ok')),
+            nz(statVal('res-manq-nok')),
+            nz(statVal('res-participants')),
+        ];
+    }
+
     btnOpenForm.addEventListener('click', () => {
         initFormPickersOnce();
         reveal.hidden = true;
@@ -131,23 +263,78 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    if (statsModalEl) {
+        statsModalEl.addEventListener('hidden.bs.modal', () => {
+            statsModalOpenGeneration += 1;
+            setStatsModalLoading(false);
+        });
+    }
+
+    if (btnStatsSave) {
+        btnStatsSave.addEventListener('click', async () => {
+            const payload = buildResultatsRow();
+            if (!payload) return;
+            btnStatsSave.disabled = true;
+            const ok = await saveData('Resultats', payload);
+            btnStatsSave.disabled = false;
+            if (ok) {
+                statsModal?.hide();
+                await loadTable();
+            } else {
+                alert("Erreur lors de l'enregistrement des statistiques.");
+            }
+        });
+    }
+
     const user = JSON.parse(localStorage.getItem('currentUser')) || { code: 'BR01', nom: 'Bureau Tunis' };
     document.getElementById('bureau-info').textContent = `Bureau : ${user.nom}`;
 
     async function loadTable() {
         tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Chargement...</td></tr>';
-        const allData = await fetchData('Programmes');
-        const myData = allData.filter((row) => row[1] === user.code);
+        const [allData, resultatsRows] = await Promise.all([fetchData('Programmes'), fetchData('Resultats')]);
+        if (!Array.isArray(allData)) {
+            tableBody.innerHTML =
+                '<tr><td colspan="4" class="text-center text-danger">Impossible de charger les programmes (API).</td></tr>';
+            return;
+        }
+        const myData = allData.filter((row) => row && row[1] === user.code);
+
+        const programmeIdsWithResultats = new Set();
+        const resList = Array.isArray(resultatsRows) ? resultatsRows : [];
+        for (const r of resList) {
+            if (!r || isResultatsHeaderRow(r) || r.length < 10) continue;
+            const pid = String(r[1]).trim();
+            if (pid) programmeIdsWithResultats.add(pid);
+        }
 
         tableBody.innerHTML = '';
         myData.forEach((row) => {
             const tr = document.createElement('tr');
+            tr.className = 'programme-row-clickable';
+            tr.dataset.programmeId = row[0];
+            const programmeId = String(row[0]).trim();
+            const hasResultats = programmeIdsWithResultats.has(programmeId);
+            if (hasResultats) {
+                tr.classList.add('programme-row-with-resultats');
+                tr.setAttribute('aria-label', 'Ouvrir les statistiques — résultats déjà enregistrés pour cette campagne');
+            } else {
+                tr.setAttribute('aria-label', 'Ouvrir les statistiques de cette campagne');
+            }
+            tr.setAttribute('role', 'button');
+            tr.tabIndex = 0;
             tr.innerHTML = `
-                <td><span class="badge bg-info text-dark">${row[2]}</span></td>
+                <td><span class="badge bg-info text-dark programme-type-badge">${row[2]}</span></td>
                 <td>${row[3]}</td>
                 <td><small>${row[4]} ⟼ ${row[5]}</small></td>
                 <td class="text-center">${row[6]}</td>
             `;
+            tr.addEventListener('click', () => openStatsModal(row));
+            tr.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openStatsModal(row);
+                }
+            });
             tableBody.appendChild(tr);
         });
     }

@@ -142,6 +142,111 @@
       </div>
     </main>
 
+    <!-- Modal statistiques campagne (données feuille Resultats) -->
+    <div class="modal" id="modal-stats-campagne" tabindex="-1" aria-labelledby="modal-stats-title" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content stats-modal-content">
+          <div class="modal-header border-0 pb-0 pt-3 px-3">
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Fermer"></button>
+          </div>
+          <div class="modal-body pt-0 px-3 pb-3">
+            <h3 class="stats-popup-section-title h6 fw-bold mb-3" id="modal-stats-title">
+              Programme de la campagne
+              <span class="stats-popup-section-id text-muted fw-semibold">(<span class="modal-stats-pid"></span>)</span>
+            </h3>
+            <div class="stats-programme-box">
+              <table class="stats-programme-line-table">
+                <tbody>
+                  <tr>
+                    <td class="stats-programme-cell" id="modal-prog-type"></td>
+                    <td class="stats-programme-cell" id="modal-prog-zone"></td>
+                    <td class="stats-programme-cell" id="modal-prog-period"></td>
+                    <td class="stats-programme-cell stats-programme-cell-effectif text-center text-nowrap" id="modal-prog-effectif"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="stats-popup-section-title h6 fw-bold stats-popup-stats-heading mb-3 mt-5">
+              Statistiques de la campagne
+              <span class="stats-popup-section-id text-muted fw-semibold">(<span class="modal-stats-pid"></span>)</span>
+            </h3>
+            <div class="table-responsive stats-table-scroll" id="stats-table-panel">
+              <div class="stats-modal-loader" id="stats-modal-loader" aria-hidden="true">
+                <div class="spinner-border text-success" role="status" aria-label="Chargement">
+                  <span class="visually-hidden">Chargement…</span>
+                </div>
+                <p class="small text-muted mb-0 mt-3 fw-semibold">Chargement des données…</p>
+              </div>
+              <table class="table table-bordered align-middle mb-0 stats-campagne-table" dir="rtl">
+                <thead class="stats-campagne-thead">
+                  <tr>
+                    <th rowspan="2" class="stats-th-main">نوع الحملة<br />قطاع نشاط / منطقة جغرافية</th>
+                    <th rowspan="2" class="stats-th-main">نوع النشاط /<br />المنطقة الجغرافية</th>
+                    <th colspan="2" class="stats-th-group">نظام العملة الأجراء</th>
+                    <th colspan="2" class="stats-th-group">نظام العملة غير الأجراء</th>
+                    <th colspan="2" class="stats-th-group">وضعية الأجراء</th>
+                    <th colspan="3" class="stats-th-group">مبلغ النقص في المساهمات</th>
+                    <th rowspan="2" class="stats-th-main">عدد المراقبين<br />المشاركين</th>
+                  </tr>
+                  <tr>
+                    <th class="stats-th-sub">عدد المنخرطين</th>
+                    <th class="stats-th-sub">عدد غير المنخرطين</th>
+                    <th class="stats-th-sub">عدد المنخرطين</th>
+                    <th class="stats-th-sub">عدد غير المنخرطين</th>
+                    <th class="stats-th-sub">عدد الأجراء المصرح بهم</th>
+                    <th class="stats-th-sub">عدد الأجراء غير المصرح بهم</th>
+                    <th class="stats-th-sub">المبلغ الإجمالي للنقص</th>
+                    <th class="stats-th-sub">معترف به</th>
+                    <th class="stats-th-sub">غير معترف به</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm text-end bg-light"
+                        id="res-type-hamla"
+                        readonly
+                        tabindex="-1"
+                        aria-readonly="true"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm text-end bg-light"
+                        id="res-activite-zone"
+                        readonly
+                        tabindex="-1"
+                        aria-readonly="true"
+                      />
+                    </td>
+                    <td><input type="number" class="form-control form-control-sm text-end" id="res-w-in" min="0" step="1" /></td>
+                    <td><input type="number" class="form-control form-control-sm text-end" id="res-w-ni" min="0" step="1" /></td>
+                    <td><input type="number" class="form-control form-control-sm text-end" id="res-nw-in" min="0" step="1" /></td>
+                    <td><input type="number" class="form-control form-control-sm text-end" id="res-nw-ni" min="0" step="1" /></td>
+                    <td><input type="number" class="form-control form-control-sm text-end" id="res-emp-dec" min="0" step="1" /></td>
+                    <td><input type="number" class="form-control form-control-sm text-end" id="res-emp-ndec" min="0" step="1" /></td>
+                    <td><input type="number" class="form-control form-control-sm text-end" id="res-manq-tot" min="0" step="0.01" /></td>
+                    <td><input type="number" class="form-control form-control-sm text-end" id="res-manq-ok" min="0" step="0.01" /></td>
+                    <td><input type="number" class="form-control form-control-sm text-end" id="res-manq-nok" min="0" step="0.01" /></td>
+                    <td><input type="number" class="form-control form-control-sm text-end" id="res-participants" min="0" step="1" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
+            <button type="button" class="btn btn-primary" id="modal-stats-save">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
