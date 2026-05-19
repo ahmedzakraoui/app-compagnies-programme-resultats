@@ -34,7 +34,15 @@
               CNSS <span class="composed-brand-muted ms-2">Programme des campagnes de contrôle</span>
             </span>
           </div>
-          <span id="bureau-info" class="badge composed-badge-bureau">Bureau : --</span>
+          <div class="composed-user-panel">
+            <div class="composed-user-lines">
+              <div id="user-info" class="composed-user-line">--</div>
+              <div id="bureau-info" class="composed-user-subline">Bureau : --</div>
+            </div>
+            <button type="button" class="btn btn-outline-secondary btn-sm composed-logout" id="btn-logout">
+              Déconnexion
+            </button>
+          </div>
         </div>
       </nav>
     </header>
@@ -136,10 +144,23 @@
                 </tbody>
               </table>
             </div>
+            <div class="programmes-pagination d-none" id="programmes-pagination">
+              <div class="programmes-pagination-row">
+                <button type="button" class="btn btn-outline-secondary btn-sm programmes-page-btn" id="prog-prev">
+                  Précédent
+                </button>
+                <div class="programmes-pages" id="prog-pages"></div>
+                <button type="button" class="btn btn-outline-secondary btn-sm programmes-page-btn" id="prog-next">
+                  Suivant
+                </button>
+              </div>
+              <div class="programmes-total" id="prog-total"></div>
+            </div>
             </div>
           </div>
         </div>
       </div>
+
     </main>
 
     <!-- Modal statistiques campagne (données feuille Resultats) -->

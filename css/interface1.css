@@ -105,6 +105,39 @@
     box-shadow: 0 1px 2px rgba(12, 53, 32, 0.06);
 }
 
+.composed-user-panel {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+.composed-user-lines {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.15;
+}
+
+.composed-user-line {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--cp-ink);
+    white-space: nowrap;
+}
+
+.composed-user-subline {
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--cp-muted);
+    white-space: nowrap;
+}
+
+.composed-logout {
+    border-radius: 999px;
+    padding: 0.45rem 0.75rem;
+    font-weight: 700;
+}
+
 /* Main */
 .composed-main {
     position: relative;
@@ -116,7 +149,7 @@
 /* Bento row — slight stagger feel on large screens */
 @media (min-width: 768px) {
     .composed-bento {
-        align-items: stretch;
+        align-items: flex-start;
     }
 }
 
@@ -158,6 +191,92 @@
 .card-composed-body {
     position: relative;
     z-index: 1;
+}
+
+.programmes-pagination {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--cp-border);
+}
+
+.programmes-pagination-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.programmes-pages {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    flex: 1 1 auto;
+}
+
+.programmes-page-number {
+    border: 1px solid rgba(12, 107, 47, 0.18);
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--cp-muted);
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    min-width: 2.15rem;
+    height: 2.15rem;
+    padding: 0 0.65rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.programmes-page-number:hover {
+    border-color: rgba(4, 143, 64, 0.3);
+    color: var(--cp-ink);
+    background: rgba(236, 252, 240, 0.88);
+}
+
+.programmes-page-number.is-active {
+    background: linear-gradient(135deg, var(--cp-accent), var(--cp-accent-mid));
+    border-color: transparent;
+    color: white;
+}
+
+.programmes-page-ellipsis {
+    font-weight: 800;
+    color: rgba(61, 92, 71, 0.7);
+    padding: 0 0.25rem;
+    user-select: none;
+}
+
+.programmes-total {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--cp-muted);
+    text-align: center;
+}
+
+.programmes-page-btn {
+    border-radius: 999px;
+    font-weight: 700;
+    padding: 0.45rem 0.9rem;
+    border-color: rgba(12, 107, 47, 0.18);
+    color: var(--cp-muted);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.programmes-page-btn:hover {
+    border-color: rgba(4, 143, 64, 0.3);
+    color: var(--cp-ink);
+    background: rgba(236, 252, 240, 0.88);
+}
+
+.programmes-page-btn:disabled {
+    opacity: 0.6;
 }
 
 .composed-card-head {

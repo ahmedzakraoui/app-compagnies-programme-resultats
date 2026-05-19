@@ -18,6 +18,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnStatsSave = document.getElementById('modal-stats-save');
     const statsTablePanel = document.getElementById('stats-table-panel');
     const statsModalLoader = document.getElementById('stats-modal-loader');
+    const paginationWrap = document.getElementById('programmes-pagination');
+    const btnPrevPage = document.getElementById('prog-prev');
+    const btnNextPage = document.getElementById('prog-next');
+    const pageInfoEl = document.getElementById('prog-page-info');
 
     function setStatsModalLoading(isLoading) {
         if (statsTablePanel) statsTablePanel.classList.toggle('is-stats-loading', Boolean(isLoading));
@@ -31,11 +35,79 @@ document.addEventListener('DOMContentLoaded', async () => {
     /** Évite qu’un `finally` d’une ouverture précédente enlève le loader pendant une ouverture plus récente */
     let statsModalOpenGeneration = 0;
 
+    const PROGRAMMES_PAGE_SIZE = 8;
+    let programmesAllRows = [];
+    let programmeIdsWithResultats = new Set();
+    let programmesPage = 1;
+    let goToLastPageOnce = false;
+
     function isResultatsHeaderRow(r) {
         if (!Array.isArray(r) || r.length < 2) return false;
         const c0 = String(r[0]).trim();
         const c1 = String(r[1]).trim();
         return c0 === "ID_Resultat" || c1 === "ID_Programme";
+    }
+
+    function totalProgrammesPages() {
+        return Math.max(1, Math.ceil(programmesAllRows.length / PROGRAMMES_PAGE_SIZE));
+    }
+
+    function updatePaginationUI() {
+        if (!paginationWrap) return;
+        const pages = totalProgrammesPages();
+        const show = programmesAllRows.length > PROGRAMMES_PAGE_SIZE;
+        paginationWrap.classList.toggle('d-none', !show);
+        if (pageInfoEl) {
+            pageInfoEl.textContent = `Page ${programmesPage} / ${pages} • ${programmesAllRows.length} campagnes`;
+        }
+        if (btnPrevPage) btnPrevPage.disabled = programmesPage <= 1;
+        if (btnNextPage) btnNextPage.disabled = programmesPage >= pages;
+    }
+
+    function renderProgrammesPage(page) {
+        const pages = totalProgrammesPages();
+        programmesPage = Math.min(Math.max(1, page), pages);
+        const start = (programmesPage - 1) * PROGRAMMES_PAGE_SIZE;
+        const slice = programmesAllRows.slice(start, start + PROGRAMMES_PAGE_SIZE);
+
+        tableBody.innerHTML = '';
+        if (!slice.length) {
+            tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Aucune campagne.</td></tr>';
+            updatePaginationUI();
+            return;
+        }
+
+        slice.forEach((row) => {
+            const tr = document.createElement('tr');
+            tr.className = 'programme-row-clickable';
+            tr.dataset.programmeId = row[0];
+            const programmeId = String(row[0]).trim();
+            const hasResultats = programmeIdsWithResultats.has(programmeId);
+            if (hasResultats) {
+                tr.classList.add('programme-row-with-resultats');
+                tr.setAttribute('aria-label', 'Ouvrir les statistiques — résultats déjà enregistrés pour cette campagne');
+            } else {
+                tr.setAttribute('aria-label', 'Ouvrir les statistiques de cette campagne');
+            }
+            tr.setAttribute('role', 'button');
+            tr.tabIndex = 0;
+            tr.innerHTML = `
+                <td><span class="badge bg-info text-dark programme-type-badge">${row[2]}</span></td>
+                <td>${row[3]}</td>
+                <td><small>${row[4]} ⟼ ${row[5]}</small></td>
+                <td class="text-center">${row[6]}</td>
+            `;
+            tr.addEventListener('click', () => openStatsModal(row));
+            tr.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openStatsModal(row);
+                }
+            });
+            tableBody.appendChild(tr);
+        });
+
+        updatePaginationUI();
     }
 
     const choiceSelectOpts = {
@@ -168,7 +240,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 r &&
                 !isResultatsHeaderRow(r) &&
                 r.length >= 2 &&
-                String(r[1]).trim() === String(programmeId).trim()
+                String(r[1]).trim() === String(programmeId).trim() &&
+                (r.length < 13 || String(r[12]).trim() === String(user.codeBr).trim())
         );
         const data = matches.length ? matches[matches.length - 1] : null;
 
@@ -254,6 +327,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             nz(statVal('res-manq-ok')),
             nz(statVal('res-manq-nok')),
             nz(statVal('res-participants')),
+            String(user.codeBr).trim(),
         ];
     }
 
@@ -294,8 +368,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    const user = JSON.parse(localStorage.getItem('currentUser')) || { code: '80', nom: 'Bureau Tunis' };
-    document.getElementById('bureau-info').textContent = `Bureau : ${user.nom}`;
+    let user = null;
+    try {
+        user = JSON.parse(localStorage.getItem('currentUser'));
+    } catch {}
+    if (!user || !user.codeBr || !user.token) {
+        window.location.href = 'index.html';
+        return;
+    }
+    const userInfoEl = document.getElementById('user-info');
+    if (userInfoEl) {
+        const name = user.frName || user.arName || '';
+        const matricule = user.matricule ? String(user.matricule).trim() : '';
+        const grade = user.grade ? String(user.grade).trim() : '';
+        const parts = [];
+        if (name) parts.push(name);
+        if (matricule) parts.push(matricule);
+        if (grade) parts.push(grade);
+        userInfoEl.textContent = parts.length ? parts.join(' • ') : '--';
+    }
+    const bureauLabel = user.bureauName || user.codeBr;
+    document.getElementById('bureau-info').textContent = `Bureau : ${bureauLabel}`;
+    const logoutBtn = document.getElementById('btn-logout');
+    logoutBtn?.addEventListener('click', () => {
+        try {
+            localStorage.removeItem('currentUser');
+        } catch {}
+        window.location.href = 'index.html';
+    });
 
     async function loadTable() {
         tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Chargement...</td></tr>';
@@ -305,49 +405,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 '<tr><td colspan="4" class="text-center text-danger">Impossible de charger les programmes (API).</td></tr>';
             return;
         }
-        const myData = allData.filter((row) => row && row[1] === user.code);
+        const myData = allData.filter((row) => row && String(row[1]).trim() === String(user.codeBr).trim());
 
-        const programmeIdsWithResultats = new Set();
+        programmeIdsWithResultats = new Set();
         const resList = Array.isArray(resultatsRows) ? resultatsRows : [];
         for (const r of resList) {
             if (!r || isResultatsHeaderRow(r) || r.length < 2) continue;
+            if (r.length >= 13 && String(r[12]).trim() !== String(user.codeBr).trim()) continue;
             const pid = String(r[1]).trim();
             if (pid) programmeIdsWithResultats.add(pid);
         }
-
-        tableBody.innerHTML = '';
-        myData.forEach((row) => {
-            const tr = document.createElement('tr');
-            tr.className = 'programme-row-clickable';
-            tr.dataset.programmeId = row[0];
-            const programmeId = String(row[0]).trim();
-            const hasResultats = programmeIdsWithResultats.has(programmeId);
-            if (hasResultats) {
-                tr.classList.add('programme-row-with-resultats');
-                tr.setAttribute('aria-label', 'Ouvrir les statistiques — résultats déjà enregistrés pour cette campagne');
-            } else {
-                tr.setAttribute('aria-label', 'Ouvrir les statistiques de cette campagne');
-            }
-            tr.setAttribute('role', 'button');
-            tr.tabIndex = 0;
-            tr.innerHTML = `
-                <td><span class="badge bg-info text-dark programme-type-badge">${row[2]}</span></td>
-                <td>${row[3]}</td>
-                <td><small>${row[4]} ⟼ ${row[5]}</small></td>
-                <td class="text-center">${row[6]}</td>
-            `;
-            tr.addEventListener('click', () => openStatsModal(row));
-            tr.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    openStatsModal(row);
-                }
-            });
-            tableBody.appendChild(tr);
-        });
+        programmesAllRows = myData;
+        if (goToLastPageOnce) {
+            programmesPage = totalProgrammesPages();
+            goToLastPageOnce = false;
+        }
+        renderProgrammesPage(programmesPage);
     }
 
     await loadTable();
+
+    btnPrevPage?.addEventListener('click', () => renderProgrammesPage(programmesPage - 1));
+    btnNextPage?.addEventListener('click', () => renderProgrammesPage(programmesPage + 1));
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -362,7 +441,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const newEntry = [
             'P' + Date.now(),
-            user.code,
+            user.codeBr,
             typeCampagne.value,
             getZoneActiviteValue(),
             inputDateDebut.value,
@@ -373,6 +452,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const success = await saveData('Programmes', newEntry);
 
         if (success) {
+            goToLastPageOnce = true;
             form.reset();
             fpDebut.clear();
             fpFin.clear();
