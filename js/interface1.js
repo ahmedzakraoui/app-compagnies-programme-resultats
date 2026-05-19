@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnPrevPage = document.getElementById('prog-prev');
     const btnNextPage = document.getElementById('prog-next');
     const pageInfoEl = document.getElementById('prog-page-info');
+    const progPages = document.getElementById('prog-pages');
+    const progTotal = document.getElementById('prog-total');
 
     function setStatsModalLoading(isLoading) {
         if (statsTablePanel) statsTablePanel.classList.toggle('is-stats-loading', Boolean(isLoading));
@@ -35,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     /** Évite qu’un `finally` d’une ouverture précédente enlève le loader pendant une ouverture plus récente */
     let statsModalOpenGeneration = 0;
 
-    const PROGRAMMES_PAGE_SIZE = 8;
+    const PROGRAMMES_PAGE_SIZE = 7;
     let programmesAllRows = [];
     let programmeIdsWithResultats = new Set();
     let programmesPage = 1;
@@ -53,16 +55,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updatePaginationUI() {
-        if (!paginationWrap) return;
-        const pages = totalProgrammesPages();
-        const show = programmesAllRows.length > PROGRAMMES_PAGE_SIZE;
-        paginationWrap.classList.toggle('d-none', !show);
-        if (pageInfoEl) {
-            pageInfoEl.textContent = `Page ${programmesPage} / ${pages} • ${programmesAllRows.length} campagnes`;
-        }
-        if (btnPrevPage) btnPrevPage.disabled = programmesPage <= 1;
-        if (btnNextPage) btnNextPage.disabled = programmesPage >= pages;
+    if (!paginationWrap) return;
+    const pages = totalProgrammesPages();
+    const show = programmesAllRows.length > PROGRAMMES_PAGE_SIZE;
+    paginationWrap.classList.toggle('d-none', !show);
+    // Update page info text
+    if (pageInfoEl) {
+        pageInfoEl.textContent = `Page ${programmesPage} / ${pages} • ${programmesAllRows.length} campagnes`;
     }
+    // Enable/disable prev/next buttons
+    if (btnPrevPage) btnPrevPage.disabled = programmesPage <= 1;
+    if (btnNextPage) btnNextPage.disabled = programmesPage >= pages;
+    // Render clickable page numbers
+    if (progPages) {
+        progPages.innerHTML = '';
+        for (let i = 1; i <= pages; i++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'programmes-page-number' + (i === programmesPage ? ' is-active' : '');
+            btn.textContent = i;
+            btn.addEventListener('click', () => renderProgrammesPage(i));
+            progPages.appendChild(btn);
+        }
+    }
+    // Ensure total is centered under numbers (already styled)
+    if (progTotal) {
+        progTotal.style.textAlign = 'center';
+    }
+}
 
     function renderProgrammesPage(page) {
         const pages = totalProgrammesPages();
