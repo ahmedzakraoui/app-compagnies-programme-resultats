@@ -167,12 +167,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             (r) =>
                 r &&
                 !isResultatsHeaderRow(r) &&
-                r.length >= 10 &&
+                r.length >= 2 &&
                 String(r[1]).trim() === String(programmeId).trim()
         );
         const data = matches.length ? matches[matches.length - 1] : null;
 
-        if (data && data.length >= 10) {
+        if (data && data.length >= 2) {
             currentResultatId = data[0] != null && String(data[0]).trim() !== "" ? String(data[0]).trim() : null;
             setStatVal('res-type-hamla', prog[2]);
             setStatVal('res-activite-zone', prog[3]);
@@ -182,10 +182,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             setStatVal('res-nw-ni', data[5]);
             setStatVal('res-emp-dec', data[6]);
             setStatVal('res-emp-ndec', data[7]);
-            setStatVal('res-manq-tot', '');
-            setStatVal('res-manq-ok', data[8]);
-            setStatVal('res-manq-nok', data[9]);
-            setStatVal('res-participants', data.length > 10 ? data[10] : '');
+            if (data.length >= 12) {
+                setStatVal('res-manq-tot', data[8]);
+                setStatVal('res-manq-ok', data[9]);
+                setStatVal('res-manq-nok', data[10]);
+                setStatVal('res-participants', data[11]);
+            } else {
+                setStatVal('res-manq-tot', '');
+                setStatVal('res-manq-ok', data[8]);
+                setStatVal('res-manq-nok', data[9]);
+                setStatVal('res-participants', data.length > 10 ? data[10] : '');
+            }
         } else {
             setStatVal('res-type-hamla', prog[2]);
             setStatVal('res-activite-zone', prog[3]);
@@ -243,6 +250,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             nz(statVal('res-nw-ni')),
             nz(statVal('res-emp-dec')),
             nz(statVal('res-emp-ndec')),
+            nz(statVal('res-manq-tot')),
             nz(statVal('res-manq-ok')),
             nz(statVal('res-manq-nok')),
             nz(statVal('res-participants')),
@@ -286,7 +294,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    const user = JSON.parse(localStorage.getItem('currentUser')) || { code: 'BR01', nom: 'Bureau Tunis' };
+    const user = JSON.parse(localStorage.getItem('currentUser')) || { code: '80', nom: 'Bureau Tunis' };
     document.getElementById('bureau-info').textContent = `Bureau : ${user.nom}`;
 
     async function loadTable() {
@@ -302,7 +310,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const programmeIdsWithResultats = new Set();
         const resList = Array.isArray(resultatsRows) ? resultatsRows : [];
         for (const r of resList) {
-            if (!r || isResultatsHeaderRow(r) || r.length < 10) continue;
+            if (!r || isResultatsHeaderRow(r) || r.length < 2) continue;
             const pid = String(r[1]).trim();
             if (pid) programmeIdsWithResultats.add(pid);
         }
