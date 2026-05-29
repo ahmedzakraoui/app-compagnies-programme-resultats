@@ -77,6 +77,45 @@ function buildHeaderIndex_(headerRow) {
   return idx;
 }
 
+function bytesToHex_(bytes) {
+  var hex = [];
+  for (var i = 0; i < bytes.length; i++) {
+    var v = (bytes[i] + 256) % 256;
+    var h = v.toString(16);
+    hex.push(h.length === 1 ? "0" + h : h);
+  }
+  return hex.join("");
+}
+
+function sha256Hex_(text) {
+  var bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(text || ""), Utilities.Charset.UTF_8);
+  return bytesToHex_(bytes);
+}
+
+function passwordHashHex_(matricule, pw) {
+  return sha256Hex_(String(matricule || "").trim() + ":" + String(pw || ""));
+}
+
+function passwordHash_(matricule, pw) {
+  return "sha256:" + passwordHashHex_(matricule, pw);
+}
+
+function isSha256Hex_(s) {
+  return /^[0-9a-f]{64}$/i.test(String(s || "").trim());
+}
+
+function passwordMatches_(matricule, inputPw, storedPw) {
+  var stored = String(storedPw || "").trim();
+  if (!stored) return false;
+  if (stored.indexOf("sha256:") === 0) {
+    return passwordHash_(matricule, inputPw) === stored;
+  }
+  if (isSha256Hex_(stored)) {
+    return passwordHashHex_(matricule, inputPw) === stored.toLowerCase();
+  }
+  return stored === String(inputPw || "").trim();
+}
+
 function sheetObjects_(sheet) {
   if (!sheet) return { headers: [], rows: [] };
   var data = sheet.getDataRange().getDisplayValues();
@@ -152,7 +191,7 @@ function doPost(e) {
         var u = usersPack.rows[i];
         var m = String(u.matricule || "").trim();
         var p = String(u.pw || u.password || "").trim();
-        if (m === matricule && p === pw) {
+        if (m === matricule && passwordMatches_(matricule, pw, p)) {
           found = u;
           break;
         }
@@ -174,6 +213,38 @@ function doPost(e) {
           bureauRegion: bureau ? String(bureau.region || "").trim() : ""
         }
       });
+    }
+
+    if (data.action === "changePassword") {
+      var sess0 = requireSession_(data);
+      if (!sess0 || !sess0.matricule) return json_({ ok: false, error: "unauthorized" });
+      var oldPw = String(data.oldPw || "").trim();
+      var newPw = String(data.newPw || "").trim();
+      if (!oldPw || !newPw) return json_({ ok: false, error: "missing_fields" });
+      var usersSheet0 = readSheet_("Users");
+      if (!usersSheet0) return json_({ ok: false, error: "missing_sheet" });
+      var all0 = usersSheet0.getDataRange().getValues();
+      if (!all0 || all0.length < 2) return json_({ ok: false, error: "empty_sheet" });
+      var headers0 = all0[0];
+      var idx0 = buildHeaderIndex_(headers0);
+      var matriculeIdx = idx0.matricule !== undefined ? idx0.matricule : 0;
+      var pwIdx =
+        idx0.pw !== undefined ? idx0.pw : idx0.password !== undefined ? idx0.password : Math.min(1, headers0.length - 1);
+      var rowToUpdate0 = -1;
+      var stored0 = "";
+      for (var r0 = 1; r0 < all0.length; r0++) {
+        var row0 = all0[r0];
+        if (!row0) continue;
+        if (String(row0[matriculeIdx] || "").trim() === String(sess0.matricule || "").trim()) {
+          rowToUpdate0 = r0 + 1;
+          stored0 = String(row0[pwIdx] || "").trim();
+          break;
+        }
+      }
+      if (rowToUpdate0 < 0) return json_({ ok: false, error: "user_not_found" });
+      if (!passwordMatches_(sess0.matricule, oldPw, stored0)) return json_({ ok: false, error: "invalid_old_password" });
+      usersSheet0.getRange(rowToUpdate0, pwIdx + 1).setValue(passwordHash_(sess0.matricule, newPw));
+      return json_({ ok: true });
     }
 
     if (data.action === "getSheet") {

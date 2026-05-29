@@ -25,6 +25,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     const progPages = document.getElementById('prog-pages');
     const progTotal = document.getElementById('prog-total');
 
+    if (document.body) {
+        document.querySelectorAll('.modal-backdrop').forEach((el) => el.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+    }
+
+    // Debug: Check for any overlays that might block interaction
+    function checkOverlays() {
+        const overlays = document.querySelectorAll('body *');
+        overlays.forEach(el => {
+            const style = getComputedStyle(el);
+            const zIndex = parseInt(style.zIndex);
+            const pointerEvents = style.pointerEvents;
+            const rect = el.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0 && (zIndex >= 0 || pointerEvents !== 'none')) {
+                console.log('Potential overlay:', el.id || el.className, 
+                    'z-index:', zIndex, 
+                    'pointer-events:', pointerEvents,
+                    'rect:', rect);
+            }
+        });
+    }
+    // Run check on load
+    setTimeout(checkOverlays, 1000);
+    // Also check after modal opens
+    if (statsModal) {
+        statsModalEl.addEventListener('shown.bs.modal', checkOverlays);
+    }
+
     function setStatsModalLoading(isLoading) {
         if (statsTablePanel) statsTablePanel.classList.toggle('is-stats-loading', Boolean(isLoading));
         if (statsModalLoader) statsModalLoader.setAttribute('aria-hidden', isLoading ? 'false' : 'true');
@@ -42,6 +72,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     let programmeIdsWithResultats = new Set();
     let programmesPage = 1;
     let goToLastPageOnce = false;
+    let programmesMessage = '';
+
+    function setProgrammesMessage(msg) {
+        programmesMessage = msg ? String(msg) : '';
+        programmesAllRows = [];
+        programmeIdsWithResultats = new Set();
+        if (paginationWrap) paginationWrap.classList.add('d-none');
+        if (progTotal) progTotal.textContent = programmesMessage;
+        if (tableBody) {
+            tableBody.innerHTML = programmesMessage
+                ? `<tr><td colspan="4" class="text-center text-danger fw-semibold">${programmesMessage}</td></tr>`
+                : '';
+        }
+    }
 
     function isResultatsHeaderRow(r) {
         if (!Array.isArray(r) || r.length < 2) return false;
@@ -55,10 +99,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updatePaginationUI() {
-    if (!paginationWrap) return;
+    if (programmesMessage) {
+        if (paginationWrap) paginationWrap.classList.add('d-none');
+        if (progTotal) progTotal.textContent = programmesMessage;
+        return;
+    }
     const pages = totalProgrammesPages();
     const show = programmesAllRows.length > PROGRAMMES_PAGE_SIZE;
-    paginationWrap.classList.toggle('d-none', !show);
+    if (paginationWrap) paginationWrap.classList.toggle('d-none', !show);
     // Update page info text
     if (pageInfoEl) {
         pageInfoEl.textContent = `Page ${programmesPage} / ${pages} • ${programmesAllRows.length} campagnes`;
@@ -78,13 +126,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             progPages.appendChild(btn);
         }
     }
-    // Ensure total is centered under numbers (already styled)
     if (progTotal) {
-        progTotal.style.textAlign = 'center';
+        const total = programmesAllRows.length;
+        progTotal.textContent = `${total} campagne${total > 1 ? 's' : ''}`;
     }
 }
 
     function renderProgrammesPage(page) {
+        if (programmesMessage) return;
         const pages = totalProgrammesPages();
         programmesPage = Math.min(Math.max(1, page), pages);
         const start = (programmesPage - 1) * PROGRAMMES_PAGE_SIZE;
@@ -244,6 +293,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (el) el.value = v === undefined || v === null ? '' : String(v);
     }
 
+    function sanitizeAmountText(v) {
+        const raw = String(v === undefined || v === null ? '' : v);
+        const normalizedSep = raw.replace(/[.;:،؛'"’‘“”]/g, ',');
+        const kept = normalizedSep.replace(/[^\d,]/g, '');
+        return kept.replace(/,{2,}/g, ',').replace(/^,/, '');
+    }
+
+    function initAmountInputs() {
+        const ids = ['res-manq-tot', 'res-manq-ok', 'res-manq-nok'];
+        ids.forEach((id) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('input', () => {
+                const next = sanitizeAmountText(el.value);
+                if (el.value !== next) el.value = next;
+            });
+            el.addEventListener('blur', () => {
+                const next = sanitizeAmountText(el.value);
+                if (el.value !== next) el.value = next;
+            });
+        });
+    }
+
     /**
      * Feuille Resultats (colonnes) :
      * ID_Resultat, ID_Programme, Sal_Aff, Sal_NonAff, NonSal_Aff, NonSal_NonAff,
@@ -276,14 +348,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             setStatVal('res-emp-dec', data[6]);
             setStatVal('res-emp-ndec', data[7]);
             if (data.length >= 12) {
-                setStatVal('res-manq-tot', data[8]);
-                setStatVal('res-manq-ok', data[9]);
-                setStatVal('res-manq-nok', data[10]);
+                setStatVal('res-manq-tot', sanitizeAmountText(data[8]));
+                setStatVal('res-manq-ok', sanitizeAmountText(data[9]));
+                setStatVal('res-manq-nok', sanitizeAmountText(data[10]));
                 setStatVal('res-participants', data[11]);
             } else {
                 setStatVal('res-manq-tot', '');
-                setStatVal('res-manq-ok', data[8]);
-                setStatVal('res-manq-nok', data[9]);
+                setStatVal('res-manq-ok', sanitizeAmountText(data[8]));
+                setStatVal('res-manq-nok', sanitizeAmountText(data[9]));
                 setStatVal('res-participants', data.length > 10 ? data[10] : '');
             }
         } else {
@@ -321,7 +393,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const elEff = document.getElementById('modal-prog-effectif');
             if (elType) elType.textContent = programmeRow[2] ?? '';
             if (elZone) elZone.textContent = programmeRow[3] ?? '';
-            if (elPeriod) elPeriod.textContent = `${programmeRow[4] ?? ''} ⟼ ${programmeRow[5] ?? ''}`;
+            if (elPeriod) elPeriod.textContent = `${programmeRow[4] ?? ''} ↤ ${programmeRow[5] ?? ''}`;
             if (elEff) elEff.textContent = programmeRow[6] != null ? String(programmeRow[6]) : '';
             statsModal.show();
             await loadStatsFromSheet(programmeRow[0], programmeRow);
@@ -333,6 +405,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function buildResultatsRow() {
         if (!currentProgrammeRow) return null;
         const nz = (v) => (v === '' || v === undefined ? '0' : v);
+        const amountVal = (id) => statVal(id).replace(/,/g, '');
         const idResultat = currentResultatId && String(currentResultatId).trim() !== '' ? String(currentResultatId).trim() : `R${Date.now()}`;
         return [
             idResultat,
@@ -343,9 +416,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             nz(statVal('res-nw-ni')),
             nz(statVal('res-emp-dec')),
             nz(statVal('res-emp-ndec')),
-            nz(statVal('res-manq-tot')),
-            nz(statVal('res-manq-ok')),
-            nz(statVal('res-manq-nok')),
+            nz(amountVal('res-manq-tot')),
+            nz(amountVal('res-manq-ok')),
+            nz(amountVal('res-manq-nok')),
             nz(statVal('res-participants')),
             String(user.codeBr).trim(),
         ];
@@ -372,6 +445,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    initAmountInputs();
+
     if (btnStatsSave) {
         btnStatsSave.addEventListener('click', async () => {
             const payload = buildResultatsRow();
@@ -393,22 +468,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         user = JSON.parse(localStorage.getItem('currentUser'));
     } catch {}
     if (!user || !user.codeBr || !user.token) {
+        try {
+            localStorage.setItem('postLoginRedirect', 'interface1.html');
+        } catch {}
         window.location.href = 'index.html';
         return;
     }
+
+    // Auto logout when session TTL is reached (token expires server-side after ~6h)
+    if (typeof window !== 'undefined' && typeof window.isSessionExpired === 'function' && window.isSessionExpired()) {
+        if (typeof window.logoutToLogin === 'function') window.logoutToLogin();
+        else window.location.href = 'index.html';
+        return;
+    }
+    if (typeof window !== 'undefined' && typeof window.scheduleAutoLogout === 'function') window.scheduleAutoLogout();
     const userInfoEl = document.getElementById('user-info');
     if (userInfoEl) {
         const name = user.frName || user.arName || '';
-        const matricule = user.matricule ? String(user.matricule).trim() : '';
-        const grade = user.grade ? String(user.grade).trim() : '';
-        const parts = [];
-        if (name) parts.push(name);
-        if (matricule) parts.push(matricule);
-        if (grade) parts.push(grade);
-        userInfoEl.textContent = parts.length ? parts.join(' • ') : '--';
+        userInfoEl.textContent = name ? String(name).trim() : '--';
     }
-    const bureauLabel = user.bureauName || user.codeBr;
-    document.getElementById('bureau-info').textContent = `Bureau : ${bureauLabel}`;
     const logoutBtn = document.getElementById('btn-logout');
     logoutBtn?.addEventListener('click', () => {
         try {
@@ -418,13 +496,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     async function loadTable() {
+        setProgrammesMessage('');
         tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Chargement...</td></tr>';
-        const [allData, resultatsRows] = await Promise.all([fetchData('Programmes'), fetchData('Resultats')]);
-        if (!Array.isArray(allData)) {
-            tableBody.innerHTML =
-                '<tr><td colspan="4" class="text-center text-danger">Impossible de charger les programmes (API).</td></tr>';
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+            setProgrammesMessage('Pas de connexion internet');
             return;
         }
+
+        const [progRes, resultatsRes] = await Promise.all([
+            postAction('getSheet', { sheet: 'Programmes' }),
+            postAction('getSheet', { sheet: 'Resultats' }),
+        ]);
+
+        if (!progRes || !progRes.ok || !Array.isArray(progRes.rows)) {
+            if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+                setProgrammesMessage('Pas de connexion internet');
+                return;
+            }
+            // Some browsers keep navigator.onLine=true even when internet is down.
+            // postAction() reports it as network/http error in that case.
+            if (!progRes) {
+                setProgrammesMessage('Pas de connexion internet');
+                return;
+            }
+            if (progRes && (progRes.error === 'network_error' || progRes.error === 'http_error')) {
+                setProgrammesMessage('Pas de connexion internet');
+                return;
+            }
+            // Token session côté Apps Script peut expirer (cache ~ 6h) => logout auto
+            if (progRes && progRes.error === 'unauthorized') {
+                if (typeof window !== 'undefined' && typeof window.logoutToLogin === 'function') window.logoutToLogin();
+                else window.location.href = 'index.html';
+                return;
+            }
+            setProgrammesMessage('Impossible de charger les programmes (API).');
+            return;
+        }
+
+        const allData = progRes.rows;
+        const resultatsRows = resultatsRes && resultatsRes.ok && Array.isArray(resultatsRes.rows) ? resultatsRes.rows : [];
         const myData = allData.filter((row) => row && String(row[1]).trim() === String(user.codeBr).trim());
 
         programmeIdsWithResultats = new Set();

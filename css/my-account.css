@@ -1,0 +1,150 @@
+.page-account .account-card {
+  overflow: hidden;
+}
+
+.page-account .account-title {
+  padding-top: 0.25rem;
+}
+
+.page-account .account-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2.75rem minmax(0, 1fr);
+  align-items: start;
+}
+
+.page-account .account-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-account .account-panel:first-child {
+  padding-right: 1.25rem;
+}
+
+.page-account .account-panel:last-child {
+  padding-left: 1.25rem;
+}
+
+.page-account .account-divider {
+  justify-self: center;
+  align-self: stretch;
+  width: 0.5px;
+  min-height: 100%;
+  background: var(--cp-border-strong);
+  opacity: 1;
+}
+
+.page-account .account-divider::before,
+.page-account .account-divider::after {
+  content: none;
+}
+
+.page-account .account-panel-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cp-muted);
+  margin-bottom: 2rem;
+  text-align: center;
+  width: 100%;
+}
+
+.page-account .account-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.page-account .account-info-item {
+  padding: 0.5rem 1.5rem;
+}
+
+.page-account .account-info-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--cp-muted);
+  margin-bottom: 0.25rem;
+}
+
+.page-account .account-info-value {
+  font-weight: 700;
+  color: var(--cp-ink);
+  word-break: break-word;
+}
+
+.page-account .account-sep {
+  border-top: 1px solid var(--cp-border);
+  opacity: 1;
+  margin: 1.5rem 0;
+}
+
+.page-account #account-alert {
+  border-radius: 14px;
+  border-width: 1px;
+}
+
+.page-account #form-change-password {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.page-account #form-change-password .mb-3 {
+  width: 100%;
+}
+
+.page-account .form-label {
+  font-size: 0.78rem;
+}
+
+.page-account .form-control {
+  padding: 0.4rem 0.65rem;
+  font-size: 0.86rem;
+  border-radius: 10px;
+}
+
+.page-account #btn-change-password {
+  width: auto;
+  min-width: 150px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
+  border-radius: 12px;
+}
+
+.page-account .change-password-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0.75rem 0;
+}
+
+@media (max-width: 992px) {
+  .page-account .account-split {
+    grid-template-columns: 1fr;
+    row-gap: 1.75rem;
+  }
+
+  .page-account .account-panel:first-child {
+    padding-right: 0;
+  }
+
+  .page-account .account-panel:last-child {
+    padding-left: 0;
+  }
+
+  .page-account .account-divider {
+    width: 100%;
+    height: 1px;
+    min-height: 1px;
+  }
+
+  .page-account .account-divider::before {
+    content: none;
+  }
+}

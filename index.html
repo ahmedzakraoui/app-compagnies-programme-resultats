@@ -40,7 +40,11 @@
                   <label for="login-pw" class="form-label">Mot de passe</label>
                   <input type="password" class="form-control" id="login-pw" autocomplete="current-password" required />
                 </div>
-                <button type="submit" class="btn btn-primary w-100" id="login-submit">Se connecter</button>
+                <button type="submit" class="btn btn-primary w-100" id="login-submit">
+                  <span id="login-submit-text">Se connecter</span>
+                  <span class="spinner-border spinner-border-sm ms-2 d-none" id="login-submit-spinner" role="status" aria-hidden="true"></span>
+                  <span class="visually-hidden" id="login-submit-spinner-label">Chargement…</span>
+                </button>
               </form>
             </div>
           </div>

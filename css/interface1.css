@@ -74,6 +74,38 @@
     gap: 0.75rem;
 }
 
+.page-programme .brand-mini-menu {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.page-programme .brand-mini-link {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 0.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(12, 107, 47, 0.14);
+    background: rgba(255, 255, 255, 0.35);
+    color: var(--cp-ink, #0c3520);
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+
+.page-programme .brand-mini-link:hover {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(4, 143, 64, 0.35);
+}
+
+.page-programme .brand-mini-link.is-active {
+    background: rgba(4, 143, 64, 0.12);
+    border-color: rgba(4, 143, 64, 0.35);
+    color: var(--cp-accent, #048f40);
+}
+
 .composed-brand-logo {
     width: 2.75rem;
     height: 2.75rem;
@@ -87,11 +119,6 @@
     font-size: 1.1rem;
     letter-spacing: -0.02em;
     color: var(--cp-ink) !important;
-}
-
-.composed-brand-muted {
-    font-weight: 600;
-    color: var(--cp-muted);
 }
 
 .composed-badge-bureau {
@@ -198,7 +225,7 @@
     flex-direction: column;
     align-items: center;
     gap: 0.55rem;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
 }
 
 .programmes-pagination-row {
@@ -395,7 +422,8 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--cp-muted);
-    border-bottom: 1px solid var(--cp-border-strong) !important;
+    /*border-bottom: 1px solid var(--cp-border-strong) !important;*/
+    border-bottom: none !important;
     background: linear-gradient(180deg, rgba(236, 252, 240, 0.95), rgba(220, 238, 224, 0.88)) !important;
     padding-top: 0.9rem;
     padding-bottom: 0.9rem;
@@ -749,6 +777,57 @@ table {
     border: 1px solid var(--cp-border-strong);
     box-shadow: var(--cp-shadow), 0 28px 64px -20px rgba(12, 53, 32, 0.35);
     overflow: hidden;
+    max-height: 94vh;
+    direction: rtl;
+}
+
+.stats-modal-content .btn-close {
+    margin-top: 0.2rem;
+    margin-right: auto;
+    margin-left: 0;
+}
+
+.stats-modal-content .modal-footer {
+    padding-top: 0.35rem !important;
+    padding-bottom: 0.65rem !important;
+    gap: 0.6rem;
+}
+
+/* Ensure Interface2 modal buttons match Interface1 styling */
+.stats-modal-content .btn-primary {
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 0.65rem 1rem;
+    background: linear-gradient(135deg, var(--cp-accent) 0%, var(--cp-accent-mid) 50%, var(--cp-accent-2) 100%);
+    box-shadow: 0 4px 14px rgba(4, 143, 64, 0.38);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stats-modal-content .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(4, 143, 64, 0.42);
+    background: linear-gradient(135deg, #037a38 0%, #168a36 50%, #359a30 100%);
+}
+
+.stats-modal-content .btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Also align modal form-controls with Interface1 look (Interface2 body uses a different page class) */
+.stats-modal-content .form-control,
+.stats-modal-content .form-select {
+    border-radius: 12px;
+    border-color: var(--cp-border-strong);
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.stats-modal-content .form-control:focus,
+.stats-modal-content .form-select:focus {
+    border-color: var(--cp-accent);
+    box-shadow: 0 0 0 3px var(--cp-focus-ring);
+    background-color: #fff;
 }
 
 .stats-popup-section-title {
@@ -757,16 +836,23 @@ table {
 }
 
 .stats-popup-section-id {
+    unicode-bidi: isolate;
+    margin-left: 0.45rem;
+}
+
+.stats-popup-section-id {
     font-weight: 600;
     font-size: 0.92em;
 }
 
 .stats-programme-box {
-    border: 1px solid var(--cp-border-strong);
     border-radius: 12px;
-    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--cp-border-strong);
+    padding: 0.55rem 0.75rem;
     background: rgba(255, 255, 255, 0.78);
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    width: 90%;
+    margin: auto;
 }
 
 .stats-programme-line-table {
@@ -774,19 +860,34 @@ table {
     margin: 0;
     border: 0;
     border-collapse: separate;
-    border-spacing: 1.15rem 0;
+    border-spacing: 0.85rem 0;
     table-layout: fixed;
+}
+
+.stats-programme-line-table thead th {
+    border: none !important;
+    padding: 0 0 0.35rem;
+    vertical-align: bottom;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--cp-muted);
+    background: transparent !important;
+    white-space: nowrap;
+    text-align: center;
 }
 
 .stats-programme-line-table td {
     border: none !important;
     padding: 0.4rem 0;
     vertical-align: middle;
-    font-size: 0.9rem;
+    font-size: 0.86rem;
     font-weight: 500;
     color: var(--cp-ink);
     background: transparent !important;
     box-shadow: none !important;
+    text-align: center;
 }
 
 .stats-programme-cell-effectif {
@@ -806,12 +907,11 @@ table {
 }
 
 .stats-table-scroll {
-    max-height: min(60vh, 520px);
-    /*border-radius: 12px;*/
-    /*border: 1px solid var(--cp-border);*/
+    max-height: none;
     background: rgba(255, 255, 255, 0.65);
     position: relative;
-    min-height: 200px;
+    min-height: 0;
+    overflow: visible;
 }
 
 .stats-table-scroll.is-stats-loading .stats-campagne-table {
@@ -838,13 +938,57 @@ table {
     display: flex;
 }
 
-.stats-campagne-table {
-    font-size: 0.78rem;
-    min-width: 920px;
-    --bs-table-border-color: var(--cp-border-strong);
+.stats-table-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding: 0.45rem 0.55rem 0.55rem;
 }
 
-.stats-campagne-thead th {
+.stats-split-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: start;
+    column-gap: 0.85rem;
+}
+
+.stats-split-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 520px) minmax(0, 240px);
+    align-items: start;
+    column-gap: 0.85rem;
+    justify-content: center;
+}
+
+.stats-block-title {
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: var(--cp-ink);
+    margin-bottom: 0.35rem;
+    text-align: center;
+}
+
+.stats-table-layout > .stats-block:last-child {
+    max-width: none;
+    width: auto;
+    margin: 0;
+}
+
+.stats-block-table {
+    font-size: 0.74rem;
+    width: 100%;
+    --bs-table-border-color: var(--cp-border-strong);
+    border-collapse: separate !important;
+    border-spacing: 6px !important;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.stats-block-table.table-bordered > :not(caption) > * > * {
+    border-width: 0 !important;
+}
+
+.stats-block-thead th {
     vertical-align: middle;
     font-weight: 700;
     text-align: center;
@@ -852,7 +996,8 @@ table {
     color: var(--cp-ink);
     white-space: normal;
     line-height: 1.25;
-    padding: 0.5rem 0.4rem;
+    padding: 0.4rem 0.35rem;
+    border-radius: 8px;
 }
 
 .stats-th-group {
@@ -866,29 +1011,43 @@ table {
     color: var(--cp-muted);
 }
 
-.stats-campagne-table tbody td {
-    padding: 0.35rem;
+.stats-block-table tbody td {
+    padding: 0.25rem;
     background: rgba(255, 255, 255, 0.9);
 }
 
-.stats-campagne-table tbody .form-control {
+.stats-block-table tbody .form-control {
     border-radius: 8px;
     border-color: var(--cp-border-strong);
-    min-width: 4.5rem;
+    min-width: 3.6rem;
+    padding: 0.3rem 0.55rem;
+    font-size: 0.82rem;
 }
 
-.stats-campagne-table tbody .form-control:focus {
+.stats-block-table tbody .form-control:focus {
     border-color: var(--cp-accent);
     box-shadow: 0 0 0 2px var(--cp-focus-ring);
 }
 
-.stats-campagne-table tbody input[readonly].form-control {
+.stats-block-table tbody input[readonly].form-control {
     cursor: default;
     opacity: 1;
     color: var(--cp-ink);
 }
 
-.stats-campagne-table tbody input[readonly].form-control:focus {
+.stats-block-table tbody input[readonly].form-control:focus {
     border-color: var(--cp-border-strong);
     box-shadow: none;
+}
+
+@media (max-width: 992px) {
+    .stats-split-top {
+        grid-template-columns: 1fr;
+        row-gap: 1.15rem;
+    }
+
+    .stats-split-bottom {
+        grid-template-columns: 1fr;
+        row-gap: 1.15rem;
+    }
 }

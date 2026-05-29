@@ -1,4 +1,12 @@
-const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbw_liNSDAoQkXqFMwgj4xX0Tmf3zvVCQzAAPNgvmC5qhjp0Y_HnmqffaPW7LfxatXEm/exec";
+const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbwQkMlCdkGsdNYxhePtl7mX9Zz5kcSKMHgyLu_6_RElhSyqgGAglrXwlY8aTHxfR_bt/exec";
+
+// Session TTL must match Google Apps Script cache duration (see Code.gs createSession_()).
+// Currently: 21600 seconds = 6 hours.
+const SESSION_TTL_MS = 21600 * 1000;
+// Expose for other scripts (login.js / interface pages)
+try {
+    window.SESSION_TTL_MS = SESSION_TTL_MS;
+} catch {}
 
 function getCurrentUser() {
     try {
@@ -15,6 +23,61 @@ function getToken() {
     const u = getCurrentUser();
     return u && u.token ? String(u.token) : '';
 }
+
+function getSessionExpiresAt() {
+    const u = getCurrentUser();
+    const v = u && u.sessionExpiresAt != null ? Number(u.sessionExpiresAt) : NaN;
+    return Number.isFinite(v) ? v : null;
+}
+
+function isSessionExpired() {
+    const exp = getSessionExpiresAt();
+    return exp != null ? Date.now() >= exp : false;
+}
+
+function rememberPostLoginRedirect() {
+    try {
+        const file = String(window.location.pathname || '').split('/').pop() || '';
+        // Only remember real app pages (avoid redirecting back to login itself)
+        if (file && file.endsWith('.html') && file !== 'index.html') {
+            localStorage.setItem('postLoginRedirect', file);
+        }
+    } catch {}
+}
+
+function logoutToLogin() {
+    // When the session expires, return the user to the page they were on after re-login.
+    rememberPostLoginRedirect();
+    try {
+        localStorage.removeItem('currentUser');
+    } catch {}
+    window.location.href = 'index.html';
+}
+
+function scheduleAutoLogout() {
+    const exp = getSessionExpiresAt();
+    if (exp == null) return;
+    const delay = exp - Date.now();
+    if (delay <= 0) {
+        logoutToLogin();
+        return;
+    }
+    // Avoid multiple timers per page.
+    try {
+        if (window.__autoLogoutTimer) clearTimeout(window.__autoLogoutTimer);
+        window.__autoLogoutTimer = setTimeout(logoutToLogin, delay);
+    } catch {
+        setTimeout(logoutToLogin, delay);
+    }
+}
+
+// Expose helpers
+try {
+    window.getSessionExpiresAt = getSessionExpiresAt;
+    window.isSessionExpired = isSessionExpired;
+    window.logoutToLogin = logoutToLogin;
+    window.scheduleAutoLogout = scheduleAutoLogout;
+} catch {}
 
 /**
  * Client navigateur — ne pas mettre de code Google Apps Script (doPost/doGet) ici.

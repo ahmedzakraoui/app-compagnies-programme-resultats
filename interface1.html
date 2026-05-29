@@ -22,26 +22,18 @@
       <nav class="navbar composed-nav py-2">
         <div class="container composed-nav-inner">
           <div class="composed-brand">
-            <img
-              src="images/cnss_logo.svg"
-              alt=""
-              class="composed-brand-logo"
-              width="44"
-              height="44"
-              decoding="async"
-            />
-            <span class="navbar-brand mb-0 fw-bold composed-brand-text">
-              CNSS <span class="composed-brand-muted ms-2">Programme des campagnes de contrôle</span>
-            </span>
+            <img src="images/cnss_logo.svg" alt="" class="composed-brand-logo" width="44" height="44" decoding="async" />
+            <div class="brand-mini-menu" aria-label="Menu">
+              <a href="interface1.html" class="brand-mini-link is-active" aria-current="page">Programme</a>
+              <a href="interface2.html" class="brand-mini-link">Statistiques</a>
+            </div>
           </div>
           <div class="composed-user-panel">
             <div class="composed-user-lines">
               <div id="user-info" class="composed-user-line">--</div>
-              <div id="bureau-info" class="composed-user-subline">Bureau : --</div>
             </div>
-            <button type="button" class="btn btn-outline-secondary btn-sm composed-logout" id="btn-logout">
-              Déconnexion
-            </button>
+            <a href="my-account.html" class="btn btn-outline-secondary btn-sm composed-logout" id="btn-account"> Mon compte </a>
+            <button type="button" class="btn btn-outline-secondary btn-sm composed-logout" id="btn-logout">Déconnexion</button>
           </div>
         </div>
       </nav>
@@ -54,66 +46,66 @@
           <div class="card card-custom card-composed h-100">
             <div class="card-composed-accent" aria-hidden="true"></div>
             <div class="card-composed-body p-4 p-lg-4">
-            <div class="composed-card-head mb-4">
-              <span class="composed-card-icon" aria-hidden="true"></span>
-              <div>
-                <h2 class="h5 fw-bold mb-0">Nouvelle campagne</h2>
+              <div class="composed-card-head mb-4">
+                <span class="composed-card-icon" aria-hidden="true"></span>
+                <div>
+                  <h2 class="h5 fw-bold mb-0">Nouvelle campagne</h2>
+                </div>
               </div>
-            </div>
 
-            <div class="form-campagne-reveal" id="form-campagne-reveal">
-              <div class="btn-cta-wave-halo">
-                <button type="button" id="btn-open-campagne-form" class="btn-cta-wave" aria-expanded="false">
-                  <span class="btn-cta-wave__inner">
-                    <span class="btn-cta-wave__icon" aria-hidden="true">+</span>
-                    <span class="btn-cta-wave__label">Ajouter une campagne</span>
-                  </span>
-                </button>
+              <div class="form-campagne-reveal" id="form-campagne-reveal">
+                <div class="btn-cta-wave-halo">
+                  <button type="button" id="btn-open-campagne-form" class="btn-cta-wave" aria-expanded="false">
+                    <span class="btn-cta-wave__inner">
+                      <span class="btn-cta-wave__icon" aria-hidden="true">+</span>
+                      <span class="btn-cta-wave__label">Ajouter une campagne</span>
+                    </span>
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div class="form-campagne-panel" id="form-campagne-panel" hidden>
-            <form id="form-programme" novalidate>
-              <div class="mb-3">
-                <label class="form-label">Type de Campagne</label>
-                <select id="type_campagne" class="form-select" required>
-                  <option value="قطاعية">قطاعية</option>
-                  <option value="جغرافية">جغرافية</option>
-                  <option value="لا شيء">لا شيء</option>
-                </select>
+              <div class="form-campagne-panel" id="form-campagne-panel" hidden>
+                <form id="form-programme" novalidate>
+                  <div class="mb-3">
+                    <label class="form-label">Type de Campagne</label>
+                    <select id="type_campagne" class="form-select" required>
+                      <option value="قطاعية">قطاعية</option>
+                      <option value="جغرافية">جغرافية</option>
+                      <option value="لا شيء">لا شيء</option>
+                    </select>
+                  </div>
+                  <div class="mb-3" id="zone-activite-block" hidden>
+                    <label class="form-label">Zone / Activité</label>
+                    <div id="zone-sectorielle-wrap" class="d-none">
+                      <select id="activite_sectorielle" class="form-select">
+                        <option value="Industrielle">Industrielle</option>
+                        <option value="Agriculture">Agriculture</option>
+                        <option value="Services">Services</option>
+                      </select>
+                    </div>
+                    <div id="zone-geographique-wrap" class="d-none">
+                      <input type="text" id="activite_zone_geo" class="form-control" placeholder="Saisir la zone géographique" />
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col">
+                      <label class="form-label">Date Début</label>
+                      <input type="text" id="date_debut" class="form-control fp-date-input" placeholder="Choisir…" autocomplete="off" required />
+                    </div>
+                    <div class="col">
+                      <label class="form-label">Date Fin</label>
+                      <input type="text" id="date_fin" class="form-control fp-date-input" placeholder="Choisir…" autocomplete="off" required />
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Nombre de Contrôleurs</label>
+                    <input type="number" id="nb_controleurs" class="form-control" min="1" required />
+                  </div>
+                  <button type="submit" class="btn btn-primary w-100" id="btn-submit">
+                    <span id="btn-text">Ajouter au programme</span>
+                  </button>
+                </form>
               </div>
-              <div class="mb-3" id="zone-activite-block" hidden>
-                <label class="form-label">Zone / Activité</label>
-                <div id="zone-sectorielle-wrap" class="d-none">
-                  <select id="activite_sectorielle" class="form-select">
-                    <option value="Industrielle">Industrielle</option>
-                    <option value="Agriculture">Agriculture</option>
-                    <option value="Services">Services</option>
-                  </select>
-                </div>
-                <div id="zone-geographique-wrap" class="d-none">
-                  <input type="text" id="activite_zone_geo" class="form-control" placeholder="Saisir la zone géographique" />
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col">
-                  <label class="form-label">Date Début</label>
-                  <input type="text" id="date_debut" class="form-control fp-date-input" placeholder="Choisir…" autocomplete="off" required />
-                </div>
-                <div class="col">
-                  <label class="form-label">Date Fin</label>
-                  <input type="text" id="date_fin" class="form-control fp-date-input" placeholder="Choisir…" autocomplete="off" required />
-                </div>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Nombre de Contrôleurs</label>
-                <input type="number" id="nb_controleurs" class="form-control" min="1" required />
-              </div>
-              <button type="submit" class="btn btn-primary w-100" id="btn-submit">
-                <span id="btn-text">Ajouter au programme</span>
-              </button>
-            </form>
-            </div>
             </div>
           </div>
         </div>
@@ -123,60 +115,63 @@
           <div class="card card-custom card-composed card-composed--wide h-100">
             <div class="card-composed-accent card-composed-accent--secondary" aria-hidden="true"></div>
             <div class="card-composed-body p-4 p-lg-4 d-flex flex-column">
-            <div class="composed-card-head mb-4">
-              <span class="composed-card-icon composed-card-icon--table" aria-hidden="true"></span>
-              <div>
-                <h2 class="h5 fw-bold mb-0">Programmes du bureau</h2>
+              <div class="composed-card-head mb-4">
+                <span class="composed-card-icon composed-card-icon--table" aria-hidden="true"></span>
+                <div>
+                  <h2 class="h5 fw-bold mb-0">Programmes du bureau</h2>
+                  <div class="programmes-total mt-2 text-start" id="prog-total"></div>
+                </div>
               </div>
-            </div>
-            <div class="table-responsive composed-table-wrap flex-grow-1">
-              <table class="table table-hover align-middle composed-table mb-0">
-                <thead>
-                  <tr>
-                    <th>Type</th>
-                    <th>Type d'activité / Zone Géo</th>
-                    <th>Période</th>
-                    <th>Effectif</th>
-                  </tr>
-                </thead>
-                <tbody id="table-body">
-                  <!-- Les lignes s'ajouteront ici -->
-                </tbody>
-              </table>
-            </div>
-            <div class="programmes-pagination d-none" id="programmes-pagination">
-              <div class="programmes-pagination-row">
-                <button type="button" class="btn btn-outline-secondary btn-sm programmes-page-btn" id="prog-prev">
-                  Précédent
-                </button>
-                <div class="programmes-pages" id="prog-pages"></div>
-                <button type="button" class="btn btn-outline-secondary btn-sm programmes-page-btn" id="prog-next">
-                  Suivant
-                </button>
+              <div class="table-responsive composed-table-wrap flex-grow-1">
+                <table class="table table-hover align-middle composed-table mb-0">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Type d'activité / Zone Géo</th>
+                      <th>Période</th>
+                      <th>Effectif</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-body">
+                    <!-- Les lignes s'ajouteront ici -->
+                  </tbody>
+                </table>
               </div>
-              <div class="programmes-total" id="prog-total"></div>
-            </div>
+              <div class="programmes-pagination d-none" id="programmes-pagination">
+                <div class="programmes-pagination-row">
+                  <button type="button" class="btn btn-outline-secondary btn-sm programmes-page-btn" id="prog-prev">Précédent</button>
+                  <div class="programmes-pages" id="prog-pages"></div>
+                  <button type="button" class="btn btn-outline-secondary btn-sm programmes-page-btn" id="prog-next">Suivant</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
     </main>
 
     <!-- Modal statistiques campagne (données feuille Resultats) -->
     <div class="modal" id="modal-stats-campagne" tabindex="-1" aria-labelledby="modal-stats-title" aria-hidden="true">
-      <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
-        <div class="modal-content stats-modal-content">
-          <div class="modal-header border-0 pb-0 pt-3 px-3">
-            <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content stats-modal-content" dir="rtl">
+          <div class="modal-header border-0 py-2 px-3">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
           </div>
-          <div class="modal-body pt-0 px-3 pb-3">
-            <h3 class="stats-popup-section-title h6 fw-bold mb-3" id="modal-stats-title">
-              Programme de la campagne
-              <span class="stats-popup-section-id text-muted fw-semibold">(<span class="modal-stats-pid"></span>)</span>
+          <div class="modal-body pt-0 px-3 pb-1">
+            <h3 class="stats-popup-section-title h6 fw-bold mb-3 pe-3" id="modal-stats-title">
+              <span class="ms-2">برنامج الحملة</span>
+              <bdi class="stats-popup-section-id text-muted fw-semibold"><span class="modal-stats-pid"></span></bdi>
             </h3>
             <div class="stats-programme-box">
-              <table class="stats-programme-line-table">
+              <table class="stats-programme-line-table" dir="rtl">
+                <thead>
+                  <tr>
+                    <th scope="col">نوع الحملة</th>
+                    <th scope="col">نوع النشاط / المنطقة الجغرافية</th>
+                    <th scope="col">الفترة</th>
+                    <th scope="col" class="text-center">عدد المراقبين</th>
+                  </tr>
+                </thead>
                 <tbody>
                   <tr>
                     <td class="stats-programme-cell" id="modal-prog-type"></td>
@@ -188,9 +183,9 @@
               </table>
             </div>
 
-            <h3 class="stats-popup-section-title h6 fw-bold stats-popup-stats-heading mb-3 mt-5">
-              Statistiques de la campagne
-              <span class="stats-popup-section-id text-muted fw-semibold">(<span class="modal-stats-pid"></span>)</span>
+            <h3 class="stats-popup-section-title h6 fw-bold mb-3 mt-3 pe-3" id="modal-stats-title">
+              <span class="ms-2">إحصائيات الحملة</span>
+              <bdi class="stats-popup-section-id text-muted fw-semibold"><span class="modal-stats-pid"></span></bdi>
             </h3>
             <div class="table-responsive stats-table-scroll" id="stats-table-panel">
               <div class="stats-modal-loader" id="stats-modal-loader" aria-hidden="true">
@@ -199,64 +194,100 @@
                 </div>
                 <p class="small text-muted mb-0 mt-3 fw-semibold">Chargement des données…</p>
               </div>
-              <table class="table table-bordered align-middle mb-0 stats-campagne-table" dir="rtl">
-                <thead class="stats-campagne-thead">
-                  <tr>
-                    <th rowspan="2" class="stats-th-main">نوع الحملة<br />قطاع نشاط / منطقة جغرافية</th>
-                    <th rowspan="2" class="stats-th-main">نوع النشاط /<br />المنطقة الجغرافية</th>
-                    <th colspan="2" class="stats-th-group">نظام العملة الأجراء</th>
-                    <th colspan="2" class="stats-th-group">نظام العملة غير الأجراء</th>
-                    <th colspan="2" class="stats-th-group">وضعية الأجراء</th>
-                    <th colspan="3" class="stats-th-group">مبلغ النقص في المساهمات</th>
-                    <th rowspan="2" class="stats-th-main">عدد المراقبين<br />المشاركين</th>
-                  </tr>
-                  <tr>
-                    <th class="stats-th-sub">عدد المنخرطين</th>
-                    <th class="stats-th-sub">عدد غير المنخرطين</th>
-                    <th class="stats-th-sub">عدد المنخرطين</th>
-                    <th class="stats-th-sub">عدد غير المنخرطين</th>
-                    <th class="stats-th-sub">عدد الأجراء المصرح بهم</th>
-                    <th class="stats-th-sub">عدد الأجراء غير المصرح بهم</th>
-                    <th class="stats-th-sub">المبلغ الإجمالي للنقص</th>
-                    <th class="stats-th-sub">معترف به</th>
-                    <th class="stats-th-sub">غير معترف به</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <input
-                        type="text"
-                        class="form-control form-control-sm text-end bg-light"
-                        id="res-type-hamla"
-                        readonly
-                        tabindex="-1"
-                        aria-readonly="true"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        class="form-control form-control-sm text-end bg-light"
-                        id="res-activite-zone"
-                        readonly
-                        tabindex="-1"
-                        aria-readonly="true"
-                      />
-                    </td>
-                    <td><input type="number" class="form-control form-control-sm text-end" id="res-w-in" min="0" step="1" /></td>
-                    <td><input type="number" class="form-control form-control-sm text-end" id="res-w-ni" min="0" step="1" /></td>
-                    <td><input type="number" class="form-control form-control-sm text-end" id="res-nw-in" min="0" step="1" /></td>
-                    <td><input type="number" class="form-control form-control-sm text-end" id="res-nw-ni" min="0" step="1" /></td>
-                    <td><input type="number" class="form-control form-control-sm text-end" id="res-emp-dec" min="0" step="1" /></td>
-                    <td><input type="number" class="form-control form-control-sm text-end" id="res-emp-ndec" min="0" step="1" /></td>
-                    <td><input type="number" class="form-control form-control-sm text-end" id="res-manq-tot" min="0" step="0.01" /></td>
-                    <td><input type="number" class="form-control form-control-sm text-end" id="res-manq-ok" min="0" step="0.01" /></td>
-                    <td><input type="number" class="form-control form-control-sm text-end" id="res-manq-nok" min="0" step="0.01" /></td>
-                    <td><input type="number" class="form-control form-control-sm text-end" id="res-participants" min="0" step="1" /></td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="stats-table-layout" dir="rtl">
+                <div class="stats-split-top">
+                  <section class="stats-block">
+                    <div class="stats-block-title">الحملة</div>
+                    <table class="table table-bordered align-middle mb-0 stats-block-table">
+                      <thead class="stats-block-thead">
+                        <tr>
+                          <th class="stats-th-main">نوع الحملة</th>
+                          <th class="stats-th-main">نوع النشاط / المنطقة الجغرافية</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <input type="text" class="form-control form-control-sm text-center bg-light" id="res-type-hamla" readonly tabindex="-1" aria-readonly="true" />
+                          </td>
+                          <td>
+                            <input type="text" class="form-control form-control-sm text-center bg-light" id="res-activite-zone" readonly tabindex="-1" aria-readonly="true" />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </section>
+
+                  <section class="stats-block">
+                    <div class="stats-block-title">الأجراء</div>
+                    <table class="table table-bordered align-middle mb-0 stats-block-table">
+                      <thead class="stats-block-thead">
+                        <tr>
+                          <th colspan="2" class="stats-th-group">نظام العملة الأجراء</th>
+                          <th colspan="2" class="stats-th-group">نظام العملة غير الأجراء</th>
+                          <th colspan="2" class="stats-th-group">وضعية الأجراء</th>
+                        </tr>
+                        <tr>
+                          <th class="stats-th-sub">عدد المنخرطين</th>
+                          <th class="stats-th-sub">عدد غير المنخرطين</th>
+                          <th class="stats-th-sub">عدد المنخرطين</th>
+                          <th class="stats-th-sub">عدد غير المنخرطين</th>
+                          <th class="stats-th-sub">عدد الأجراء المصرح بهم</th>
+                          <th class="stats-th-sub">عدد الأجراء غير المصرح بهم</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><input type="number" class="form-control form-control-sm text-center" id="res-w-in" min="0" step="1" /></td>
+                          <td><input type="number" class="form-control form-control-sm text-center" id="res-w-ni" min="0" step="1" /></td>
+                          <td><input type="number" class="form-control form-control-sm text-center" id="res-nw-in" min="0" step="1" /></td>
+                          <td><input type="number" class="form-control form-control-sm text-center" id="res-nw-ni" min="0" step="1" /></td>
+                          <td><input type="number" class="form-control form-control-sm text-center" id="res-emp-dec" min="0" step="1" /></td>
+                          <td><input type="number" class="form-control form-control-sm text-center" id="res-emp-ndec" min="0" step="1" /></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </section>
+                </div>
+
+                <div class="stats-split-bottom">
+                  <section class="stats-block">
+                    <div class="stats-block-title">النقص المستخرج</div>
+                    <table class="table table-bordered align-middle mb-0 stats-block-table">
+                      <thead class="stats-block-thead">
+                        <tr>
+                          <th class="stats-th-main">المبلغ الإجمالي للنقص</th>
+                          <th class="stats-th-main">معترف به</th>
+                          <th class="stats-th-main">غير معترف به</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><input type="text" class="form-control form-control-sm text-center stats-amount-input" id="res-manq-tot" inputmode="numeric" autocomplete="off" /></td>
+                          <td><input type="text" class="form-control form-control-sm text-center stats-amount-input" id="res-manq-ok" inputmode="numeric" autocomplete="off" /></td>
+                          <td><input type="text" class="form-control form-control-sm text-center stats-amount-input" id="res-manq-nok" inputmode="numeric" autocomplete="off" /></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </section>
+
+                  <section class="stats-block">
+                    <div class="stats-block-title">عدد المراقبين</div>
+                    <table class="table table-bordered align-middle mb-0 stats-block-table">
+                      <thead class="stats-block-thead">
+                        <tr>
+                          <th class="stats-th-main">عدد المراقبين</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><input type="number" class="form-control form-control-sm text-center" id="res-participants" min="0" step="1" /></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </section>
+                </div>
+              </div>
             </div>
           </div>
           <div class="modal-footer border-0">
