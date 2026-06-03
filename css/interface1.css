@@ -111,7 +111,7 @@
     height: 2.75rem;
     object-fit: contain;
     flex-shrink: 0;
-    border-radius: 12px;
+    border-radius: 5em;
     box-shadow: 0 2px 14px rgba(4, 143, 64, 0.18);
 }
 

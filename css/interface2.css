@@ -26,6 +26,29 @@
     margin-right: auto;
 }
 
+/* ------------------------------------------------------------------ */
+/* RTL mirroring for the card header (icon+title on the right, total on the left) */
+/* Scoped only to the header where we set dir="rtl" in interface2.html */
+/* ------------------------------------------------------------------ */
+.page-results .composed-card-head[dir="rtl"] {
+    flex-direction: row-reverse; /* icon moves to the right */
+}
+
+/* Avoid Bootstrap .w-100 forcing 100% width inside a flex row */
+.page-results .composed-card-head[dir="rtl"] > .w-100 {
+    width: auto !important;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.page-results .composed-card-head[dir="rtl"] .d-flex {
+    flex-direction: row-reverse; /* title right, total left */
+}
+
+.page-results .composed-card-head[dir="rtl"] h2 {
+    text-align: right;
+}
+
 .page-results .brand-mini-menu {
     display: flex;
     align-items: center;
