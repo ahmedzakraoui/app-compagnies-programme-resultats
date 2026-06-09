@@ -23,9 +23,48 @@ Le super admin voit un tableau qui collecte toutes les info et résultats de cha
 Appscript
 
 Mise à jour du déploiement effectuée.
-Version 8 du 20 mai 2026, 11:17
+Version 9 du 4 juin 2026, 17:18
 ID de déploiement
-AKfycbwQkMlCdkGsdNYxhePtl7mX9Zz5kcSKMHgyLu_6_RElhSyqgGAglrXwlY8aTHxfR_bt
+AKfycbwag-J-DWVyKdgr05tDlvuaNBFLCqQykQMsrXwkQYW-6JzaHvEK1B9YLCOJOzD-udbO
 Application Web
 URL
-https://script.google.com/macros/s/AKfycbwQkMlCdkGsdNYxhePtl7mX9Zz5kcSKMHgyLu_6_RElhSyqgGAglrXwlY8aTHxfR_bt/exec
+https://script.google.com/macros/s/AKfycbwag-J-DWVyKdgr05tDlvuaNBFLCqQykQMsrXwkQYW-6JzaHvEK1B9YLCOJOzD-udbO/exec
+
+google sheets tables structure:
+
+Bureaux (sheet):
+Nom_Bureau -> column A
+Code_Bureau -> column B
+Region -> column C
+
+Users (sheet):
+Matricule -> column A
+FR_Name -> column B
+AR_Name -> column C
+Grade -> column D
+Code_BR -> column E
+Pw -> column F
+
+Programmes (sheet):
+ID_Programme -> column A
+Code_Bureau -> column B
+Type_Campagne -> column C
+Activite_Zone -> column D
+Date_Debut -> column E
+Date_Fin -> column F
+Nb_Controleurs -> column G
+
+Resultats (sheet):
+ID_Resultat -> column A
+ID_Programme -> column B
+Sal_Aff -> column C
+Sal_NonAff -> column D
+NonSal_Aff -> column E
+NonSal_NonAff -> column F
+Trav_Declares -> column G
+Trav_NonDeclares -> column H
+insuff_totale -> column I
+Mt_Reconnu -> column J
+Mt_NonReconnu -> column K
+Controleurs_participants -> column L
+Code_br -> column M

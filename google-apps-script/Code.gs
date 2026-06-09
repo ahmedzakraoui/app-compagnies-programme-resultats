@@ -247,11 +247,30 @@ function doPost(e) {
       return json_({ ok: true });
     }
 
+    if (data.action === "getAdminSheet") {
+      var sessAdmin = requireSession_(data);
+      if (!sessAdmin) return json_({ ok: false, error: "unauthorized" });
+      var snameAdmin = String(data.sheet || "").trim();
+      if (snameAdmin !== "Programmes" && snameAdmin !== "Resultats" && snameAdmin !== "Bureaux") return json_({ ok: false, error: "invalid_sheet" });
+      var sheetAdmin = readSheet_(snameAdmin);
+      if (!sheetAdmin) return json_({ ok: true, rows: [] });
+      var allAdmin = sheetAdmin.getDataRange().getDisplayValues();
+      var rowsAdmin = allAdmin && allAdmin.length > 1 ? allAdmin.slice(1) : [];
+      return json_({ ok: true, rows: rowsAdmin });
+    }
+
     if (data.action === "getSheet") {
       var sess = requireSession_(data);
       if (!sess || !sess.codeBr) return json_({ ok: false, error: "unauthorized" });
       var sname = String(data.sheet || "").trim();
-      if (sname !== "Programmes" && sname !== "Resultats") return json_({ ok: false, error: "invalid_sheet" });
+      if (sname !== "Programmes" && sname !== "Resultats" && sname !== "Bureaux") return json_({ ok: false, error: "invalid_sheet" });
+      if (sname === "Bureaux") {
+        var sheetBureau = readSheet_("Bureaux");
+        if (!sheetBureau) return json_({ ok: true, rows: [] });
+        var allBureau = sheetBureau.getDataRange().getDisplayValues();
+        var rowsBureau = allBureau && allBureau.length > 1 ? allBureau.slice(1) : [];
+        return json_({ ok: true, rows: rowsBureau });
+      }
       var sheet = readSheet_(sname);
       if (!sheet) return json_({ ok: true, rows: [] });
       var all = sheet.getDataRange().getDisplayValues();

@@ -140,7 +140,7 @@
 
     .page-results .results-filter-compact:not(.results-filter-compact--type) {
         flex: 1 1 320px;
-        min-width: 260px;
+        min-width: 11em;
     }
 
     .page-results .results-filter-actions {
