@@ -1,4 +1,4 @@
-const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbwag-J-DWVyKdgr05tDlvuaNBFLCqQykQMsrXwkQYW-6JzaHvEK1B9YLCOJOzD-udbO/exec";
+const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbztXxU6nuuIEkCL2sBxU6QNFvcDLv1nWiVU7Woa_6Mc7iXbkcC2jxdVhxGwTVQaQ8Iv/exec";
 
 // Session TTL must match Google Apps Script cache duration (see Code.gs createSession_()).
 // Currently: 21600 seconds = 6 hours.

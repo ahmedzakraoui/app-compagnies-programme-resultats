@@ -61,14 +61,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (typeof window !== 'undefined' && typeof window.scheduleAutoLogout === 'function') window.scheduleAutoLogout();
 
-    const displayName = user.frName || user.arName || '';
+    const displayName = user.arName || user.frName || '';
     nameEls.forEach((el) => {
         el.textContent = displayName || '--';
     });
     if (matriculeEl) matriculeEl.textContent = user.matricule ? String(user.matricule).trim() : '--';
-    if (gradeEl) gradeEl.textContent = user.grade ? String(user.grade).trim() : '--';
+    const gradeMap = {
+        'CU': 'رئيس وحدة المراقبة',
+        'CC': 'رئيس خلية المراقبة الحسابية',
+        'CT': 'رئيس خلية المراقبة الفنية',
+    };
+    const gradeRaw = user.grade ? String(user.grade).trim() : '';
+    if (gradeEl) gradeEl.textContent = gradeMap[gradeRaw] || gradeRaw || '--';
     const bureauParts = [];
-    if (user.bureauName) bureauParts.push(String(user.bureauName).trim());
+    if (user.bureauNameAr) bureauParts.push(String(user.bureauNameAr).trim());
+    else if (user.bureauName) bureauParts.push(String(user.bureauName).trim());
     if (user.codeBr) bureauParts.push(`(${String(user.codeBr).trim()})`);
     if (bureauEl) bureauEl.textContent = bureauParts.length ? bureauParts.join(' ') : '--';
     if (subtitleEl) subtitleEl.textContent = user.bureauRegion ? String(user.bureauRegion).trim() : '--';

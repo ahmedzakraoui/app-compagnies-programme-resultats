@@ -210,6 +210,7 @@ function doPost(e) {
           grade: String(found.grade || "").trim(),
           codeBr: codeBr,
           bureauName: bureau ? String(bureau.nom_bureau || "").trim() : "",
+          bureauNameAr: bureau ? String(bureau.nom_bureau_ar || "").trim() : "",
           bureauRegion: bureau ? String(bureau.region || "").trim() : ""
         }
       });

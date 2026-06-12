@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Toutes les campagnes - Administration</title>
+    <title>جميع إحصائيات الحملات</title>
     <link rel="icon" href="images/cnss_logo.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,31 +11,28 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link rel="stylesheet" href="css/common.css" />
-    <link rel="stylesheet" href="css/interface1.css" />
-    <link rel="stylesheet" href="css/interface2.css" />
-    <link rel="stylesheet" href="css/interface3.css" />
+    <link rel="stylesheet" href="css/interface4.css" />
   </head>
   <body class="page-results page-admin">
     <div class="composed-backdrop" aria-hidden="true"></div>
     <div class="composed-grid-pattern" aria-hidden="true"></div>
 
     <header class="composed-topbar">
-      <nav class="navbar composed-nav py-2">
+      <nav class="navbar composed-nav py-2" dir="rtl">
         <div class="container composed-nav-inner">
           <div class="composed-brand">
             <img src="images/cnss_logo.svg" alt="" class="composed-brand-logo" width="44" height="44" decoding="async" />
             <div class="brand-mini-menu" aria-label="Menu">
-              <a href="interface1.html" class="brand-mini-link">Programme</a>
-              <a href="interface2.html" class="brand-mini-link">Statistiques</a>
-              <a href="interface3.html" class="brand-mini-link is-active" aria-current="page">Admin</a>
+              <a href="#" class="btn btn-outline-secondary btn-sm composed-menu-btn is-active" aria-current="page">البرامج</a>
+              <a href="interface4.html" class="btn btn-outline-secondary btn-sm composed-menu-btn">الإحصائيات</a>
             </div>
           </div>
           <div class="composed-user-panel">
             <div class="composed-user-lines">
               <div id="user-info" class="composed-user-line">--</div>
             </div>
-            <a href="my-account.html" class="btn btn-outline-secondary btn-sm composed-logout" id="btn-account"> Mon compte </a>
-            <button type="button" class="btn btn-outline-secondary btn-sm composed-logout" id="btn-logout">Déconnexion</button>
+            <a href="my-account.html" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="btn-account"> حسابي </a>
+            <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn p-0" id="btn-logout"><img src="images/off_icon.svg" alt="Déconnexion" width="32" height="32" /></button>
           </div>
         </div>
       </nav>
@@ -46,12 +43,12 @@
         <div class="col-12">
           <div class="card card-custom card-composed card-composed--wide h-100">
             <div class="card-composed-accent card-composed-accent--secondary" aria-hidden="true"></div>
-            <div class="card-composed-body p-4 p-lg-4 d-flex flex-column">
-              <div class="composed-card-head mb-2" dir="rtl">
+            <div class="card-composed-body p-4 p-lg-4 d-flex flex-column" dir="rtl">
+              <div class="composed-card-head mb-3">
                 <span class="composed-card-icon composed-card-icon--table" aria-hidden="true"></span>
                 <div class="w-100">
                   <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
-                    <h2 class="h5 fw-bold mb-0">Toutes les campagnes</h2>
+                    <h2 class="h5 fw-bold mb-0">برامج الحملات</h2>
                     <div class="programmes-total text-start results-total" id="results-total"></div>
                   </div>
                 </div>
@@ -63,24 +60,24 @@
                   <div class="results-filters-section results-filters-section--primary">
                     <div class="results-filters-row">
                       <div class="results-filter-compact">
-                        <label class="form-label mb-1" for="filter-br">Code BR</label>
+                        <label class="form-label mb-1" for="filter-br">رقم المكتب</label>
                         <input type="text" class="form-control form-control-sm" id="filter-br" placeholder="" inputmode="numeric" />
                       </div>
                       <div class="results-filter-compact results-filter-compact--type">
-                        <label class="form-label mb-1" for="filter-type">Type</label>
+                        <label class="form-label mb-1" for="filter-type">نوع الحملة</label>
                         <select class="form-select form-select-sm" id="filter-type">
-                          <option value="">Tous</option>
+                          <option value=""></option>
                           <option value="قطاعية">قطاعية</option>
                           <option value="جغرافية">جغرافية</option>
                           <option value="لا شيء">لا شيء</option>
                         </select>
                       </div>
                       <div class="results-filter-compact">
-                        <label class="form-label mb-1" for="filter-zone">Zone / Activité</label>
-                        <input type="text" class="form-control form-control-sm" id="filter-zone" placeholder="Contient…" />
+                        <label class="form-label mb-1" for="filter-zone">نوع النشاط / المنطقة الجغرافية</label>
+                        <input type="text" class="form-control form-control-sm" id="filter-zone" placeholder="..." />
                       </div>
                       <div class="results-filter-actions">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-filters-reset">Réinitialiser</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-filters-reset">إلغاء</button>
                       </div>
                     </div>
                   </div>
@@ -103,9 +100,9 @@
               </div>
               <div class="programmes-pagination d-none" id="results-pagination">
                 <div class="programmes-pagination-row">
-                  <button type="button" class="btn btn-outline-secondary btn-sm programmes-page-btn" id="res-prev">Précédent</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm programmes-page-btn composed-menu-btn" id="res-prev">الصفحة السابقة</button>
                   <div class="programmes-pages" id="res-pages"></div>
-                  <button type="button" class="btn btn-outline-secondary btn-sm programmes-page-btn" id="res-next">Suivant</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm programmes-page-btn composed-menu-btn" id="res-next">الصفحة التالية</button>
                 </div>
               </div>
             </div>
@@ -114,159 +111,12 @@
       </div>
     </main>
 
-    <!-- Modal consultation campagne -->
-    <div class="modal" id="modal-stats-campagne" tabindex="-1" aria-labelledby="modal-stats-title" aria-hidden="true">
-      <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content stats-modal-content" dir="rtl">
-          <div class="modal-header border-0 py-2 px-3">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-          </div>
-          <div class="modal-body pt-0 px-3 pb-1">
-            <h3 class="stats-popup-section-title h6 fw-bold mb-3 pe-3" id="modal-stats-title">
-              <span class="ms-2">برنامج الحملة</span>
-              <bdi class="stats-popup-section-id text-muted fw-semibold"><span class="modal-stats-pid"></span></bdi>
-            </h3>
-            <div class="stats-programme-box">
-              <table class="stats-programme-line-table" dir="rtl">
-                <thead>
-                  <tr>
-                    <th scope="col">نوع الحملة</th>
-                    <th scope="col">نوع النشاط / المنطقة الجغرافية</th>
-                    <th scope="col">الفترة</th>
-                    <th scope="col" class="text-center">عدد المراقبين</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="stats-programme-cell" id="modal-prog-type"></td>
-                    <td class="stats-programme-cell" id="modal-prog-zone"></td>
-                    <td class="stats-programme-cell" id="modal-prog-period"></td>
-                    <td class="stats-programme-cell stats-programme-cell-effectif text-center text-nowrap" id="modal-prog-effectif"></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <h3 class="stats-popup-section-title h6 fw-bold mb-3 mt-3 pe-3">
-              <span class="ms-2">إحصائيات الحملة</span>
-              <bdi class="stats-popup-section-id text-muted fw-semibold"><span class="modal-stats-pid"></span></bdi>
-            </h3>
-            <div class="table-responsive stats-table-scroll" id="stats-table-panel">
-              <div class="stats-modal-loader" id="stats-modal-loader" aria-hidden="true">
-                <div class="spinner-border text-success" role="status" aria-label="Chargement">
-                  <span class="visually-hidden">Chargement…</span>
-                </div>
-                <p class="small text-muted mb-0 mt-3 fw-semibold">Chargement des données…</p>
-              </div>
-              <div class="stats-table-layout" dir="rtl">
-                <div class="stats-split-top">
-                  <section class="stats-block">
-                    <div class="stats-block-title">الحملة</div>
-                    <table class="table table-bordered align-middle mb-0 stats-block-table">
-                      <thead class="stats-block-thead">
-                        <tr>
-                          <th class="stats-th-main">نوع الحملة</th>
-                          <th class="stats-th-main">نوع النشاط / المنطقة الجغرافية</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <input type="text" class="form-control form-control-sm text-center bg-light" id="res-type-hamla" readonly tabindex="-1" aria-readonly="true" />
-                          </td>
-                          <td>
-                            <input type="text" class="form-control form-control-sm text-center bg-light" id="res-activite-zone" readonly tabindex="-1" aria-readonly="true" />
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </section>
-
-                  <section class="stats-block">
-                    <div class="stats-block-title">الأجراء</div>
-                    <table class="table table-bordered align-middle mb-0 stats-block-table">
-                      <thead class="stats-block-thead">
-                        <tr>
-                          <th colspan="2" class="stats-th-group">نظام العملة الأجراء</th>
-                          <th colspan="2" class="stats-th-group">نظام العملة غير الأجراء</th>
-                          <th colspan="2" class="stats-th-group">وضعية الأجراء</th>
-                        </tr>
-                        <tr>
-                          <th class="stats-th-sub">عدد المنخرطين</th>
-                          <th class="stats-th-sub">عدد غير المنخرطين</th>
-                          <th class="stats-th-sub">عدد المنخرطين</th>
-                          <th class="stats-th-sub">عدد غير المنخرطين</th>
-                          <th class="stats-th-sub">عدد الأجراء المصرح بهم</th>
-                          <th class="stats-th-sub">عدد الأجراء غير المصرح بهم</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td><input type="number" class="form-control form-control-sm text-center" id="res-w-in" min="0" step="1" readonly tabindex="-1" /></td>
-                          <td><input type="number" class="form-control form-control-sm text-center" id="res-w-ni" min="0" step="1" readonly tabindex="-1" /></td>
-                          <td><input type="number" class="form-control form-control-sm text-center" id="res-nw-in" min="0" step="1" readonly tabindex="-1" /></td>
-                          <td><input type="number" class="form-control form-control-sm text-center" id="res-nw-ni" min="0" step="1" readonly tabindex="-1" /></td>
-                          <td><input type="number" class="form-control form-control-sm text-center" id="res-emp-dec" min="0" step="1" readonly tabindex="-1" /></td>
-                          <td><input type="number" class="form-control form-control-sm text-center" id="res-emp-ndec" min="0" step="1" readonly tabindex="-1" /></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </section>
-                </div>
-
-                <div class="stats-split-bottom">
-                  <section class="stats-block">
-                    <div class="stats-block-title">النقص المستخرج</div>
-                    <table class="table table-bordered align-middle mb-0 stats-block-table">
-                      <thead class="stats-block-thead">
-                        <tr>
-                          <th class="stats-th-main">المبلغ الإجمالي للنقص</th>
-                          <th class="stats-th-main">معترف به</th>
-                          <th class="stats-th-main">غير معترف به</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td><input type="text" class="form-control form-control-sm text-center stats-amount-input" id="res-manq-tot" inputmode="numeric" autocomplete="off" readonly tabindex="-1" /></td>
-                          <td><input type="text" class="form-control form-control-sm text-center stats-amount-input" id="res-manq-ok" inputmode="numeric" autocomplete="off" readonly tabindex="-1" /></td>
-                          <td><input type="text" class="form-control form-control-sm text-center stats-amount-input" id="res-manq-nok" inputmode="numeric" autocomplete="off" readonly tabindex="-1" /></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </section>
-
-                  <section class="stats-block">
-                    <div class="stats-block-title">عدد المراقبين</div>
-                    <table class="table table-bordered align-middle mb-0 stats-block-table">
-                      <thead class="stats-block-thead">
-                        <tr>
-                          <th class="stats-th-main">عدد المراقبين</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td><input type="number" class="form-control form-control-sm text-center" id="res-participants" min="0" step="1" readonly tabindex="-1" /></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </section>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer border-0">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/@tanstack/table-core@8.5.20/build/umd/index.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
     <script src="js/api.js"></script>
-    <script src="js/interface3.js?v=20260604"></script>
+    <script src="js/interface3.js"></script>
   </body>
 </html>

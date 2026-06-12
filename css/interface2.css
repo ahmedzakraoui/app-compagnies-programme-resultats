@@ -1,5 +1,4 @@
 .page-results {
-    /* Same design tokens as Interface1 (needed for pagination active green background, etc.) */
     --cp-surface: rgba(255, 255, 255, 0.82);
     --cp-surface-2: rgba(236, 252, 240, 0.94);
     --cp-border: rgba(12, 107, 47, 0.08);
@@ -20,182 +19,54 @@
     position: relative;
 }
 
-.page-results .results-main-fluid {
-    max-width: 1650px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* ------------------------------------------------------------------ */
-/* RTL mirroring for the card header (icon+title on the right, total on the left) */
-/* Scoped only to the header where we set dir="rtl" in interface2.html */
-/* ------------------------------------------------------------------ */
+/* RTL header mirroring */
 .page-results .composed-card-head[dir="rtl"] {
-    flex-direction: row-reverse; /* icon moves to the right */
+    flex-direction: row-reverse;
 }
-
-/* Avoid Bootstrap .w-100 forcing 100% width inside a flex row */
 .page-results .composed-card-head[dir="rtl"] > .w-100 {
     width: auto !important;
     flex: 1 1 auto;
     min-width: 0;
 }
-
 .page-results .composed-card-head[dir="rtl"] .d-flex {
-    flex-direction: row-reverse; /* title right, total left */
+    flex-direction: row-reverse;
 }
-
 .page-results .composed-card-head[dir="rtl"] h2 {
     text-align: right;
 }
 
-.page-results .brand-mini-menu {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-}
-
-.page-results .brand-mini-link {
-    display: inline-flex;
-    align-items: center;
-    height: 32px;
-    padding: 0 0.75rem;
-    border-radius: 999px;
-    border: 1px solid rgba(12, 107, 47, 0.14);
-    background: rgba(255, 255, 255, 0.35);
-    color: var(--cp-ink, #0c3520);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.78rem;
-    white-space: nowrap;
-}
-
-.page-results .brand-mini-link:hover {
-    background: rgba(255, 255, 255, 0.7);
-    border-color: rgba(4, 143, 64, 0.35);
-}
-
-.page-results .brand-mini-link.is-active {
-    background: rgba(4, 143, 64, 0.12);
-    border-color: rgba(4, 143, 64, 0.35);
-    color: var(--cp-accent, #048f40);
-}
-
+/* Card body compact */
 .page-results .card-composed-body {
     padding: 1rem !important;
 }
 
-.page-results .results-filters {
-    margin-bottom: 0 !important;
-}
-
-.page-results .results-filters-shell {
-    display: flex;
-    gap: 0.6rem;
-    align-items: flex-end;
-    padding-bottom: 0.35rem;
-    /* Numeric filters removed: keep this area minimal */
-    border-bottom: 0;
-}
-
-.page-results .results-filters-section {
-    min-width: 0;
-}
-
-.page-results .results-vr {
-    align-self: stretch;
-    width: 1px;
-    background-color: rgba(108, 117, 125, 0.35);
-    opacity: 1;
-    margin: 0.1rem 0;
-}
-
-.page-results .results-filters-row {
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-    align-items: flex-end;
-}
-
-/* Keep filters inline (same line) on normal/large screens */
+/* Filter sizing */
 @media (min-width: 992px) {
-    .page-results .results-filters-row {
-        flex-wrap: nowrap;
-        align-items: flex-end;
-    }
-
     .page-results .results-filter-compact {
         max-width: none;
     }
-
-    .page-results .results-filter-compact--type {
-        max-width: none;
-    }
-
-    /* Inline sizing: Type fixed, Zone grows, button stays compact */
     .page-results .results-filter-compact--type {
         flex: 0 0 220px;
         min-width: 220px;
+        max-width: none;
     }
-
     .page-results .results-filter-compact:not(.results-filter-compact--type) {
         flex: 1 1 320px;
         min-width: 11em;
     }
-
-    .page-results .results-filter-actions {
-        flex: 0 0 auto;
-        white-space: nowrap;
-    }
 }
-
-.page-results .results-filter-compact {
-    max-width: 210px;
-}
-
 .page-results .results-filter-compact--type {
     max-width: 240px;
     min-width: 200px;
 }
-
-.page-results .results-filter-actions {
-    display: flex;
-    align-items: flex-end;
-}
-
-.page-results .results-filter-actions .btn {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-}
-
-.page-results .results-filters .form-label {
-    font-size: 0.64rem;
-    font-weight: 700;
-    color: var(--cp-muted, #6c757d);
-    letter-spacing: 0.02em;
-}
-
-/* Make filters smaller/denser (inputs + selects) */
-.page-results .results-filters .form-control-sm,
-.page-results .results-filters .form-select-sm {
-    font-size: 0.78rem;
-    padding-top: 0.18rem;
-    padding-bottom: 0.18rem;
-    padding-left: 0.45rem;
-    padding-right: 0.45rem;
-    border-radius: 10px;
-}
-
-/* Match Zone/Activité input height with Type select (Choices) */
 .page-results #filter-zone.form-control-sm {
     height: 39px;
 }
 
-/* Choices.js (modern select like Interface1) */
+/* Choices.js for filters */
 .page-results .choices {
     margin-bottom: 0;
 }
-
 .page-results .choices__inner {
     min-height: 32px;
     padding: 0.22rem 2.1rem 0.22rem 0.55rem;
@@ -204,19 +75,16 @@
     background-color: rgba(255, 255, 255, 0.35);
     font-size: 0.78rem;
 }
-
 .page-results .choices.is-focused .choices__inner,
 .page-results .choices.is-open .choices__inner {
     border-color: var(--cp-accent, #048f40);
     box-shadow: 0 0 0 3px rgba(4, 143, 64, 0.16);
     background-color: #fff;
 }
-
 .page-results .choices[data-type*='select-one']::after {
     border-color: rgba(0, 0, 0, 0.45) transparent transparent;
     right: 0.75rem;
 }
-
 .page-results .choices__list--dropdown,
 .page-results .choices__list[aria-expanded] {
     border-radius: 12px;
@@ -226,19 +94,15 @@
     overflow: hidden;
     z-index: 200;
 }
-
 .page-results .choices__list--dropdown .choices__item--selectable {
     padding: 0.45rem 0.75rem;
 }
-
 .page-results .choices__list--dropdown .choices__item--selectable.is-highlighted {
     background: rgba(4, 143, 64, 0.1);
 }
-
 .page-results .choices__item--choice {
     font-size: 0.78rem;
 }
-
 .page-results .results-filter-field label {
     display: block;
     font-size: 0.62rem;
@@ -246,7 +110,6 @@
     color: var(--cp-muted, #6c757d);
     margin-bottom: 0.1rem;
 }
-
 .page-results .results-filter-field .form-control-sm {
     border-radius: 10px;
     border: 1px solid rgba(12, 107, 47, 0.14);
@@ -255,232 +118,69 @@
     padding-bottom: 0.18rem;
 }
 
-.page-results .results-table-wrap {
-    /*overflow-x: auto;*/
-    -webkit-overflow-scrolling: touch;
-    border: 1px solid #8080804a;
-    position: relative;
-}
-
-.page-results .results-table-loader {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    pointer-events: none;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.15s ease, visibility 0.15s ease;
-}
-
-.page-results .results-table-wrap.is-loading .results-table-loader {
-    opacity: 1;
-    visibility: visible;
-}
-
-.page-results .results-table-wrap.is-loading .results-table {
-    opacity: 0.35;
-}
-
-.page-results .results-export-toolbar {
-    display: flex;
-    /* Push export buttons to the far right inside results-filters-shell */
-    margin-inline-start: auto;
-    justify-content: flex-end; /* top-right above table */
-    gap: 0.4rem;
-    margin-bottom: 0.0;
-}
-
-.page-results .results-export-toolbar .btn {
-    height: 32px;
-    padding-top: 0;
-    padding-bottom: 0;
-    display: inline-flex;
-    align-items: center;
-}
-
-.page-results .results-table {
-    width: 100%;
-    min-width: 1250px;
-    table-layout: auto;
-    font-size: 0.72rem;
-    border-collapse: separate;
-}
-
-.page-results .results-table th,
-.page-results .results-table td {
-    text-align: center;
-}
-
-.page-results .results-table thead th {
-    text-transform: none;
-    letter-spacing: normal;
-    white-space: nowrap;
-    padding: 0;
-    line-height: 1.1;
-}
-
-.page-results .results-table thead tr:first-child th {
-    font-size: 0.7rem;
-    white-space: nowrap;
-    padding-top: 0.6rem;
-}
-
-.page-results .results-table thead tr:nth-child(2) th {
-    font-size: 0.7rem;
-    white-space: nowrap;
-}
-
-.page-results .results-head-top .results-th-sortable,
-.page-results .results-head-top .results-th-static {
-    /* Make group headers visually "include" their subheaders by filling the whole colspan */
-    width: 100%;
-    margin: 0;
-}
-
-.page-results .results-head-top th:not(.is-placeholder) {
-    text-align: center;
-    font-weight: 800;
-}
-
-.page-results .results-head-sub th:not(.is-placeholder) {
-    text-align: center;
-    font-weight: 800;
-}
-
-.page-results .results-table thead th.results-th-group {
-    text-align: center;
-    font-size: 0.72rem;
-    font-weight: 800;
-    color: var(--cp-accent, #048f40);
-}
-
-.page-results .results-table thead th.is-placeholder {
-    padding: 0 !important;
-    border: 0 !important;
-    background: transparent !important;
-}
-
-.page-results .results-th-sortable,
-.page-results .results-th-static {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    /* Header-only spacing (thead). Keeps tbody compact/normal. */
-    width: calc(100% - 0.44rem);
-    padding: 0.65rem 0.45rem;
-    justify-content: center;
-    border-radius: 10px;
-    border: 1px solid rgba(12, 107, 47, 0.12);
-    background: linear-gradient(180deg, rgba(236, 252, 240, 0.95), rgba(220, 238, 224, 0.88));
-}
-
-.page-results .results-th-sortable {
-    cursor: pointer;
-    user-select: none;
-}
-
-/* Interface2: remove Interface1 header gradient ONLY for the results table */
-.page-results .results-table.composed-table thead th {
-    background: transparent !important;
-}
-
-.page-results .results-table.composed-table thead .results-th-sortable,
-.page-results .results-table.composed-table thead .results-th-static {
-    background: transparent !important;
-}
-
-.page-results .results-sort-indicator {
-    font-size: 0.72rem;
-    color: rgba(0, 0, 0, 0.45);
-}
-
-.page-results .results-table tbody tr.results-row-clickable {
-    cursor: pointer;
-}
-
-.page-results .results-table tbody td {
-    padding: 0.45rem 0.35rem;
-    white-space: nowrap;
-    line-height: 1.15;
-    border: none;
-}
-
+/* Column width rules */
 .page-results .results-table tbody td:nth-child(1) {
-    /* ID */
     width: 1%;
     white-space: nowrap;
     min-width: unset;
     max-width: unset;
 }
-
-/* Also constrain the ID header column to its content */
 .page-results .results-table thead th:nth-child(1) {
     width: 1%;
     white-space: nowrap;
 }
 .page-results .results-table tbody td:nth-child(2) {
-    /* Type campagne */
     min-width: 140px;
     max-width: 190px;
 }
-
 .page-results .results-table tbody td:nth-child(3) {
-    /* Zone / Activité */
     min-width: 180px;
     max-width: 220px;
     white-space: normal;
     word-break: break-word;
 }
-
 .page-results .results-table tbody td:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(3)) {
     min-width: 92px;
 }
 
-.page-results .results-type-cell {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
+/* Footer overrides */
+.page-results .results-filters {
+    margin-bottom: 0 !important;
+}
+.page-results .results-vr {
+    align-self: stretch;
+    width: 1px;
+    background-color: rgba(108, 117, 125, 0.35);
+    opacity: 1;
+    margin: 0.1rem 0;
+}
+.page-results .results-table-wrap {
+    min-height: 12.146em;
 }
 
-.page-results .results-type-main {
-    font-weight: 800;
-    color: var(--cp-accent, #048f40);
-}
-
-.page-results .results-type-sub {
-    font-size: 0.7rem;
-    color: var(--cp-muted, #6c757d);
-    font-weight: 700;
-}
-
-.page-results .results-total {
-    font-weight: 800;
-    color: var(--cp-accent, #048f40);
-}
-tbody#results-tbody {
-    background-color: #8080800a;
-}
-thead#results-thead th div {
-    background-color: #efefef !important;
-    color: #0a9244;
-}
-.results-filter-compact.results-filter-compact--type div.choices, 
-.results-filter-compact.results-filter-compact--type div.choices .choices__inner, 
-.page-results #filter-zone.form-control-sm {
-    height: 32px;
-}
-table.table.table-hover.align-middle.composed-table.results-table.mb-0 td {
+/* Miscellaneous */
+.page-results table.table.table-hover.align-middle.composed-table.results-table.mb-0 td {
     min-width: unset;
-    text-wrap:auto;
-    max-width:min-content;
+    text-wrap: auto;
+    max-width: min-content;
 }
-main.container-fluid.composed-main.results-main-fluid {
+.page-results main.container-fluid.composed-main.results-main-fluid {
     margin-top: 2em;
     padding-bottom: 0;
 }
-div.results-table-wrap {
-    min-height: 12.146em;
+body.page-results tbody#results-tbody {
+    background-color: #8080800a;
+}
+body.page-results thead#results-thead th div {
+    background-color: #efefef !important;
+    color: #0a9244;
+}
+.page-results .results-filter-compact.results-filter-compact--type div.choices,
+.page-results .results-filter-compact.results-filter-compact--type div.choices .choices__inner,
+.page-results #filter-zone.form-control-sm {
+    height: 32px;
+}
+.stats-th-group {
+    background: linear-gradient(180deg, rgba(4, 143, 64, 0.12), rgba(165, 202, 31, 0.08)) !important;
+    font-size: 0.76rem;
 }

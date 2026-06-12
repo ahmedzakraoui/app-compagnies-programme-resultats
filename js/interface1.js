@@ -16,14 +16,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const statsModalEl = document.getElementById('modal-stats-campagne');
     const statsModal = typeof bootstrap !== 'undefined' ? bootstrap.Modal.getOrCreateInstance(statsModalEl) : null;
     const btnStatsSave = document.getElementById('modal-stats-save');
-    const statsTablePanel = document.getElementById('stats-table-panel');
-    const statsModalLoader = document.getElementById('stats-modal-loader');
     const paginationWrap = document.getElementById('programmes-pagination');
     const btnPrevPage = document.getElementById('prog-prev');
     const btnNextPage = document.getElementById('prog-next');
     const pageInfoEl = document.getElementById('prog-page-info');
     const progPages = document.getElementById('prog-pages');
     const progTotal = document.getElementById('prog-total');
+    const programmesLoaderRow = document.getElementById('programmes-loader-row');
 
     if (document.body) {
         document.querySelectorAll('.modal-backdrop').forEach((el) => el.remove());
@@ -55,17 +54,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         statsModalEl.addEventListener('shown.bs.modal', checkOverlays);
     }
 
-    function setStatsModalLoading(isLoading) {
-        if (statsTablePanel) statsTablePanel.classList.toggle('is-stats-loading', Boolean(isLoading));
-        if (statsModalLoader) statsModalLoader.setAttribute('aria-hidden', isLoading ? 'false' : 'true');
-        if (btnStatsSave) btnStatsSave.disabled = Boolean(isLoading);
-    }
+
 
     let currentProgrammeRow = null;
-    /** Dernière ligne Resultats chargée : col. A (ID_Resultat), pour ré-enregistrer la même ligne si besoin */
     let currentResultatId = null;
-    /** Évite qu’un `finally` d’une ouverture précédente enlève le loader pendant une ouverture plus récente */
-    let statsModalOpenGeneration = 0;
+    const resultatsCache = new Map();
 
     const PROGRAMMES_PAGE_SIZE = 7;
     let programmesAllRows = [];
@@ -73,6 +66,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     let programmesPage = 1;
     let goToLastPageOnce = false;
     let programmesMessage = '';
+
+    function setProgrammesLoading(isLoading) {
+        if (programmesLoaderRow) programmesLoaderRow.style.display = isLoading ? '' : 'none';
+    }
 
     function setProgrammesMessage(msg) {
         programmesMessage = msg ? String(msg) : '';
@@ -128,7 +125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (progTotal) {
         const total = programmesAllRows.length;
-        progTotal.textContent = `${total} campagne${total > 1 ? 's' : ''}`;
+        progTotal.textContent = `${total} ${total > 1 ? 'حملات' : 'حملة'}`;
     }
 }
 
@@ -141,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         tableBody.innerHTML = '';
         if (!slice.length) {
-            tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Aucune campagne.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">قائمة فارغة</td></tr>';
             updatePaginationUI();
             return;
         }
@@ -163,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             tr.innerHTML = `
                 <td><span class="badge bg-info text-dark programme-type-badge">${row[2]}</span></td>
                 <td>${row[3]}</td>
-                <td><small>${row[4]} ⟼ ${row[5]}</small></td>
+                <td><small>${row[5]} ⟻ ${row[4]}</small></td>
                 <td class="text-center">${row[6]}</td>
             `;
             tr.addEventListener('click', () => openStatsModal(row));
@@ -316,31 +313,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    /**
-     * Feuille Resultats (colonnes) :
-     * ID_Resultat, ID_Programme, Sal_Aff, Sal_NonAff, NonSal_Aff, NonSal_NonAff,
-     * Trav_Declares, Trav_NonDeclares, Mt_Reconnu, Mt_NonReconnu, Controleurs_participants
-     * عدد المراقبين المشاركين (res-participants) : indépendant de l’effectif du programme.
-     */
-    async function loadStatsFromSheet(programmeId, prog) {
+    function populateModalFromCache(progRow) {
         currentResultatId = null;
-        const rows = await fetchData('Resultats');
-        if (String(currentProgrammeRow?.[0]) !== String(programmeId)) return;
-        const list = Array.isArray(rows) ? rows : [];
-        const matches = list.filter(
-            (r) =>
-                r &&
-                !isResultatsHeaderRow(r) &&
-                r.length >= 2 &&
-                String(r[1]).trim() === String(programmeId).trim() &&
-                (r.length < 13 || String(r[12]).trim() === String(user.codeBr).trim())
-        );
-        const data = matches.length ? matches[matches.length - 1] : null;
+        const pid = String(progRow[0] ?? '').trim();
+        const data = resultatsCache.get(pid) || null;
+
+        setStatVal('res-type-hamla', progRow[2]);
+        setStatVal('res-activite-zone', progRow[3]);
 
         if (data && data.length >= 2) {
             currentResultatId = data[0] != null && String(data[0]).trim() !== "" ? String(data[0]).trim() : null;
-            setStatVal('res-type-hamla', prog[2]);
-            setStatVal('res-activite-zone', prog[3]);
             setStatVal('res-w-in', data[2]);
             setStatVal('res-w-ni', data[3]);
             setStatVal('res-nw-in', data[4]);
@@ -359,8 +341,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setStatVal('res-participants', data.length > 10 ? data[10] : '');
             }
         } else {
-            setStatVal('res-type-hamla', prog[2]);
-            setStatVal('res-activite-zone', prog[3]);
             setStatVal('res-w-in', '');
             setStatVal('res-w-ni', '');
             setStatVal('res-nw-in', '');
@@ -374,32 +354,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function openStatsModal(programmeRow) {
+    function openStatsModal(programmeRow) {
         if (!statsModal) {
             alert('Interface modal indisponible (Bootstrap JS).');
             return;
         }
-        const openGen = ++statsModalOpenGeneration;
-        setStatsModalLoading(true);
-        try {
-            currentProgrammeRow = programmeRow;
-            const pid = String(programmeRow[0] ?? '').trim();
-            document.querySelectorAll('.modal-stats-pid').forEach((el) => {
-                el.textContent = pid;
-            });
-            const elType = document.getElementById('modal-prog-type');
-            const elZone = document.getElementById('modal-prog-zone');
-            const elPeriod = document.getElementById('modal-prog-period');
-            const elEff = document.getElementById('modal-prog-effectif');
-            if (elType) elType.textContent = programmeRow[2] ?? '';
-            if (elZone) elZone.textContent = programmeRow[3] ?? '';
-            if (elPeriod) elPeriod.textContent = `${programmeRow[4] ?? ''} ↤ ${programmeRow[5] ?? ''}`;
-            if (elEff) elEff.textContent = programmeRow[6] != null ? String(programmeRow[6]) : '';
-            statsModal.show();
-            await loadStatsFromSheet(programmeRow[0], programmeRow);
-        } finally {
-            if (openGen === statsModalOpenGeneration) setStatsModalLoading(false);
-        }
+        currentProgrammeRow = programmeRow;
+        const pid = String(programmeRow[0] ?? '').trim();
+        document.querySelectorAll('.modal-stats-pid').forEach((el) => {
+            el.textContent = pid;
+        });
+        const elType = document.getElementById('modal-prog-type');
+        const elZone = document.getElementById('modal-prog-zone');
+        const elPeriod = document.getElementById('modal-prog-period');
+        const elEff = document.getElementById('modal-prog-effectif');
+        if (elType) elType.textContent = programmeRow[2] ?? '';
+        if (elZone) elZone.textContent = programmeRow[3] ?? '';
+        if (elPeriod) elPeriod.textContent = `${programmeRow[4] ?? ''} ⟻ ${programmeRow[5] ?? ''}`;
+        if (elEff) elEff.textContent = programmeRow[6] != null ? String(programmeRow[6]) : '';
+        populateModalFromCache(programmeRow);
+        statsModal.show();
     }
 
     function buildResultatsRow() {
@@ -438,12 +412,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    if (statsModalEl) {
-        statsModalEl.addEventListener('hidden.bs.modal', () => {
-            statsModalOpenGeneration += 1;
-            setStatsModalLoading(false);
-        });
-    }
+
 
     initAmountInputs();
 
@@ -458,7 +427,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 statsModal?.hide();
                 await loadTable();
             } else {
-                alert("Erreur lors de l'enregistrement des statistiques.");
+                alert("Erreur lors de l'enregistrement des statistiques");
             }
         });
     }
@@ -496,8 +465,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     async function loadTable() {
-        setProgrammesMessage('');
-        tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Chargement...</td></tr>';
+        programmesMessage = '';
+        programmesAllRows = [];
+        programmeIdsWithResultats = new Set();
+        if (paginationWrap) paginationWrap.classList.add('d-none');
+        if (progTotal) progTotal.textContent = '';
+        tableBody.innerHTML = '';
+        const loaderTr = document.createElement('tr');
+        loaderTr.id = 'programmes-loader-row';
+        loaderTr.innerHTML = '<td colspan="4" class="text-center py-4"><div class="spinner-border text-success" role="status" aria-label="Chargement"></div></td>';
+        tableBody.appendChild(loaderTr);
         if (typeof navigator !== 'undefined' && navigator.onLine === false) {
             setProgrammesMessage('Pas de connexion internet');
             return;
@@ -529,7 +506,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 else window.location.href = 'index.html';
                 return;
             }
-            setProgrammesMessage('Impossible de charger les programmes (API).');
+            setProgrammesMessage('Impossible de charger les programmes (API)');
             return;
         }
 
@@ -538,12 +515,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const myData = allData.filter((row) => row && String(row[1]).trim() === String(user.codeBr).trim());
 
         programmeIdsWithResultats = new Set();
+        resultatsCache.clear();
         const resList = Array.isArray(resultatsRows) ? resultatsRows : [];
         for (const r of resList) {
             if (!r || isResultatsHeaderRow(r) || r.length < 2) continue;
             if (r.length >= 13 && String(r[12]).trim() !== String(user.codeBr).trim()) continue;
             const pid = String(r[1]).trim();
-            if (pid) programmeIdsWithResultats.add(pid);
+            if (pid) {
+                programmeIdsWithResultats.add(pid);
+                resultatsCache.set(pid, r);
+            }
         }
         programmesAllRows = myData;
         if (goToLastPageOnce) {
@@ -562,7 +543,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
         initFormPickersOnce();
         if (!validateProgrammeForm()) {
-            alert('Veuillez compléter tous les champs obligatoires.');
+            alert('Veuillez compléter tous les champs obligatoires');
             return;
         }
 
@@ -592,7 +573,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             btnText.textContent = 'Ajouter au programme';
             await loadTable();
         } else {
-            alert('Erreur lors de l\'enregistrement.');
+            alert('Erreur lors de l\'enregistrement');
             btnText.textContent = 'Ajouter au programme';
         }
     });

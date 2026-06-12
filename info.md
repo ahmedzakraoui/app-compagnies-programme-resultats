@@ -23,12 +23,12 @@ Le super admin voit un tableau qui collecte toutes les info et résultats de cha
 Appscript
 
 Mise à jour du déploiement effectuée.
-Version 9 du 4 juin 2026, 17:18
+Version 10 du 12 juin 2026, 14:46
 ID de déploiement
-AKfycbwag-J-DWVyKdgr05tDlvuaNBFLCqQykQMsrXwkQYW-6JzaHvEK1B9YLCOJOzD-udbO
+AKfycbztXxU6nuuIEkCL2sBxU6QNFvcDLv1nWiVU7Woa_6Mc7iXbkcC2jxdVhxGwTVQaQ8Iv
 Application Web
 URL
-https://script.google.com/macros/s/AKfycbwag-J-DWVyKdgr05tDlvuaNBFLCqQykQMsrXwkQYW-6JzaHvEK1B9YLCOJOzD-udbO/exec
+https://script.google.com/macros/s/AKfycbztXxU6nuuIEkCL2sBxU6QNFvcDLv1nWiVU7Woa_6Mc7iXbkcC2jxdVhxGwTVQaQ8Iv/exec
 
 google sheets tables structure:
 
@@ -36,6 +36,7 @@ Bureaux (sheet):
 Nom_Bureau -> column A
 Code_Bureau -> column B
 Region -> column C
+Nom_Bureau_Ar -> column D
 
 Users (sheet):
 Matricule -> column A

@@ -64,15 +64,15 @@
 }
 
 .page-account .account-info-label {
-  font-size: 0.75rem;
-  font-weight: 800;
+  font-size: 0.78rem;
+  font-weight: 600;
   letter-spacing: 0.06em;
   color: var(--cp-muted);
   margin-bottom: 0.25rem;
 }
 
 .page-account .account-info-value {
-  font-weight: 700;
+  font-weight: 800;
   color: var(--cp-ink);
   word-break: break-word;
 }
@@ -110,7 +110,6 @@
 
 .page-account #btn-change-password {
   width: auto;
-  min-width: 150px;
   padding: 0.45rem 0.9rem;
   font-size: 0.9rem;
   border-radius: 12px;

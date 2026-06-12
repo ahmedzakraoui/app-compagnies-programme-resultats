@@ -17,47 +17,47 @@
     <div class="composed-grid-pattern" aria-hidden="true"></div>
 
     <header class="composed-topbar">
-      <nav class="navbar composed-nav py-2">
+      <nav class="navbar composed-nav py-2" dir="rtl">
         <div class="container composed-nav-inner">
           <div class="composed-brand">
             <img src="images/cnss_logo.svg" alt="" class="composed-brand-logo" width="44" height="44" decoding="async" />
           </div>
           <div class="composed-user-panel">
-            <button type="button" class="btn btn-outline-secondary btn-sm composed-logout" id="btn-back">Retour</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm composed-logout" id="btn-logout">Déconnexion</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="btn-back">الرجوع</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="btn-logout"><img src="images/off_icon.svg" alt="Déconnexion" width="32" height="32" /></button>
           </div>
         </div>
       </nav>
     </header>
 
-    <main class="container composed-main">
+    <main class="container composed-main" dir="rtl">
       <div class="row g-4 justify-content-center">
         <div class="col-lg-10">
           <div class="card card-composed account-card">
             <div class="card-composed-accent" aria-hidden="true"></div>
             <div class="card-composed-body p-4 p-lg-4">
               <div class="account-title text-center mb-5">
-                <h1 class="h4 fw-bold mb-1 acc-name">Mon compte</h1>
+                <h1 class="h4 fw-bold mb-1 acc-name">حسابي</h1>
               </div>
 
               <div class="account-split">
                 <section class="account-panel">
-                  <div class="account-panel-title">Informations</div>
+                  <div class="account-panel-title">المعلومات الشخصية</div>
                   <div class="account-info-grid">
                     <div class="account-info-item">
-                      <div class="account-info-label">Nom et prénom</div>
+                      <div class="account-info-label">الاسم و اللقب</div>
                       <div class="account-info-value acc-name">--</div>
                     </div>
                     <div class="account-info-item">
-                      <div class="account-info-label">Matricule</div>
+                      <div class="account-info-label">رقم الآلي</div>
                       <div class="account-info-value" id="acc-matricule">--</div>
                     </div>
                     <div class="account-info-item">
-                      <div class="account-info-label">Fonction</div>
+                      <div class="account-info-label">الوظيفة</div>
                       <div class="account-info-value" id="acc-grade">--</div>
                     </div>
                     <div class="account-info-item pb-4">
-                      <div class="account-info-label">Bureau</div>
+                      <div class="account-info-label">المكتب</div>
                       <div class="account-info-value" id="acc-bureau">--</div>
                     </div>
                   </div>
@@ -66,31 +66,33 @@
                 <div class="vr account-divider" aria-hidden="true"></div>
 
                 <section class="account-panel">
-                  <div class="account-panel-title">Changer le mot de passe</div>
+                  <div class="account-panel-title">تغيير كلمة المرور</div>
                   <div class="alert d-none" id="account-alert" role="alert"></div>
 
                   <form id="form-change-password" novalidate>
                     <div id="change-password-panel">
                       <div class="mb-3">
-                        <label class="form-label" for="old-pw">Ancien mot de passe</label>
+                        <label class="form-label" for="old-pw">كلمة المرور القديمة</label>
                         <input type="password" class="form-control" id="old-pw" autocomplete="current-password" required />
                       </div>
                       <div class="mb-3">
-                        <label class="form-label" for="new-pw">Nouveau mot de passe</label>
+                        <label class="form-label" for="new-pw">كلمة المرور الجديدة</label>
                         <input type="password" class="form-control" id="new-pw" autocomplete="new-password" required />
                       </div>
                       <div class="mb-3">
-                        <label class="form-label" for="new-pw-2">Confirmer le nouveau mot de passe</label>
+                        <label class="form-label" for="new-pw-2">تأكيد كلمة المرور الجديدة</label>
                         <input type="password" class="form-control" id="new-pw-2" autocomplete="new-password" required />
                       </div>
-                      <button type="submit" class="btn btn-primary" id="btn-change-password">Mettre à jour</button>
+                      <div class="d-flex justify-content-center mt-3">
+                        <button type="submit" class="btn btn-primary" id="btn-change-password">تغيير كلمة المرور</button>
+                      </div>
                     </div>
 
                     <div class="change-password-loader d-none" id="change-password-loader" aria-live="polite">
                       <div class="spinner-border text-success" role="status" aria-label="Chargement">
-                        <span class="visually-hidden">Chargement…</span>
+                        <span class="visually-hidden">تحديث</span>
                       </div>
-                      <div class="small text-muted fw-semibold mt-3">Mise à jour en cours…</div>
+                      <div class="small text-muted fw-semibold mt-3">تحديث...</div>
                     </div>
                   </form>
                 </section>

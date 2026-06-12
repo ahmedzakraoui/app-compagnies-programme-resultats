@@ -25,33 +25,10 @@ function parseMaybeNumber(v) {
     return Number.isFinite(n) ? n : null;
 }
 
-function parseMaybeAmount(v) {
-    const s = String(v ?? '').trim();
-    if (!s) return null;
-    const cleaned = s.replace(/[^\d]/g, '');
-    if (!cleaned) return null;
-    const n = Number(cleaned);
-    return Number.isFinite(n) ? n : null;
-}
-
-function sanitizeAmountText(v) {
-    const raw = String(v === undefined || v === null ? '' : v);
-    const normalizedSep = raw.replace(/[.;:،؛'"’‘“”]/g, ',');
-    const kept = normalizedSep.replace(/[^\d,]/g, '');
-    return kept.replace(/,{2,}/g, ',').replace(/^,/, '');
-}
-
-function isResultatsHeaderRow(r) {
-    if (!Array.isArray(r) || r.length < 2) return false;
-    const c0 = String(r[0]).trim();
-    const c1 = String(r[1]).trim();
-    return c0 === 'ID_Resultat' || c1 === 'ID_Programme';
-}
-
 function isHeaderRow(r) {
     if (!Array.isArray(r) || r.length < 1) return false;
     const c0 = String(r[0]).trim().toLowerCase();
-    return c0 === 'id_programme' || c0 === 'id_resultat' || c0.indexOf('id_') === 0;
+    return c0 === 'id_programme' || c0.indexOf('id_') === 0;
 }
 
 function findColumnIndex(headers, names) {
@@ -85,11 +62,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnPrevPage = document.getElementById('res-prev');
     const btnNextPage = document.getElementById('res-next');
     const resPages = document.getElementById('res-pages');
-
-    const statsModalEl = document.getElementById('modal-stats-campagne');
-    const statsModal = bootstrap ? bootstrap.Modal.getOrCreateInstance(statsModalEl) : null;
-    const statsTablePanel = document.getElementById('stats-table-panel');
-    const statsModalLoader = document.getElementById('stats-modal-loader');
 
     let user = null;
     try {
@@ -127,104 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (resultsTableLoader) resultsTableLoader.setAttribute('aria-hidden', isLoading ? 'false' : 'true');
     }
 
-    function setStatsModalLoading(isLoading) {
-        if (statsTablePanel) statsTablePanel.classList.toggle('is-stats-loading', Boolean(isLoading));
-        if (statsModalLoader) statsModalLoader.setAttribute('aria-hidden', isLoading ? 'false' : 'true');
-    }
-
-    function statVal(id) {
-        const el = document.getElementById(id);
-        return el ? el.value.trim() : '';
-    }
-
-    function setStatVal(id, v) {
-        const el = document.getElementById(id);
-        if (el) el.value = v === undefined || v === null ? '' : String(v);
-    }
-
-    let currentProgrammeRow = null;
-    let currentResultatId = null;
-    let statsModalOpenGeneration = 0;
     let bureauMap = new Map();
-
-    async function loadStatsFromSheet(programmeId, prog) {
-        currentResultatId = null;
-        const res = await postAction('getAdminSheet', { sheet: 'Resultats' });
-        if (String(currentProgrammeRow?.[0]) !== String(programmeId)) return;
-        const rows = res && res.ok && Array.isArray(res.rows) ? res.rows : [];
-        const matches = rows.filter(
-            (r) => r && !isResultatsHeaderRow(r) && r.length >= 2 && String(r[1]).trim() === String(programmeId).trim(),
-        );
-        const data = matches.length ? matches[matches.length - 1] : null;
-
-        setStatVal('res-type-hamla', prog[2]);
-        setStatVal('res-activite-zone', prog[3]);
-
-        if (data && data.length >= 2) {
-            currentResultatId = data[0] != null && String(data[0]).trim() !== '' ? String(data[0]).trim() : null;
-            setStatVal('res-w-in', data[2]);
-            setStatVal('res-w-ni', data[3]);
-            setStatVal('res-nw-in', data[4]);
-            setStatVal('res-nw-ni', data[5]);
-            setStatVal('res-emp-dec', data[6]);
-            setStatVal('res-emp-ndec', data[7]);
-            if (data.length >= 12) {
-                setStatVal('res-manq-tot', sanitizeAmountText(data[8]));
-                setStatVal('res-manq-ok', sanitizeAmountText(data[9]));
-                setStatVal('res-manq-nok', sanitizeAmountText(data[10]));
-                setStatVal('res-participants', data[11]);
-            } else {
-                setStatVal('res-manq-tot', '');
-                setStatVal('res-manq-ok', sanitizeAmountText(data[8]));
-                setStatVal('res-manq-nok', sanitizeAmountText(data[9]));
-                setStatVal('res-participants', data.length > 10 ? data[10] : '');
-            }
-        } else {
-            setStatVal('res-w-in', '');
-            setStatVal('res-w-ni', '');
-            setStatVal('res-nw-in', '');
-            setStatVal('res-nw-ni', '');
-            setStatVal('res-emp-dec', '');
-            setStatVal('res-emp-ndec', '');
-            setStatVal('res-manq-tot', '');
-            setStatVal('res-manq-ok', '');
-            setStatVal('res-manq-nok', '');
-            setStatVal('res-participants', '');
-        }
-    }
-
-    async function openStatsModal(programmeRow) {
-        if (!statsModal) {
-            alert('Interface modal indisponible (Bootstrap JS).');
-            return;
-        }
-        const openGen = ++statsModalOpenGeneration;
-        setStatsModalLoading(true);
-        try {
-            currentProgrammeRow = programmeRow;
-            const pid = String(programmeRow[0] ?? '').trim();
-            document.querySelectorAll('.modal-stats-pid').forEach((el) => {
-                el.textContent = pid;
-            });
-            const elType = document.getElementById('modal-prog-type');
-            const elZone = document.getElementById('modal-prog-zone');
-            const elPeriod = document.getElementById('modal-prog-period');
-            const elEff = document.getElementById('modal-prog-effectif');
-            if (elType) elType.textContent = programmeRow[2] ?? '';
-            if (elZone) elZone.textContent = programmeRow[3] ?? '';
-            if (elPeriod) elPeriod.textContent = `${programmeRow[4] ?? ''} ↤ ${programmeRow[5] ?? ''}`;
-            if (elEff) elEff.textContent = programmeRow[6] != null ? String(programmeRow[6]) : '';
-            statsModal.show();
-            await loadStatsFromSheet(programmeRow[0], programmeRow);
-        } finally {
-            if (openGen === statsModalOpenGeneration) setStatsModalLoading(false);
-        }
-    }
-
-    statsModalEl?.addEventListener('hidden.bs.modal', () => {
-        statsModalOpenGeneration += 1;
-        setStatsModalLoading(false);
-    });
 
     const choiceSelectOpts = {
         searchEnabled: false,
@@ -245,19 +120,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const columnHelper = createColumnHelper();
-
-    const numberMinFilter = (row, columnId, filterValue) => {
-        const min = filterValue === '' || filterValue == null ? null : Number(filterValue);
-        if (min == null || !Number.isFinite(min)) return true;
-        const v = parseMaybeNumber(row.getValue(columnId)) ?? 0;
-        return v >= min;
-    };
-    const amountMinFilter = (row, columnId, filterValue) => {
-        const min = filterValue === '' || filterValue == null ? null : Number(filterValue);
-        if (min == null || !Number.isFinite(min)) return true;
-        const v = parseMaybeAmount(row.getValue(columnId)) ?? 0;
-        return v >= min;
-    };
 
     const columns = [
         columnHelper.accessor('programmeId', {
@@ -285,74 +147,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             cell: (info) => String(info.getValue() ?? '—'),
             filterFn: 'includesString',
         }),
-        columnHelper.accessor('salAff', {
-            id: 'salAff',
-            header: () => 'عدد المنخرطين (الأجراء)',
+        columnHelper.accessor('periode', {
+            id: 'periode',
+            header: () => 'الفترة الزمنية',
             cell: (info) => String(info.getValue() ?? '—'),
-            filterFn: numberMinFilter,
-            sortingFn: (a, b) => (parseMaybeNumber(a.getValue('salAff')) ?? 0) - (parseMaybeNumber(b.getValue('salAff')) ?? 0),
+            filterFn: 'includesString',
         }),
-        columnHelper.accessor('salNonAff', {
-            id: 'salNonAff',
-            header: () => 'عدد غير المنخرطين (الأجراء)',
+        columnHelper.accessor('effectif', {
+            id: 'effectif',
+            header: () => 'عدد المراقبين',
             cell: (info) => String(info.getValue() ?? '—'),
-            filterFn: numberMinFilter,
-            sortingFn: (a, b) => (parseMaybeNumber(a.getValue('salNonAff')) ?? 0) - (parseMaybeNumber(b.getValue('salNonAff')) ?? 0),
-        }),
-        columnHelper.accessor('nonSalAff', {
-            id: 'nonSalAff',
-            header: () => 'عدد المنخرطين (غير الأجراء)',
-            cell: (info) => String(info.getValue() ?? '—'),
-            filterFn: numberMinFilter,
-            sortingFn: (a, b) => (parseMaybeNumber(a.getValue('nonSalAff')) ?? 0) - (parseMaybeNumber(b.getValue('nonSalAff')) ?? 0),
-        }),
-        columnHelper.accessor('nonSalNonAff', {
-            id: 'nonSalNonAff',
-            header: () => 'عدد غير المنخرطين (غير الأجراء)',
-            cell: (info) => String(info.getValue() ?? '—'),
-            filterFn: numberMinFilter,
-            sortingFn: (a, b) => (parseMaybeNumber(a.getValue('nonSalNonAff')) ?? 0) - (parseMaybeNumber(b.getValue('nonSalNonAff')) ?? 0),
-        }),
-        columnHelper.accessor('travTotal', {
-            id: 'travTotal',
-            header: () => 'عدد الأجراء',
-            cell: (info) => String(info.getValue() ?? '—'),
-            filterFn: numberMinFilter,
-            sortingFn: (a, b) => (parseMaybeNumber(a.getValue('travTotal')) ?? 0) - (parseMaybeNumber(b.getValue('travTotal')) ?? 0),
-        }),
-        columnHelper.accessor('insuffTotale', {
-            id: 'insuffTotale',
-            header: () => 'المبلغ الإجمالي للنقص',
-            cell: (info) => String(info.getValue() ?? '—'),
-            filterFn: amountMinFilter,
-            sortingFn: (a, b) => (parseMaybeAmount(a.getValue('insuffTotale')) ?? 0) - (parseMaybeAmount(b.getValue('insuffTotale')) ?? 0),
-        }),
-        columnHelper.accessor('mtReconnu', {
-            id: 'mtReconnu',
-            header: () => 'معترف به',
-            cell: (info) => String(info.getValue() ?? '—'),
-            filterFn: amountMinFilter,
-            sortingFn: (a, b) => (parseMaybeAmount(a.getValue('mtReconnu')) ?? 0) - (parseMaybeAmount(b.getValue('mtReconnu')) ?? 0),
-        }),
-        columnHelper.accessor('mtNonReconnu', {
-            id: 'mtNonReconnu',
-            header: () => 'غير معترف به',
-            cell: (info) => String(info.getValue() ?? '—'),
-            filterFn: amountMinFilter,
-            sortingFn: (a, b) => (parseMaybeAmount(a.getValue('mtNonReconnu')) ?? 0) - (parseMaybeAmount(b.getValue('mtNonReconnu')) ?? 0),
-        }),
-        columnHelper.accessor('controleursParticipants', {
-            id: 'controleursParticipants',
-            header: () => 'عدد المراقبين المشاركين',
-            cell: (info) => String(info.getValue() ?? '—'),
-            filterFn: numberMinFilter,
-            sortingFn: (a, b) =>
-                (parseMaybeNumber(a.getValue('controleursParticipants')) ?? 0) -
-                (parseMaybeNumber(b.getValue('controleursParticipants')) ?? 0),
+            filterFn: (row, columnId, filterValue) => {
+                const min = filterValue === '' || filterValue == null ? null : Number(filterValue);
+                if (min == null || !Number.isFinite(min)) return true;
+                const v = parseMaybeNumber(row.getValue(columnId)) ?? 0;
+                return v >= min;
+            },
+            sortingFn: (a, b) => (parseMaybeNumber(a.getValue('effectif')) ?? 0) - (parseMaybeNumber(b.getValue('effectif')) ?? 0),
         }),
     ];
 
-    const TABLE_COLS = 13;
+    const TABLE_COLS = 6;
 
     let table = null;
     let tableState = null;
@@ -403,7 +218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         resultsTotalEl.textContent =
-            countAll === countFiltered ? `${countAll} campagne${countAll > 1 ? 's' : ''}` : `${countFiltered} / ${countAll} campagnes`;
+            countAll === countFiltered ? `${countAll} ${countAll > 1 ? 'حملات' : 'حملة'}` : `${countFiltered} / ${countAll} حملات`;
     }
 
     function renderTanstackTable() {
@@ -430,27 +245,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         theadEl.innerHTML = '';
         const headerGroups = table.getHeaderGroups();
-        const totalHeaderRows = headerGroups.length;
-        const fuseIds = ['programmeId', 'br', 'typeCampagne', 'zone', 'controleursParticipants'];
-        const nonSortableGroupIds = [];
 
-        headerGroups.forEach((hg, idx) => {
+        headerGroups.forEach((hg) => {
             const tr = document.createElement('tr');
-            tr.className = idx === 0 ? 'results-head-top' : 'results-head-sub';
+            tr.className = 'results-head-top';
             hg.headers.forEach((header) => {
-                const colId = header.column?.id;
-                const shouldFuse = fuseIds.includes(colId);
-                if (!header.isPlaceholder && shouldFuse && idx > 0) return;
-
                 const th = document.createElement('th');
                 th.colSpan = header.colSpan;
                 th.rowSpan = header.rowSpan || 1;
                 th.className = header.isPlaceholder ? 'is-placeholder' : '';
-                if (header.isPlaceholder && shouldFuse && idx === 0) th.className = '';
-                if (!header.isPlaceholder || (header.isPlaceholder && shouldFuse && idx === 0)) {
-                    if (shouldFuse && idx === 0 && totalHeaderRows > 1) th.rowSpan = totalHeaderRows;
-
-                    const canSort = !nonSortableGroupIds.includes(colId) && header.column.getCanSort();
+                if (!header.isPlaceholder) {
+                    const canSort = header.column.getCanSort();
                     const div = document.createElement('div');
                     div.className = canSort ? 'results-th-sortable' : 'results-th-static';
                     if (canSort) {
@@ -475,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             }
                         });
                     }
-                    div.innerHTML = header.isPlaceholder && shouldFuse ? flexRender(header.column.columnDef.header, {}) : flexRender(header.column.columnDef.header, header.getContext());
+                    div.innerHTML = flexRender(header.column.columnDef.header, header.getContext());
                     const s = header.column.getIsSorted();
                     if (s) {
                         const badge = document.createElement('span');
@@ -513,18 +318,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             tr.className = 'results-row-clickable';
             tr.setAttribute('role', 'button');
             tr.tabIndex = 0;
-
-            const progRow = row.original.programmeRow;
-            const open = () => {
-                if (progRow) openStatsModal(progRow);
-            };
-            tr.addEventListener('click', open);
-            tr.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    open();
-                }
-            });
 
             row.getVisibleCells().forEach((cell) => {
                 const td = document.createElement('td');
@@ -601,15 +394,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             'BR',
             'نوع الحملة',
             'نوع النشاط / المنطقة الجغرافية',
-            'عدد المنخرطين (الأجراء)',
-            'عدد غير المنخرطين (الأجراء)',
-            'عدد المنخرطين (غير الأجراء)',
-            'عدد غير المنخرطين (غير الأجراء)',
-            'عدد الأجراء',
-            'المبلغ الإجمالي للنقص',
-            'معترف به',
-            'غير معترف به',
-            'عدد المراقبين المشاركين',
+            'الفترة الزمنية',
+            'عدد المراقبين',
         ];
         const aoa = [
             headers,
@@ -618,15 +404,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 r.br ?? '',
                 r.typeCampagne ?? '',
                 r.zone ?? '',
-                r.salAff ?? '',
-                r.salNonAff ?? '',
-                r.nonSalAff ?? '',
-                r.nonSalNonAff ?? '',
-                r.travTotal ?? '',
-                r.insuffTotale ?? '',
-                r.mtReconnu ?? '',
-                r.mtNonReconnu ?? '',
-                r.controleursParticipants ?? '',
+                r.periode ?? '',
+                r.effectif ?? '',
             ]),
         ];
 
@@ -641,7 +420,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function exportToPdf() {
-        const tableEl = document.querySelector('.page-results .results-table');
+        const tableEl = document.querySelector('.page-admin .results-table');
         if (!tableEl || !table) return;
 
         const filenameBase = `campagnes_${new Date().toISOString().slice(0, 10)}`;
@@ -681,9 +460,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       thead th { background: #f2f2f2; font-weight: 700; }
       th, td { border: 1px solid #999; padding: 4px 6px; font-size: 9pt; text-align: center; word-wrap: break-word; }
       tr { page-break-inside: avoid; break-inside: avoid; }
-      .results-type-cell { display: block; }
-      .results-type-main { font-weight: 700; }
-      .results-type-sub { font-size: 8pt; color: #555; }
     </style>
   </head>
   <body>
@@ -718,7 +494,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           }, 200);
         };
       })();
-    </script>
+    <\/script>
   </body>
 </html>`;
 
@@ -745,12 +521,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         let progRes = null;
-        let resultatsRes = null;
         let bureauxRes = null;
         try {
-            [progRes, resultatsRes, bureauxRes] = await Promise.all([
+            [progRes, bureauxRes] = await Promise.all([
                 postAction('getAdminSheet', { sheet: 'Programmes' }),
-                postAction('getAdminSheet', { sheet: 'Resultats' }),
                 postAction('getAdminSheet', { sheet: 'Bureaux' }),
             ]);
         } catch (e) {
@@ -793,68 +567,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         populateBrFilter();
 
-        const programmesById = new Map();
+        rowsAll = [];
         progRes.rows.forEach((r) => {
             if (!r || !r.length || isHeaderRow(r)) return;
             const id = String(r[0] ?? '').trim();
-            if (id) programmesById.set(id, r);
-        });
-
-        const resultatsRows = resultatsRes && resultatsRes.ok && Array.isArray(resultatsRes.rows) ? resultatsRes.rows : [];
-        const latestByProgramme = new Map();
-        for (const r of resultatsRows) {
-            if (!r || isResultatsHeaderRow(r) || r.length < 2) continue;
-            const pid = String(r[1]).trim();
-            if (!pid) continue;
-            latestByProgramme.set(pid, r);
-        }
-
-        rowsAll = [];
-        for (const [pid, r] of latestByProgramme.entries()) {
-            const prog = programmesById.get(pid);
-            if (!prog) continue;
-            const brCode = String(prog[1] ?? '').trim();
+            if (!id) return;
+            const brCode = String(r[1] ?? '').trim();
             const brName = bureauMap.get(brCode) || '';
             const brLabel = brName ? `${brCode} - ${brName}` : brCode;
-            const modern = r.length >= 12;
-            const dec = parseMaybeNumber(r[6]) ?? null;
-            const ndec = parseMaybeNumber(r[7]) ?? null;
-            const travTotal = dec == null && ndec == null ? '' : String((dec ?? 0) + (ndec ?? 0));
             rowsAll.push({
-                programmeId: pid,
+                programmeId: id,
                 br: brLabel,
-                programmeRow: prog,
-                resultatId: String(r[0] ?? '').trim(),
-                typeCampagne: prog[2] ?? '',
-                zone: prog[3] ?? '',
-                salAff: r[2] ?? '',
-                salNonAff: r[3] ?? '',
-                nonSalAff: r[4] ?? '',
-                nonSalNonAff: r[5] ?? '',
-                travDeclares: r[6] ?? '',
-                travNonDeclares: r[7] ?? '',
-                travTotal,
-                insuffTotale: modern ? r[8] ?? '' : '',
-                mtReconnu: modern ? r[9] ?? '' : r[8] ?? '',
-                mtNonReconnu: modern ? r[10] ?? '' : r[9] ?? '',
-                controleursParticipants: modern ? r[11] ?? '' : r[10] ?? '',
+                programmeRow: r,
+                typeCampagne: r[2] ?? '',
+                zone: r[3] ?? '',
+                periode: `${r[4] ?? ''} ⟻ ${r[5] ?? ''}`,
+                effectif: r[6] ?? '',
             });
-        }
+        });
 
         const resolvedOptions = {
             data: rowsAll,
             columns,
-            filterFns: { numberMinFilter, amountMinFilter },
             globalFilterFn: (row, columnId, filterValue) => {
                 const q = String(filterValue ?? '').trim().toLowerCase();
                 if (!q) return true;
                 const r = row.original;
-                const hay = [
-                    r.programmeId, r.br, r.typeCampagne, r.zone,
-                    r.salAff, r.salNonAff, r.nonSalAff, r.nonSalNonAff,
-                    r.travTotal, r.insuffTotale, r.mtReconnu, r.mtNonReconnu,
-                    r.controleursParticipants,
-                ]
+                const hay = [r.programmeId, r.br, r.typeCampagne, r.zone, r.periode, r.effectif]
                     .map((v) => String(v ?? '').toLowerCase())
                     .join(' ');
                 return hay.includes(q);
