@@ -238,3 +238,7 @@
 .page-admin .results-filter-compact--type div.choices .choices__inner {
     height: 32px;
 }
+
+.page-admin .results-main-fluid {
+    max-width: 82em;
+}

@@ -23,6 +23,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const progPages = document.getElementById('prog-pages');
     const progTotal = document.getElementById('prog-total');
     const programmesLoaderRow = document.getElementById('programmes-loader-row');
+    const filterTypeEl = document.getElementById('filter-type');
+    const filterZoneEl = document.getElementById('filter-zone');
+    const btnResetEl = document.getElementById('btn-filters-reset');
+    const btnExportXlsx = document.getElementById('btn-export-xlsx');
+    const btnExportPdf = document.getElementById('btn-export-pdf');
 
     if (document.body) {
         document.querySelectorAll('.modal-backdrop').forEach((el) => el.remove());
@@ -60,12 +65,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentResultatId = null;
     const resultatsCache = new Map();
 
-    const PROGRAMMES_PAGE_SIZE = 7;
+    const PROGRAMMES_PAGE_SIZE = 6;
     let programmesAllRows = [];
+    let programmesFilteredRows = [];
     let programmeIdsWithResultats = new Set();
     let programmesPage = 1;
     let goToLastPageOnce = false;
     let programmesMessage = '';
+    let sortColIdx = 0;
+    let sortDir = 'asc';
 
     function setProgrammesLoading(isLoading) {
         if (programmesLoaderRow) programmesLoaderRow.style.display = isLoading ? '' : 'none';
@@ -74,6 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function setProgrammesMessage(msg) {
         programmesMessage = msg ? String(msg) : '';
         programmesAllRows = [];
+        programmesFilteredRows = [];
         programmeIdsWithResultats = new Set();
         if (paginationWrap) paginationWrap.classList.add('d-none');
         if (progTotal) progTotal.textContent = programmesMessage;
@@ -91,8 +100,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         return c0 === "ID_Resultat" || c1 === "ID_Programme";
     }
 
+    function sortFilteredRows() {
+        const colMap = [2, 3, 5, 6];
+        const col = colMap[sortColIdx] ?? 2;
+        const dir = sortDir === 'asc' ? 1 : -1;
+        programmesFilteredRows.sort((a, b) => {
+            const va = a[col] ?? '';
+            const vb = b[col] ?? '';
+            if (col === 6) return (Number(va) - Number(vb)) * dir;
+            return String(va).localeCompare(String(vb)) * dir;
+        });
+    }
+
+    function applyFilters() {
+        const type = (filterTypeEl?.value || '').trim();
+        const zone = (filterZoneEl?.value || '').trim().toLowerCase();
+        programmesFilteredRows = programmesAllRows.filter((row) => {
+            if (type && row[2] !== type) return false;
+            if (zone && !String(row[3] || '').toLowerCase().includes(zone)) return false;
+            return true;
+        });
+        sortFilteredRows();
+        programmesPage = 1;
+        renderProgrammesPage(programmesPage);
+    }
+
     function totalProgrammesPages() {
-        return Math.max(1, Math.ceil(programmesAllRows.length / PROGRAMMES_PAGE_SIZE));
+        return Math.max(1, Math.ceil(programmesFilteredRows.length / PROGRAMMES_PAGE_SIZE));
     }
 
     function updatePaginationUI() {
@@ -102,16 +136,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     const pages = totalProgrammesPages();
-    const show = programmesAllRows.length > PROGRAMMES_PAGE_SIZE;
+    const totalFiltered = programmesFilteredRows.length;
+    const totalAll = programmesAllRows.length;
+    const show = totalFiltered > PROGRAMMES_PAGE_SIZE;
     if (paginationWrap) paginationWrap.classList.toggle('d-none', !show);
-    // Update page info text
     if (pageInfoEl) {
-        pageInfoEl.textContent = `Page ${programmesPage} / ${pages} • ${programmesAllRows.length} campagnes`;
+        pageInfoEl.textContent = `Page ${programmesPage} / ${pages} • ${totalFiltered} حملات`;
     }
-    // Enable/disable prev/next buttons
     if (btnPrevPage) btnPrevPage.disabled = programmesPage <= 1;
     if (btnNextPage) btnNextPage.disabled = programmesPage >= pages;
-    // Render clickable page numbers
     if (progPages) {
         progPages.innerHTML = '';
         for (let i = 1; i <= pages; i++) {
@@ -124,8 +157,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     if (progTotal) {
-        const total = programmesAllRows.length;
-        progTotal.textContent = `${total} ${total > 1 ? 'حملات' : 'حملة'}`;
+        progTotal.textContent = totalAll === totalFiltered
+            ? `${totalAll} ${totalAll > 1 ? 'حملات' : 'حملة'}`
+            : `${totalFiltered} / ${totalAll} حملات`;
     }
 }
 
@@ -134,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const pages = totalProgrammesPages();
         programmesPage = Math.min(Math.max(1, page), pages);
         const start = (programmesPage - 1) * PROGRAMMES_PAGE_SIZE;
-        const slice = programmesAllRows.slice(start, start + PROGRAMMES_PAGE_SIZE);
+        const slice = programmesFilteredRows.slice(start, start + PROGRAMMES_PAGE_SIZE);
 
         tableBody.innerHTML = '';
         if (!slice.length) {
@@ -183,6 +217,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         allowHTML: false,
         position: 'bottom',
     };
+    if (filterTypeEl && typeof window !== 'undefined' && window.Choices) {
+        try { new window.Choices(filterTypeEl, choiceSelectOpts); } catch {}
+    }
 
     const fpLocale =
         typeof flatpickr !== 'undefined' && flatpickr.l10ns && flatpickr.l10ns.fr
@@ -464,6 +501,84 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = 'index.html';
     });
 
+    // Filters
+    filterTypeEl?.addEventListener('change', applyFilters);
+    filterZoneEl?.addEventListener('input', applyFilters);
+    btnResetEl?.addEventListener('click', () => {
+        if (filterTypeEl) filterTypeEl.value = '';
+        if (filterZoneEl) filterZoneEl.value = '';
+        applyFilters();
+    });
+
+    // Sort triggers
+    const sortHeaders = document.querySelectorAll('.page-programme .sort-trigger');
+    function updateSortIndicators() {
+        sortHeaders.forEach((th) => {
+            const idx = Number(th.dataset.col);
+            const arrow = th.querySelector('.sort-indicator');
+            if (!arrow) return;
+            arrow.textContent = idx === sortColIdx ? (sortDir === 'asc' ? '▼' : '▲') : '';
+        });
+    }
+    sortHeaders.forEach((th) => {
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => {
+            const idx = Number(th.dataset.col);
+            if (sortColIdx === idx) {
+                sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColIdx = idx;
+                sortDir = 'asc';
+            }
+            sortFilteredRows();
+            programmesPage = 1;
+            renderProgrammesPage(programmesPage);
+            updateSortIndicators();
+        });
+    });
+    updateSortIndicators();
+
+    // Export Excel
+    btnExportXlsx?.addEventListener('click', () => {
+        const XLSX = typeof window !== 'undefined' ? window.XLSX : null;
+        if (!XLSX) { alert('XLSX library not loaded.'); return; }
+        const data = programmesFilteredRows;
+        const headers = ['ID', 'BR', 'نوع الحملة', 'نوع النشاط / المنطقة الجغرافية', 'الفترة الزمنية', 'عدد المراقبين'];
+        const aoa = [
+            headers,
+            ...data.map((r) => [r[0] ?? '', r[1] ?? '', r[2] ?? '', r[3] ?? '', `${r[5] ?? ''} ⟻ ${r[4] ?? ''}`, r[6] ?? '']),
+        ];
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(aoa);
+        ws['!rtl'] = true;
+        XLSX.utils.book_append_sheet(wb, ws, 'Programmes');
+        wb.Workbook = wb.Workbook || {};
+        wb.Workbook.Views = [{ RTL: true }];
+        XLSX.writeFile(wb, `programmes_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    });
+
+    // Export PDF
+    btnExportPdf?.addEventListener('click', () => {
+        const tableEl = document.querySelector('.page-programme .composed-table');
+        if (!tableEl) return;
+        const filenameBase = `campagnes_${new Date().toISOString().slice(0, 10)}`;
+        const rows = programmesFilteredRows;
+        const theadCustom = `<thead><tr><th>نوع الحملة</th><th>نوع النشاط / المنطقة الجغرافية</th><th>الفترة الزمنية</th><th>عدد المراقبين</th></tr></thead>`;
+        const tbodyHtml = rows.length === 0
+            ? `<tbody><tr><td colspan="4" style="text-align:center;color:#777;">Aucun résultat.</td></tr></tbody>`
+            : `<tbody>${rows.map((r) => `<tr><td>${r[2] ?? ''}</td><td>${r[3] ?? ''}</td><td>${r[5] ?? ''} ⟻ ${r[4] ?? ''}</td><td>${r[6] ?? ''}</td></tr>`).join('')}</tbody>`;
+        const tableHtml = `<table class="${tableEl.className}" dir="rtl">${theadCustom}${tbodyHtml}</table>`;
+        const totalCount = rows.length;
+        const totalLabel = totalCount === 1 ? 'حملة' : 'حملات';
+        const totalBadge = `<span style="position:absolute;left:10mm;font-size:14pt;font-weight:700;">${totalCount} ${totalLabel}</span>`;
+        const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"/><title>${filenameBase}</title><style>@page{size:A4 landscape;margin:10mm}body{font-family:Arial,"Segoe UI",Tahoma,sans-serif;direction:rtl;color:#111}h1{text-align:center;font-size:18pt;margin:0 0 10mm 0;position:relative}table{width:100%;border-collapse:collapse;table-layout:fixed}thead th{background:#f2f2f2;font-weight:700}th,td{border:1px solid #999;padding:4px 6px;font-size:9pt;text-align:center;word-wrap:break-word}tr{page-break-inside:avoid;break-inside:avoid}</style></head><body><h1>${totalBadge}برنامج حملات المكتب</h1>${tableHtml}<script>(function(){try{document.title="${filenameBase}"}catch(e){}var hasInvokedPrint=false;function closeMeSoon(){setTimeout(function(){try{window.close()}catch(e){}},120)}window.onafterprint=closeMeSoon;if(window.matchMedia){var mql=window.matchMedia("print");var handler=function(e){if(hasInvokedPrint&&e&&e.matches===false)closeMeSoon()};if(mql&&typeof mql.addEventListener==="function")mql.addEventListener("change",handler);else if(mql&&typeof mql.addListener==="function")mql.addListener(handler)}window.addEventListener("focus",function(){if(hasInvokedPrint)closeMeSoon()});window.onload=function(){setTimeout(function(){window.focus();hasInvokedPrint=true;window.print()},200)}})()<\/script></body></html>`;
+        const win = window.open('', '_blank');
+        if (!win) { alert('Popup blocked.'); return; }
+        win.document.open();
+        win.document.write(html);
+        win.document.close();
+    });
+
     async function loadTable() {
         programmesMessage = '';
         programmesAllRows = [];
@@ -527,11 +642,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         programmesAllRows = myData;
+        applyFilters();
         if (goToLastPageOnce) {
             programmesPage = totalProgrammesPages();
             goToLastPageOnce = false;
+            renderProgrammesPage(programmesPage);
         }
-        renderProgrammesPage(programmesPage);
     }
 
     await loadTable();
@@ -548,7 +664,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const btnText = document.getElementById('btn-text');
-        btnText.textContent = 'Envoi en cours...';
+        btnText.textContent = 'جاري الإضافة...';
 
         const newEntry = [
             'P' + Date.now(),
@@ -570,11 +686,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             fpFin.set('minDate', null);
             choicesCampagne.setChoiceByValue(typeCampagne.value);
             updateZoneActiviteUI();
-            btnText.textContent = 'Ajouter au programme';
+            btnText.textContent = 'إضافة إلى البرنامج';
             await loadTable();
         } else {
-            alert('Erreur lors de l\'enregistrement');
-            btnText.textContent = 'Ajouter au programme';
+            alert('خطأ أثناء إضافة البرنامج. حاول مرة أخرى');
+            btnText.textContent = 'إضافة إلى البرنامج';
         }
     });
 });

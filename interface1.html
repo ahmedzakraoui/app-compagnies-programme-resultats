@@ -84,7 +84,7 @@
                       </select>
                     </div>
                     <div id="zone-geographique-wrap" class="d-none">
-                      <input type="text" id="activite_zone_geo" class="form-control" placeholder="Saisir la zone géographique" />
+                      <input type="text" id="activite_zone_geo" class="form-control" placeholder="أدخل المنطقة الجغرافية" />
                     </div>
                   </div>
                   <div class="row mb-3">
@@ -115,23 +115,54 @@
           <div class="card card-custom card-composed card-composed--wide h-100">
             <div class="card-composed-accent card-composed-accent--secondary" aria-hidden="true"></div>
             <div class="card-composed-body p-4 p-lg-4 d-flex flex-column">
-              <div class="composed-card-head mb-4">
+              <div class="composed-card-head mb-2">
                 <span class="composed-card-icon composed-card-icon--table" aria-hidden="true"></span>
                 <div class="w-100">
                   <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
                     <h2 class="h5 fw-bold mb-0">برنامج حملات المكتب</h2>
-                    <div class="programmes-total mt-2 text-start" id="prog-total"></div>
+                    <div class="programmes-total text-start" id="prog-total"></div>
                   </div>
                 </div>
               </div>
+
+              <!-- Filters -->
+              <section class="results-filters mt-3" aria-label="Filtres">
+                <div class="results-filters-shell">
+                  <div class="results-filters-section results-filters-section--primary">
+                    <div class="results-filters-row">
+                      <div class="results-filter-compact results-filter-compact--type">
+                        <label class="form-label mb-1" for="filter-type">نوع الحملة</label>
+                        <select class="form-select form-select-sm" id="filter-type">
+                          <option value="" selected>الكل</option>
+                          <option value="قطاعية">قطاعية</option>
+                          <option value="جغرافية">جغرافية</option>
+                          <option value="لا شيء">لا شيء</option>
+                        </select>
+                      </div>
+                      <div class="results-filter-compact">
+                        <label class="form-label mb-1" for="filter-zone">نوع النشاط / المنطقة الجغرافية</label>
+                        <input type="text" class="form-control form-control-sm" id="filter-zone" placeholder="..." />
+                      </div>
+                      <div class="results-filter-actions">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-filters-reset">إلغاء</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="results-export-toolbar" aria-label="Téléchargements">
+                    <button type="button" class="btn btn-outline-success btn-sm" id="btn-export-xlsx">Excel</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="btn-export-pdf">PDF</button>
+                  </div>
+                </div>
+              </section>
+
               <div class="table-responsive composed-table-wrap flex-grow-1">
                 <table class="table table-hover align-middle composed-table mb-0 text-center" dir="rtl">
                   <thead>
                     <tr>
-                      <th>نوع الحملة</th>
-                      <th>نوع النشاط / المنطقة الجغرافية</th>
-                      <th>الفترة الزمنية</th>
-                      <th>عدد المراقبين</th>
+                      <th class="sort-trigger" data-col="0">نوع الحملة <span class="sort-indicator"></span></th>
+                      <th class="sort-trigger" data-col="1">نوع النشاط / المنطقة الجغرافية <span class="sort-indicator"></span></th>
+                      <th class="sort-trigger" data-col="2">الفترة الزمنية <span class="sort-indicator"></span></th>
+                      <th class="sort-trigger" data-col="3">عدد المراقبين <span class="sort-indicator"></span></th>
                     </tr>
                   </thead>
                   <tbody id="table-body">
@@ -308,6 +339,8 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
     <script src="js/api.js"></script>
     <script src="js/interface1.js"></script>
   </body>

@@ -640,6 +640,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const tableHtml = `<table class="${tableEl.className}" dir="rtl">${theadHtml}${tbodyHtml}</table>`;
 
+        const totalCount = rows.length;
+        const totalLabel = totalCount === 1 ? 'حملة' : 'حملات';
+        const totalBadge = `<span style="position:absolute;left:10mm;font-size:14pt;font-weight:700;">${totalCount} ${totalLabel}</span>`;
+
         const html = `<!doctype html>
 <html lang="ar" dir="rtl">
   <head>
@@ -648,7 +652,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <style>
       @page { size: A4 landscape; margin: 10mm; }
       body { font-family: Arial, "Segoe UI", Tahoma, sans-serif; direction: rtl; color: #111; }
-      h1 { text-align: center; font-size: 18pt; margin: 0 0 10mm 0; }
+      h1 { text-align: center; font-size: 18pt; margin: 0 0 10mm 0; position: relative; }
       table { width: 100%; border-collapse: collapse; table-layout: fixed; }
       thead th { background: #f2f2f2; font-weight: 700; }
       th, td { border: 1px solid #999; padding: 4px 6px; font-size: 9pt; text-align: center; word-wrap: break-word; }
@@ -659,7 +663,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     </style>
   </head>
   <body>
-    <h1>جميع الحملات</h1>
+    <h1>${totalBadge}جميع الحملات</h1>
     ${tableHtml}
     <script>
       (function () {

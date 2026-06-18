@@ -21,7 +21,7 @@
 
 /* Form */
 .page-programme .form-label {
-    font-size: 0.82rem;
+    font-size: 0.64rem;
     font-weight: 600;
     color: var(--cp-muted);
     letter-spacing: 0.01em;
@@ -156,12 +156,12 @@
     margin-bottom: 0;
 }
 .page-programme .choices__inner {
-    min-height: 42px;
-    padding: 0.45rem 2.25rem 0.45rem 0.85rem;
-    border-radius: 12px;
-    border: 1px solid var(--cp-border-strong);
-    background-color: rgba(255, 255, 255, 0.9);
-    font-size: 0.925rem;
+    min-height: 32px;
+    padding: 0.22rem 2.1rem 0.22rem 0.55rem;
+    border-radius: 10px;
+    border: 1px solid rgba(12, 107, 47, 0.14);
+    background-color: rgba(255, 255, 255, 0.35);
+    font-size: 0.78rem;
 }
 .page-programme .choices.is-focused .choices__inner,
 .page-programme .choices.is-open .choices__inner {
@@ -307,4 +307,56 @@
 @media (prefers-reduced-motion: reduce) {
     .btn-cta-wave, .btn-cta-wave-halo::before { animation: none !important; }
     .form-campagne-panel:not([hidden]) { animation: none; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Filters sizing (matches interface2)                                 */
+/* ------------------------------------------------------------------ */
+@media (min-width: 992px) {
+    .page-programme .results-filter-compact {
+        max-width: none;
+    }
+    .page-programme .results-filter-compact--type {
+        flex: 0 0 150px;
+        min-width: 150px;
+        max-width: none;
+    }
+    .page-programme .results-filter-compact:not(.results-filter-compact--type) {
+        flex: 1 1 200px;
+        min-width: 10em;
+    }
+}
+.page-programme .results-filter-compact--type {
+    max-width: 160px;
+    min-width: 130px;
+}
+.page-programme #filter-zone.form-control-sm {
+    height: 39px;
+}
+.page-programme .results-filter-compact.results-filter-compact--type div.choices,
+.page-programme .results-filter-compact.results-filter-compact--type div.choices .choices__inner,
+.page-programme #filter-zone.form-control-sm {
+    height: 32px;
+}
+
+/* Sort */
+.page-programme .sort-trigger {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+.page-programme .sort-trigger:hover {
+    color: var(--cp-accent);
+}
+.page-programme .sort-indicator {
+    font-size: 0.65rem;
+    margin-inline-start: 0.2rem;
+    color: var(--cp-accent);
+}
+section.results-filters.mt-3 {
+    padding-right: 0.1em;
+    padding-left: 0.1em;
+}
+.page-programme .composed-table-wrap {
+    min-height: 12.146em;;
 }
