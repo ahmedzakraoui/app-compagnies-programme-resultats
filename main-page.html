@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>الرئيسية</title>
+    <link rel="icon" href="images/cnss_logo.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/main-page.css" />
+  </head>
+  <body class="page-main">
+    <div class="shape-bg" aria-hidden="true"></div>
+    <div class="shape-circle shape-circle--tl" aria-hidden="true"></div>
+    <div class="shape-circle shape-circle--br" aria-hidden="true"></div>
+    <div class="shape-blob shape-blob--1" aria-hidden="true"></div>
+    <div class="shape-blob shape-blob--2" aria-hidden="true"></div>
+
+    <div class="top-actions">
+      <a href="my-account.html" class="top-action-btn" id="btn-account">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        حسابي
+      </a>
+      <button type="button" class="top-action-btn" id="btn-logout">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        خروج
+      </button>
+    </div>
+
+    <div class="page-main-inner">
+      <div class="main-brand">
+        <img src="images/cnss_logo.svg" alt="" class="main-logo" width="56" height="56" />
+        <div id="user-greeting" class="main-greeting"></div>
+      </div>
+
+      <div class="main-cards">
+        <a href="interface2.html" class="main-card main-card--stats">
+          <div class="main-card__glow"></div>
+          <div class="main-card__icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+          </div>
+          <h2 class="main-card__title">إحصائيات الحملات</h2>
+          <p class="main-card__desc">عرض وتحليل نتائج الحملات المنجزة</p>
+          <span class="main-card__arrow">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </span>
+        </a>
+
+        <a href="interface1.html" class="main-card main-card--programme">
+          <div class="main-card__glow"></div>
+          <div class="main-card__icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+          </div>
+          <h2 class="main-card__title">برنامج الحملات</h2>
+          <p class="main-card__desc">إدارة وتتبع حملات التفتيش المبرمجة</p>
+          <span class="main-card__arrow">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </span>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        let user = null;
+        try {
+          user = JSON.parse(localStorage.getItem("currentUser"));
+        } catch {}
+        if (!user || !user.codeBr || !user.token) {
+          try {
+            localStorage.setItem("postLoginRedirect", "main-page.html");
+          } catch {}
+          window.location.href = "index.html";
+          return;
+        }
+        if (typeof window !== "undefined" && typeof window.isSessionExpired === "function" && window.isSessionExpired()) {
+          if (typeof window.logoutToLogin === "function") window.logoutToLogin();
+          else window.location.href = "index.html";
+          return;
+        }
+        const greeting = document.getElementById("user-greeting");
+        if (greeting) {
+          const name = user.arName || user.name || "";
+          greeting.textContent = name ? `مرحباً ${name}` : "";
+        }
+        document.getElementById("btn-logout")?.addEventListener("click", () => {
+          try {
+            localStorage.removeItem("currentUser");
+          } catch {}
+          window.location.href = "index.html";
+        });
+      });
+    </script>
+  </body>
+</html>
