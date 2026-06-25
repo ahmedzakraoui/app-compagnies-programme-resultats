@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const reveal = document.getElementById('form-campagne-reveal');
     const panel = document.getElementById('form-campagne-panel');
     const btnOpenForm = document.getElementById('btn-open-campagne-form');
+    const btnCloseForm = document.getElementById('btn-close-form');
     const typeCampagne = document.getElementById('type_campagne');
     const zoneBlock = document.getElementById('zone-activite-block');
     const wrapSectorielle = document.getElementById('zone-sectorielle-wrap');
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const programmesLoaderRow = document.getElementById('programmes-loader-row');
     const filterTypeEl = document.getElementById('filter-type');
     const filterZoneEl = document.getElementById('filter-zone');
+    const filterStatusEl = document.getElementById('filter-status');
     const btnResetEl = document.getElementById('btn-filters-reset');
     const btnExportXlsx = document.getElementById('btn-export-xlsx');
     const btnExportPdf = document.getElementById('btn-export-pdf');
@@ -115,9 +117,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     function applyFilters() {
         const type = (filterTypeEl?.value || '').trim();
         const zone = (filterZoneEl?.value || '').trim().toLowerCase();
+        const status = (filterStatusEl?.value || '').trim();
         programmesFilteredRows = programmesAllRows.filter((row) => {
             if (type && row[2] !== type) return false;
             if (zone && !String(row[3] || '').toLowerCase().includes(zone)) return false;
+            if (status === 'realized' && !programmeIdsWithResultats.has(String(row[0]).trim())) return false;
+            if (status === 'not-realized' && programmeIdsWithResultats.has(String(row[0]).trim())) return false;
             return true;
         });
         sortFilteredRows();
@@ -219,6 +224,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
     if (filterTypeEl && typeof window !== 'undefined' && window.Choices) {
         try { new window.Choices(filterTypeEl, choiceSelectOpts); } catch {}
+    }
+    if (filterStatusEl && typeof window !== 'undefined' && window.Choices) {
+        try { new window.Choices(filterStatusEl, choiceSelectOpts); } catch {}
     }
 
     const fpLocale =
@@ -440,6 +448,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         reveal.hidden = true;
         panel.hidden = false;
         btnOpenForm.setAttribute('aria-expanded', 'true');
+        if (btnCloseForm) btnCloseForm.hidden = false;
 
         requestAnimationFrame(() => {
             if (typeof choicesCampagne?.refresh === 'function') choicesCampagne.refresh();
@@ -448,6 +457,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (typeof fpFin?.redraw === 'function') fpFin.redraw();
         });
     });
+
+    function closeCampagneForm() {
+        panel.hidden = true;
+        reveal.hidden = false;
+        btnOpenForm.setAttribute('aria-expanded', 'false');
+        if (btnCloseForm) btnCloseForm.hidden = true;
+    }
+
+    if (btnCloseForm) {
+        btnCloseForm.addEventListener('click', closeCampagneForm);
+    }
 
 
 
@@ -504,9 +524,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Filters
     filterTypeEl?.addEventListener('change', applyFilters);
     filterZoneEl?.addEventListener('input', applyFilters);
+    filterStatusEl?.addEventListener('change', applyFilters);
     btnResetEl?.addEventListener('click', () => {
         if (filterTypeEl) filterTypeEl.value = '';
         if (filterZoneEl) filterZoneEl.value = '';
+        if (filterStatusEl) filterStatusEl.value = '';
         applyFilters();
     });
 

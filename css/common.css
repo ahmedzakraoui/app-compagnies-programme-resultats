@@ -161,7 +161,7 @@ body { background-color: var(--light-bg); font-family: 'Inter', sans-serif; }
     position: relative;
     padding-top: 1.5rem;
     padding-bottom: 3.5rem;
-    max-width: 1140px;
+    max-width: 89%;
 }
 @media (min-width: 768px) {
     .composed-bento {

@@ -42,14 +42,17 @@
     <main class="container composed-main" dir="rtl">
       <div class="row g-4 composed-bento">
         <!-- Formulaire de Saisie -->
-        <div class="col-md-5">
+        <div class="col-md-4">
           <div class="card card-custom card-composed h-100">
             <div class="card-composed-accent" aria-hidden="true"></div>
             <div class="card-composed-body p-4 p-lg-4">
               <div class="composed-card-head mb-4">
                 <span class="composed-card-icon" aria-hidden="true"></span>
-                <div>
-                  <h2 class="h5 fw-bold mb-0">حملة جديدة</h2>
+                <div class="w-100">
+                  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <h2 class="h5 fw-bold mb-0">حملة جديدة</h2>
+                    <button type="button" id="btn-close-form" class="btn-close-form" aria-label="إلغاء" hidden>✕</button>
+                  </div>
                 </div>
               </div>
 
@@ -111,7 +114,7 @@
         </div>
 
         <!-- Tableau d'affichage -->
-        <div class="col-md-7">
+        <div class="col-md-8">
           <div class="card card-custom card-composed card-composed--wide h-100">
             <div class="card-composed-accent card-composed-accent--secondary" aria-hidden="true"></div>
             <div class="card-composed-body p-4 p-lg-4 d-flex flex-column">
@@ -142,6 +145,14 @@
                       <div class="results-filter-compact">
                         <label class="form-label mb-1" for="filter-zone">نوع النشاط / المنطقة الجغرافية</label>
                         <input type="text" class="form-control form-control-sm" id="filter-zone" placeholder="..." />
+                      </div>
+                      <div class="results-filter-compact results-filter-compact--type">
+                        <label class="form-label mb-1" for="filter-status">حالة الحملة</label>
+                        <select class="form-select form-select-sm" id="filter-status">
+                          <option value="" selected>الكل</option>
+                          <option value="realized">المنجزة</option>
+                          <option value="not-realized">الغير منجزة</option>
+                        </select>
                       </div>
                       <div class="results-filter-actions">
                         <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-filters-reset">إلغاء</button>
