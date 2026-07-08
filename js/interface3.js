@@ -31,6 +31,46 @@ function isHeaderRow(r) {
     return c0 === 'id_programme' || c0.indexOf('id_') === 0;
 }
 
+function isResultatsHeaderRow(r) {
+    if (!Array.isArray(r) || r.length < 2) return false;
+    const c0 = String(r[0]).trim();
+    const c1 = String(r[1]).trim();
+    return c0 === 'ID_Resultat' || c1 === 'ID_Programme';
+}
+
+function statVal(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+}
+
+function setStatVal(id, v) {
+    const el = document.getElementById(id);
+    if (el) el.value = v === undefined || v === null ? '' : String(v);
+}
+
+function sanitizeAmountText(v) {
+    const raw = String(v === undefined || v === null ? '' : v);
+    const normalizedSep = raw.replace(/[.;:،؛'"’‘“”]/g, ',');
+    const kept = normalizedSep.replace(/[^\d,]/g, '');
+    return kept.replace(/,{2,}/g, ',').replace(/^,/, '');
+}
+
+function initAmountInputs() {
+    const ids = ['res-manq-tot', 'res-manq-ok', 'res-manq-nok'];
+    ids.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('input', () => {
+            const next = sanitizeAmountText(el.value);
+            if (el.value !== next) el.value = next;
+        });
+        el.addEventListener('blur', () => {
+            const next = sanitizeAmountText(el.value);
+            if (el.value !== next) el.value = next;
+        });
+    });
+}
+
 function findColumnIndex(headers, names) {
     for (let i = 0; i < headers.length; i++) {
         const h = String(headers[i] || '').trim().toLowerCase().replace(/\s+/g, '_');
@@ -55,6 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const filterTypeEl = document.getElementById('filter-type');
     const filterBrEl = document.getElementById('filter-br');
     const filterZoneEl = document.getElementById('filter-zone');
+    const filterStatusEl = document.getElementById('filter-status');
     const btnResetEl = document.getElementById('btn-filters-reset');
     const btnExportXlsx = document.getElementById('btn-export-xlsx');
     const btnExportPdf = document.getElementById('btn-export-pdf');
@@ -72,6 +113,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.setItem('postLoginRedirect', 'interface3.html');
         } catch {}
         window.location.href = 'index.html';
+        return;
+    }
+
+    // Redirect normal users away from admin pages
+    if ((user.userType || '').trim().toLowerCase() !== 'admin') {
+        window.location.href = 'main-page.html';
         return;
     }
 
@@ -100,6 +147,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     let bureauMap = new Map();
+    let programmeIdsWithResultats = new Set();
+    const resultatsCache = new Map();
+    const statsModalEl = document.getElementById('modal-stats-campagne');
+    const statsModal = bootstrap ? bootstrap.Modal.getOrCreateInstance(statsModalEl) : null;
+    let currentProgrammeRow = null;
+    let currentResultatId = null;
 
     const choiceSelectOpts = {
         searchEnabled: false,
@@ -113,22 +166,80 @@ document.addEventListener('DOMContentLoaded', async () => {
             new window.Choices(filterTypeEl, choiceSelectOpts);
         } catch {}
     }
+    if (filterStatusEl && typeof window !== 'undefined' && window.Choices) {
+        try { new window.Choices(filterStatusEl, choiceSelectOpts); } catch {}
+    }
 
     function populateBrFilter() {
         if (!filterBrEl) return;
         filterBrEl.value = '';
     }
 
+    initAmountInputs();
+
+    function populateModalFromCache(progRow) {
+        currentResultatId = null;
+        const pid = String(progRow[0] ?? '').trim();
+        const data = resultatsCache.get(pid) || null;
+
+        setStatVal('res-type-hamla', progRow[2]);
+        setStatVal('res-activite-zone', progRow[3]);
+
+        if (data && data.length >= 2) {
+            currentResultatId = data[0] != null && String(data[0]).trim() !== '' ? String(data[0]).trim() : null;
+            setStatVal('res-w-in', data[2]);
+            setStatVal('res-w-ni', data[3]);
+            setStatVal('res-nw-in', data[4]);
+            setStatVal('res-nw-ni', data[5]);
+            setStatVal('res-emp-dec', data[6]);
+            setStatVal('res-emp-ndec', data[7]);
+            if (data.length >= 12) {
+                setStatVal('res-manq-tot', sanitizeAmountText(data[8]));
+                setStatVal('res-manq-ok', sanitizeAmountText(data[9]));
+                setStatVal('res-manq-nok', sanitizeAmountText(data[10]));
+                setStatVal('res-participants', data[11]);
+            } else {
+                setStatVal('res-manq-tot', '');
+                setStatVal('res-manq-ok', sanitizeAmountText(data[8]));
+                setStatVal('res-manq-nok', sanitizeAmountText(data[9]));
+                setStatVal('res-participants', data.length > 10 ? data[10] : '');
+            }
+        } else {
+            setStatVal('res-w-in', '');
+            setStatVal('res-w-ni', '');
+            setStatVal('res-nw-in', '');
+            setStatVal('res-nw-ni', '');
+            setStatVal('res-emp-dec', '');
+            setStatVal('res-emp-ndec', '');
+            setStatVal('res-manq-tot', '');
+            setStatVal('res-manq-ok', '');
+            setStatVal('res-manq-nok', '');
+            setStatVal('res-participants', '');
+        }
+    }
+
+    function openStatsModal(programmeRow) {
+        if (!statsModal) return;
+        currentProgrammeRow = programmeRow;
+        const pid = String(programmeRow[0] ?? '').trim();
+        document.querySelectorAll('.modal-stats-pid').forEach((el) => {
+            el.textContent = pid;
+        });
+        const elType = document.getElementById('modal-prog-type');
+        const elZone = document.getElementById('modal-prog-zone');
+        const elPeriod = document.getElementById('modal-prog-period');
+        const elEff = document.getElementById('modal-prog-effectif');
+        if (elType) elType.textContent = programmeRow[2] ?? '';
+        if (elZone) elZone.textContent = programmeRow[3] ?? '';
+        if (elPeriod) elPeriod.textContent = `${programmeRow[4] ?? ''} ↤ ${programmeRow[5] ?? ''}`;
+        if (elEff) elEff.textContent = programmeRow[6] != null ? String(programmeRow[6]) : '';
+        populateModalFromCache(programmeRow);
+        statsModal.show();
+    }
+
     const columnHelper = createColumnHelper();
 
     const columns = [
-        columnHelper.accessor('programmeId', {
-            id: 'programmeId',
-            header: () => 'ID',
-            cell: (info) => String(info.getValue() ?? '—'),
-            filterFn: 'includesString',
-            sortingFn: (a, b) => (parseMaybeNumber(a.getValue('programmeId')) ?? 0) - (parseMaybeNumber(b.getValue('programmeId')) ?? 0),
-        }),
         columnHelper.accessor('br', {
             id: 'br',
             header: () => 'BR',
@@ -138,13 +249,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         columnHelper.accessor('typeCampagne', {
             id: 'typeCampagne',
             header: () => 'نوع الحملة',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => {
+                const v = String(info.getValue() ?? '').trim();
+                let cls = 'badge campagne-type-badge';
+                if (v === 'لا شيء' || v === '') cls += ' campagne-type-badge--rien';
+                else if (v === 'جغرافية') cls += ' campagne-type-badge--geo';
+                return `<span class="${cls}">${v}</span>`;
+            },
             filterFn: 'includesString',
         }),
         columnHelper.accessor('zone', {
             id: 'zone',
             header: () => 'نوع النشاط / المنطقة الجغرافية',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => window.renderZoneActivity(info.getValue()),
             filterFn: 'includesString',
         }),
         columnHelper.accessor('periode', {
@@ -167,12 +284,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }),
     ];
 
-    const TABLE_COLS = 6;
+    const TABLE_COLS = 5;
 
     let table = null;
     let tableState = null;
     let rowsAll = [];
-    const RESULTS_PAGE_SIZE = 5;
+    const RESULTS_PAGE_SIZE = 7;
     let resultsPage = 1;
 
     function totalResultsPages(totalRows) {
@@ -315,9 +432,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         pageRows.forEach((row) => {
             const tr = document.createElement('tr');
-            tr.className = 'results-row-clickable';
-            tr.setAttribute('role', 'button');
-            tr.tabIndex = 0;
+            const programmeId = String(row.original?.programmeId ?? '').trim();
+            const hasResultats = programmeIdsWithResultats.has(programmeId);
+            if (hasResultats) {
+                tr.className = 'results-row-with-resultats results-row-clickable';
+                tr.setAttribute('role', 'button');
+                tr.tabIndex = 0;
+                tr.addEventListener('click', () => {
+                    if (row.original?.programmeRow) openStatsModal(row.original.programmeRow);
+                });
+                tr.addEventListener('keydown', (e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && row.original?.programmeRow) {
+                        e.preventDefault();
+                        openStatsModal(row.original.programmeRow);
+                    }
+                });
+                tr.setAttribute('aria-label', 'عرض إحصائيات هذه الحملة');
+            }
 
             row.getVisibleCells().forEach((cell) => {
                 const td = document.createElement('td');
@@ -334,6 +465,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const type = (filterTypeEl?.value || '').trim();
         const br = (filterBrEl?.value || '').trim();
         const zone = (filterZoneEl?.value || '').trim();
+        const status = (filterStatusEl?.value || '').trim();
 
         const nextColumnFilters = [];
         if (type) nextColumnFilters.push({ id: 'typeCampagne', value: type });
@@ -348,6 +480,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 columnFilters: nextColumnFilters,
             },
         }));
+
+        let filtered = rowsAll;
+        if (type) filtered = filtered.filter((r) => r.typeCampagne === type);
+        if (br) filtered = filtered.filter((r) => String(r.br).toLowerCase().includes(br.toLowerCase()));
+        if (zone) filtered = filtered.filter((r) => String(r.zone).toLowerCase().includes(zone.toLowerCase()));
+        if (status === 'realized') filtered = filtered.filter((r) => programmeIdsWithResultats.has(String(r.programmeId).trim()));
+        if (status === 'not-realized') filtered = filtered.filter((r) => !programmeIdsWithResultats.has(String(r.programmeId).trim()));
+
+        table.setOptions((prev) => ({
+            ...prev,
+            data: filtered,
+            state: {
+                ...prev.state,
+                globalFilter: '',
+                columnFilters: [],
+            },
+        }));
         resultsPage = 1;
         renderTanstackTable();
     }
@@ -356,21 +505,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         filterTypeEl?.addEventListener('change', applyFiltersToState);
         filterBrEl?.addEventListener('input', applyFiltersToState);
         filterZoneEl?.addEventListener('input', applyFiltersToState);
+        filterStatusEl?.addEventListener('change', applyFiltersToState);
         btnResetEl?.addEventListener('click', () => {
             if (filterTypeEl) filterTypeEl.value = '';
             if (filterBrEl) filterBrEl.value = '';
             if (filterZoneEl) filterZoneEl.value = '';
-            table?.setOptions((prev) => ({
-                ...prev,
-                state: {
-                    ...prev.state,
-                    globalFilter: '',
-                    columnFilters: [],
-                    sorting: [{ id: 'programmeId', desc: false }],
-                },
-            }));
-            resultsPage = 1;
-            renderTanstackTable();
+            if (filterStatusEl) filterStatusEl.value = '';
+            applyFiltersToState();
         });
     }
     bindFilterHandlers();
@@ -390,7 +531,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const data = buildExportRowsFromTable();
         const headers = [
-            'ID',
             'BR',
             'نوع الحملة',
             'نوع النشاط / المنطقة الجغرافية',
@@ -400,7 +540,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const aoa = [
             headers,
             ...data.map((r) => [
-                r.programmeId ?? '',
                 r.br ?? '',
                 r.typeCampagne ?? '',
                 r.zone ?? '',
@@ -526,10 +665,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let progRes = null;
         let bureauxRes = null;
+        let resultatsRes = null;
         try {
-            [progRes, bureauxRes] = await Promise.all([
+            [progRes, bureauxRes, resultatsRes] = await Promise.all([
                 postAction('getAdminSheet', { sheet: 'Programmes' }),
                 postAction('getAdminSheet', { sheet: 'Bureaux' }),
+                postAction('getAdminSheet', { sheet: 'Resultats' }),
             ]);
         } catch (e) {
             setResultsLoading(false);
@@ -571,6 +712,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         populateBrFilter();
 
+        programmeIdsWithResultats = new Set();
+        resultatsCache.clear();
+        if (resultatsRes && resultatsRes.ok && Array.isArray(resultatsRes.rows)) {
+            for (const r of resultatsRes.rows) {
+                if (!r || isResultatsHeaderRow(r) || r.length < 2) continue;
+                const pid = String(r[1]).trim();
+                if (pid) {
+                    programmeIdsWithResultats.add(pid);
+                    resultatsCache.set(pid, r);
+                }
+            }
+        }
+
         rowsAll = [];
         progRes.rows.forEach((r) => {
             if (!r || !r.length || isHeaderRow(r)) return;
@@ -597,7 +751,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const q = String(filterValue ?? '').trim().toLowerCase();
                 if (!q) return true;
                 const r = row.original;
-                const hay = [r.programmeId, r.br, r.typeCampagne, r.zone, r.periode, r.effectif]
+                const hay = [r.br, r.typeCampagne, r.zone, r.periode, r.effectif]
                     .map((v) => String(v ?? '').toLowerCase())
                     .join(' ');
                 return hay.includes(q);
@@ -617,8 +771,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ...resolvedOptions,
             state: {
                 ...tableState,
-                sorting: [{ id: 'programmeId', desc: false }],
-                columnFilters: [],
+                sorting: [{ id: 'br', desc: false }],
                 globalFilter: '',
             },
             onStateChange: (updater) => {

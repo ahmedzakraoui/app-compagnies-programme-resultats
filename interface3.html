@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/interface3.css" />
+    <script>try{var u=JSON.parse(localStorage.getItem('currentUser'));if(!u||!u.token){window.location.href='index.html'}else if((u.userType||'').trim().toLowerCase()!=='admin'){window.location.href='main-page.html'}}catch(e){window.location.href='index.html'}</script>
   </head>
   <body class="page-results page-admin">
     <div class="composed-backdrop" aria-hidden="true"></div>
@@ -21,21 +22,25 @@
       <nav class="navbar composed-nav py-2" dir="rtl">
         <div class="container composed-nav-inner">
           <div class="composed-brand">
-            <img src="images/cnss_logo.svg" alt="" class="composed-brand-logo" width="44" height="44" decoding="async" />
+            <img src="images/cnss_logo.svg" alt="" class="composed-brand-logo" width="34" height="34" decoding="async" />
             <div class="brand-mini-menu" aria-label="Menu">
+              <a href="admin-main-page.html" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="nav-home">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+              </a>
               <a href="#" class="btn btn-outline-secondary btn-sm composed-menu-btn is-active" aria-current="page">البرامج</a>
-              <a href="interface3.html" class="btn btn-outline-secondary btn-sm composed-menu-btn">الإحصائيات</a>
+              <a href="interface4.html" class="btn btn-outline-secondary btn-sm composed-menu-btn">الإحصائيات</a>
             </div>
           </div>
           <div class="composed-user-panel">
             <div class="composed-user-lines">
               <div id="user-info" class="composed-user-line">--</div>
             </div>
-            <a href="my-account.html" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="btn-account"> حسابي </a>
-            <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn p-0" id="btn-logout"><img src="images/off_icon.svg" alt="Déconnexion" width="32" height="32" /></button>
+            <a href="my-account.html" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="btn-account">حساب المستعمل</a>
+            <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn p-0" id="btn-logout"><img src="images/off_icon.svg" alt="Déconnexion" width="24" height="24" /></button>
           </div>
-        </div>
-      </nav>
+          </div>
+          <div class="dev-credit">أحمد الزكراوي - إدارة المراقبة</div>
+        </nav>
     </header>
 
     <main class="container-fluid composed-main results-main-fluid">
@@ -76,6 +81,14 @@
                         <label class="form-label mb-1" for="filter-zone">نوع النشاط / المنطقة الجغرافية</label>
                         <input type="text" class="form-control form-control-sm" id="filter-zone" placeholder="..." />
                       </div>
+                      <div class="results-filter-compact results-filter-compact--type">
+                        <label class="form-label mb-1" for="filter-status">حالة الحملة</label>
+                        <select class="form-select form-select-sm" id="filter-status">
+                          <option value="" selected>الكل</option>
+                          <option value="realized">المنجزة</option>
+                          <option value="not-realized">الغير منجزة</option>
+                        </select>
+                      </div>
                       <div class="results-filter-actions">
                         <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-filters-reset">إلغاء</button>
                       </div>
@@ -110,6 +123,151 @@
         </div>
       </div>
     </main>
+
+    <!-- Modal consultation résultats (admin read-only) -->
+    <div class="modal" id="modal-stats-campagne" tabindex="-1" aria-labelledby="modal-stats-title" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content stats-modal-content" dir="rtl">
+          <div class="modal-header border-0 py-2 px-3">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+          </div>
+          <div class="modal-body pt-0 px-3 pb-1">
+            <h3 class="stats-popup-section-title h6 fw-bold mb-2 pe-3" id="modal-stats-title">
+              <span class="ms-2">برنامج الحملة</span>
+            </h3>
+            <div class="stats-programme-box">
+              <table class="stats-programme-line-table" dir="rtl">
+                <thead>
+                  <tr>
+                    <th scope="col">نوع الحملة</th>
+                    <th scope="col">نوع النشاط / المنطقة الجغرافية</th>
+                    <th scope="col">الفترة</th>
+                    <th scope="col" class="text-center">عدد المراقبين</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="stats-programme-cell" id="modal-prog-type"></td>
+                    <td class="stats-programme-cell" id="modal-prog-zone"></td>
+                    <td class="stats-programme-cell" id="modal-prog-period"></td>
+                    <td class="stats-programme-cell stats-programme-cell-effectif text-center text-nowrap" id="modal-prog-effectif"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="stats-popup-section-title h6 fw-bold mb-2 pe-3" style="margin-top: 2.5em">
+              <span class="ms-2">إحصائيات الحملة</span>
+            </h3>
+            <div class="table-responsive stats-table-scroll" id="stats-table-panel">
+              <div class="stats-modal-loader" id="stats-modal-loader" aria-hidden="true">
+                <div class="spinner-border text-success" role="status" aria-label="Chargement">
+                  <span class="visually-hidden">تحميل...</span>
+                </div>
+                <p class="small text-muted mb-0 mt-3 fw-semibold">تحميل البيانات…</p>
+              </div>
+              <div class="stats-table-layout" dir="rtl">
+                <div class="stats-split-top">
+                  <section class="stats-block">
+                    <div class="stats-block-title">الحملة</div>
+                    <table class="table table-bordered align-middle mb-0 stats-block-table">
+                      <thead class="stats-block-thead">
+                        <tr>
+                          <th class="stats-th-main">نوع الحملة</th>
+                          <th class="stats-th-main">نوع النشاط / المنطقة الجغرافية</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <input type="text" class="form-control form-control-sm text-center bg-light" id="res-type-hamla" readonly disabled tabindex="-1" aria-readonly="true" />
+                          </td>
+                          <td>
+                            <input type="text" class="form-control form-control-sm text-center bg-light" id="res-activite-zone" readonly disabled tabindex="-1" aria-readonly="true" />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </section>
+
+                  <section class="stats-block">
+                    <div class="stats-block-title">الأجراء</div>
+                    <table class="table table-bordered align-middle mb-0 stats-block-table">
+                      <thead class="stats-block-thead">
+                        <tr>
+                          <th colspan="2" class="stats-th-group">نظام العملة الأجراء</th>
+                          <th colspan="2" class="stats-th-group">نظام العملة غير الأجراء</th>
+                          <th colspan="2" class="stats-th-group">وضعية الأجراء</th>
+                        </tr>
+                        <tr>
+                          <th class="stats-th-sub">عدد المنخرطين</th>
+                          <th class="stats-th-sub">عدد غير المنخرطين</th>
+                          <th class="stats-th-sub">عدد المنخرطين</th>
+                          <th class="stats-th-sub">عدد غير المنخرطين</th>
+                          <th class="stats-th-sub">عدد الأجراء المصرح بهم</th>
+                          <th class="stats-th-sub">عدد الأجراء غير المصرح بهم</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><input type="number" class="form-control form-control-sm text-center bg-light" id="res-w-in" min="0" step="1" readonly disabled /></td>
+                          <td><input type="number" class="form-control form-control-sm text-center bg-light" id="res-w-ni" min="0" step="1" readonly disabled /></td>
+                          <td><input type="number" class="form-control form-control-sm text-center bg-light" id="res-nw-in" min="0" step="1" readonly disabled /></td>
+                          <td><input type="number" class="form-control form-control-sm text-center bg-light" id="res-nw-ni" min="0" step="1" readonly disabled /></td>
+                          <td><input type="number" class="form-control form-control-sm text-center bg-light" id="res-emp-dec" min="0" step="1" readonly disabled /></td>
+                          <td><input type="number" class="form-control form-control-sm text-center bg-light" id="res-emp-ndec" min="0" step="1" readonly disabled /></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </section>
+                </div>
+
+                <div class="stats-split-bottom">
+                  <section class="stats-block">
+                    <div class="stats-block-title">النقص المستخرج</div>
+                    <table class="table table-bordered align-middle mb-0 stats-block-table">
+                      <thead class="stats-block-thead">
+                        <tr>
+                          <th class="stats-th-main">المبلغ الإجمالي للنقص</th>
+                          <th class="stats-th-main">معترف به</th>
+                          <th class="stats-th-main">غير معترف به</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><input type="text" class="form-control form-control-sm text-center stats-amount-input bg-light" id="res-manq-tot" inputmode="numeric" autocomplete="off" readonly disabled /></td>
+                          <td><input type="text" class="form-control form-control-sm text-center stats-amount-input bg-light" id="res-manq-ok" inputmode="numeric" autocomplete="off" readonly disabled /></td>
+                          <td><input type="text" class="form-control form-control-sm text-center stats-amount-input bg-light" id="res-manq-nok" inputmode="numeric" autocomplete="off" readonly disabled /></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </section>
+
+                  <section class="stats-block">
+                    <div class="stats-block-title">عدد المراقبين</div>
+                    <table class="table table-bordered align-middle mb-0 stats-block-table">
+                      <thead class="stats-block-thead">
+                        <tr>
+                          <th class="stats-th-main">عدد المراقبين</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><input type="number" class="form-control form-control-sm text-center bg-light" id="res-participants" min="0" step="1" readonly disabled /></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </section>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">إغلاق</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/@tanstack/table-core@8.5.20/build/umd/index.production.js"></script>

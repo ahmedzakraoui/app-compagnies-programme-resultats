@@ -21,13 +21,23 @@
         <div class="container composed-nav-inner">
           <div class="composed-brand">
             <img src="images/cnss_logo.svg" alt="" class="composed-brand-logo" width="44" height="44" decoding="async" />
+            <div class="brand-mini-menu" aria-label="Menu">
+              <a href="main-page.html" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="nav-home">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+              </a>
+              <a href="interface1.html" class="btn btn-outline-secondary btn-sm composed-menu-btn">البرنامج</a>
+              <a href="interface2.html" class="btn btn-outline-secondary btn-sm composed-menu-btn">الإحصائيات</a>
+            </div>
           </div>
           <div class="composed-user-panel">
-            <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="btn-back">الرجوع</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="btn-logout"><img src="images/off_icon.svg" alt="Déconnexion" width="32" height="32" /></button>
+            <div class="composed-user-lines">
+              <div id="user-info" class="composed-user-line">--</div>
+            </div>
+            <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn p-0" id="btn-logout"><img src="images/off_icon.svg" alt="Déconnexion" width="32" height="32" /></button>
           </div>
-        </div>
-      </nav>
+          </div>
+          <div class="dev-credit">أحمد الزكراوي - إدارة المراقبة</div>
+        </nav>
     </header>
 
     <main class="container composed-main" dir="rtl">
@@ -37,7 +47,7 @@
             <div class="card-composed-accent" aria-hidden="true"></div>
             <div class="card-composed-body p-4 p-lg-4">
               <div class="account-title text-center mb-5">
-                <h1 class="h4 fw-bold mb-1 acc-name">حسابي</h1>
+                <h1 class="h4 fw-bold mb-1 acc-name">حساب المستعمل</h1>
               </div>
 
               <div class="account-split">

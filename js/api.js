@@ -1,8 +1,8 @@
-const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbztXxU6nuuIEkCL2sBxU6QNFvcDLv1nWiVU7Woa_6Mc7iXbkcC2jxdVhxGwTVQaQ8Iv/exec";
+const SCRIPT_URL ="https://script.google.com/macros/s/AKfycby9e3iTBoUgGW3B7giCIelDpFZNFLIGEoDUyPpYF6MLMfj1bXSIgKcWWuw-sLSaR11P/exec";
 
 // Session TTL must match Google Apps Script cache duration (see Code.gs createSession_()).
-// Currently: 21600 seconds = 6 hours.
-const SESSION_TTL_MS = 21600 * 1000;
+// Currently: 7200 seconds = 2 hours.
+const SESSION_TTL_MS = 7200 * 1000;
 // Expose for other scripts (login.js / interface pages)
 try {
     window.SESSION_TTL_MS = SESSION_TTL_MS;
@@ -84,6 +84,7 @@ try {
  * Le serveur est dans google-apps-script/Code.gs (à coller dans Apps Script + redéployer).
  */
 async function saveData(sheetName, arrayValues) {
+    if (isSessionExpired()) { logoutToLogin(); return false; }
     try {
         const body = JSON.stringify({
             sheet: sheetName,
@@ -112,6 +113,7 @@ async function saveData(sheetName, arrayValues) {
 }
 
 async function postAction(action, payload = {}) {
+    if (isSessionExpired()) { logoutToLogin(); return { ok: false, error: "unauthorized" }; }
     try {
         const body = JSON.stringify({ action, token: getToken(), ...payload });
         const response = await fetch(SCRIPT_URL, {
@@ -137,6 +139,7 @@ async function postAction(action, payload = {}) {
 }
 
 async function fetchData(sheetName) {
+    if (isSessionExpired()) { logoutToLogin(); return []; }
     try {
         if (sheetName === 'Programmes' || sheetName === 'Resultats') {
             const res = await postAction('getSheet', { sheet: sheetName });
@@ -154,3 +157,17 @@ async function fetchData(sheetName) {
         return [];
     }
 }
+
+// Shared helper: render zone activity value with colored hierarchical segments
+window.renderZoneActivity = function (v) {
+    const raw = String(v ?? '').trim();
+    if (!raw || !raw.includes('\u203a')) return raw || '\u2014';
+    const parts = raw.split(/\s*\u203a\s*/);
+    const colors = ['#048f40', '#1b9f41', '#3da937', '#a5ca1f'];
+    return parts
+        .map((p, i) => {
+            const c = colors[i % colors.length];
+            return '<span style="color:' + c + ';font-weight:' + (i === parts.length - 1 ? '700' : '600') + ';white-space:nowrap">' + p + '</span>';
+        })
+        .join('<span style="display:inline-flex;align-items:center;margin:0 0.15em;color:#048f40;font-size:75%">\u25b6</span>');
+};

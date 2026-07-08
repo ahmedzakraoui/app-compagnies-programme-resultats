@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (matriculeEl) matriculeEl.disabled = Boolean(isLoading);
         if (pwEl) pwEl.disabled = Boolean(isLoading);
         if (submitSpinnerEl) submitSpinnerEl.classList.toggle('d-none', !v);
-        if (submitTextEl) submitTextEl.textContent = v ? 'Connexion…' : 'Se connecter';
+        if (submitTextEl) submitTextEl.textContent = v ? 'تسجيل الدخول' : 'سجِّل الدخول';
     }
 
     function consumePostLoginRedirect() {
@@ -41,6 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function defaultHomeForUser(userObj) {
+        const isAdmin = userObj && String(userObj.userType || '').trim().toLowerCase() === 'admin';
+        return isAdmin ? 'admin-main-page.html' : 'main-page.html';
+    }
+
     try {
         const existing = localStorage.getItem('currentUser');
         if (existing) {
@@ -48,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const exp = u && typeof u === 'object' ? Number(u.sessionExpiresAt) : NaN;
             const isExpired = Number.isFinite(exp) ? Date.now() >= exp : false;
             if (u && typeof u === 'object' && u.token && !isExpired) {
-                window.location.href = consumePostLoginRedirect() || 'interface1.html';
+                window.location.href = defaultHomeForUser(u);
                 return;
             }
             localStorage.removeItem('currentUser');
@@ -59,13 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         setError('');
         if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-            setError('Pas de connexion internet');
+            setError('لا يوجد اتصال بالإنترنت');
             return;
         }
         const matricule = matriculeEl?.value.trim() || '';
         const pw = pwEl?.value || '';
         if (!matricule || !pw) {
-            setError('Veuillez saisir le matricule et le mot de passe.');
+            setError('يرجى إدخال رقم التسجيل وكلمة المرور');
             return;
         }
 
@@ -75,10 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!res || !res.ok || !res.user || !res.token) {
             if (res && (res.error === 'network_error' || res.error === 'http_error')) {
-                setError('Pas de connexion internet');
+                setError('لا يوجد اتصال بالإنترنت');
                 return;
             }
-            setError('Identifiants invalides.');
+            setError('بيانات الدخول غير صحيحة');
             return;
         }
 
@@ -90,6 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 JSON.stringify({ ...res.user, token: res.token, sessionStartedAt: startedAt, sessionExpiresAt: startedAt + ttl }),
             );
         } catch {}
-        window.location.href = consumePostLoginRedirect() || 'interface1.html';
+        window.location.href = defaultHomeForUser(res.user);
     });
 });

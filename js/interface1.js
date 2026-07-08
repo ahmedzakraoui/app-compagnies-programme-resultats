@@ -196,9 +196,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             tr.setAttribute('role', 'button');
             tr.tabIndex = 0;
-            tr.innerHTML = `
-                <td><span class="badge bg-info text-dark programme-type-badge">${row[2]}</span></td>
-                <td>${row[3]}</td>
+                const typeV = String(row[2] ?? '').trim();
+                let badgeCls = 'badge campagne-type-badge';
+                if (typeV === 'لا شيء' || typeV === '') badgeCls += ' campagne-type-badge--rien';
+                else if (typeV === 'جغرافية') badgeCls += ' campagne-type-badge--geo';
+                tr.innerHTML = `
+                <td><span class="${badgeCls}">${typeV}</span></td>
+                <td>${window.renderZoneActivity(row[3])}</td>
                 <td><small>${row[5]} ⟻ ${row[4]}</small></td>
                 <td class="text-center">${row[6]}</td>
             `;
@@ -216,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const choiceSelectOpts = {
-        searchEnabled: false,
+        searchEnabled: true,
         shouldSort: false,
         itemSelectText: '',
         allowHTML: false,
@@ -240,15 +244,115 @@ document.addEventListener('DOMContentLoaded', async () => {
     let fpFin = null;
     let formPickersReady = false;
 
-    function destroySectorChoices() {
-        if (!choicesSector) return;
-        choicesSector.destroy();
-        choicesSector = null;
+    function loadActivities() {
+        const data = window.activitiesData;
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            console.warn('activitiesData not available');
+            return;
+        }
+
+        const sections = new Map();
+        const divisions = new Map();
+        const groupes = new Map();
+        const classeMap = new Map();
+
+        for (const a of data) {
+            if (!sections.has(a.sectionCode))
+                sections.set(a.sectionCode, a);
+            const dk = a.sectionCode + '|' + a.divisionCode;
+            if (!divisions.has(dk))
+                divisions.set(dk, a);
+            const gk = a.sectionCode + '|' + a.divisionCode + '|' + a.groupeCode;
+            if (!groupes.has(gk))
+                groupes.set(gk, a);
+            const ck = gk;
+            if (!classeMap.has(ck)) classeMap.set(ck, []);
+            classeMap.get(ck).push(a);
+        }
+
+        activiteSectorielle.innerHTML = '<option value="">اختر النشاط...</option>';
+
+        const levels = [
+            { bg: 'rgba(4, 143, 64, 0.12)', code: '#048f40', text: '#1a4a2e' },  // section — green
+            { bg: 'rgba(0, 102, 204, 0.10)', code: '#0066cc', text: '#1a2a4a' },  // division — blue
+            { bg: 'rgba(212, 160, 23, 0.12)', code: '#b8860b', text: '#4a3a1a' }, // groupe — amber
+            { bg: 'transparent', code: '#999', text: '#333' },                     // classe — neutral
+        ];
+
+        function addOpt(value, code, name, i) {
+            const s = levels[i];
+            const opt = document.createElement('option');
+            opt.value = code + ' - ' + value;
+            opt.textContent = code + ' - ' + name;
+            opt.setAttribute('label', '<span style="display:block;padding:4px 8px;background:' + s.bg + ';color:' + s.text + '"><span style="color:' + s.code + ';font-weight:700">' + code + '</span> - ' + name + '</span>');
+            activiteSectorielle.appendChild(opt);
+        }
+
+        for (const a of sections.values()) {
+            addOpt(a.sectionName, a.sectionCode, a.sectionName, 0);
+            for (const da of divisions.values()) {
+                if (da.sectionCode !== a.sectionCode) continue;
+                addOpt(da.divisionName, da.divisionCode, da.divisionName, 1);
+                for (const ga of groupes.values()) {
+                    if (ga.sectionCode !== da.sectionCode || ga.divisionCode !== da.divisionCode) continue;
+                    addOpt(ga.groupeName, ga.groupeCode, ga.groupeName, 2);
+                    const classeKey = ga.sectionCode + '|' + ga.divisionCode + '|' + ga.groupeCode;
+                    const classes = classeMap.get(classeKey) || [];
+                    for (const ca of classes) {
+                        addOpt(ca.classeName, ca.classeCode, ca.classeName, 3);
+                    }
+                }
+            }
+        }
     }
 
+    const sectorSearchOpts = {
+        searchEnabled: true,
+        searchResultLimit: -1,
+        shouldSort: false,
+        itemSelectText: '',
+        allowHTML: true,
+        position: 'bottom',
+        noResultsText: 'لا توجد نتائج',
+        searchFields: ['value'],
+        fuseOptions: {
+            threshold: 0,
+            distance: 1000,
+            minMatchCharLength: 1,
+            ignoreLocation: true,
+        },
+    };
+
+    let selected = false;
+    let resetting = false;
     function initSectorChoices() {
         if (choicesSector) return;
-        choicesSector = new Choices(activiteSectorielle, choiceSelectOpts);
+        choicesSector = new Choices(activiteSectorielle, sectorSearchOpts);
+        activiteSectorielle.addEventListener('showDropdown', onSectorShow);
+        activiteSectorielle.addEventListener('change', onSectorChange);
+        activiteSectorielle.addEventListener('hideDropdown', onSectorHide);
+    }
+    function destroySectorChoices() {
+        if (!choicesSector) return;
+        activiteSectorielle.removeEventListener('showDropdown', onSectorShow);
+        activiteSectorielle.removeEventListener('change', onSectorChange);
+        activiteSectorielle.removeEventListener('hideDropdown', onSectorHide);
+        const c = choicesSector;
+        choicesSector = null;
+        c.destroy();
+    }
+    function onSectorShow() { selected = false; }
+    function onSectorChange() { selected = true; }
+    function onSectorHide() {
+        if (selected || resetting) return;
+        resetSectorChoices();
+    }
+    function resetSectorChoices() {
+        resetting = true;
+        destroySectorChoices();
+        loadActivities();
+        initSectorChoices();
+        setTimeout(() => { resetting = false; }, 0);
     }
 
     function updateZoneActiviteUI() {
@@ -406,9 +510,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         currentProgrammeRow = programmeRow;
         const pid = String(programmeRow[0] ?? '').trim();
-        document.querySelectorAll('.modal-stats-pid').forEach((el) => {
-            el.textContent = pid;
-        });
         const elType = document.getElementById('modal-prog-type');
         const elZone = document.getElementById('modal-prog-zone');
         const elPeriod = document.getElementById('modal-prog-period');
@@ -475,6 +576,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (btnStatsSave) {
         btnStatsSave.addEventListener('click', async () => {
+            const statsFieldIds = ['res-w-in','res-w-ni','res-nw-in','res-nw-ni','res-emp-dec','res-emp-ndec','res-manq-tot','res-manq-ok','res-manq-nok','res-participants'];
+            for (const id of statsFieldIds) {
+                const el = document.getElementById(id);
+                if (!el || el.value.trim() === '') {
+                    el?.focus();
+                    el?.select();
+                    alert('الرجاء تعمير جميع الخانات وبشكل صحيح');
+                    return;
+                }
+            }
             const payload = buildResultatsRow();
             if (!payload) return;
             btnStatsSave.disabled = true;
@@ -482,7 +593,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             btnStatsSave.disabled = false;
             if (ok) {
                 statsModal?.hide();
-                await loadTable();
+    await loadTable();
             } else {
                 alert("Erreur lors de l'enregistrement des statistiques");
             }
@@ -498,6 +609,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.setItem('postLoginRedirect', 'interface1.html');
         } catch {}
         window.location.href = 'index.html';
+        return;
+    }
+
+    // Redirect admins away from bureau pages
+    if ((user.userType || '').trim().toLowerCase() === 'admin') {
+        window.location.href = 'admin-main-page.html';
         return;
     }
 
@@ -672,6 +789,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    loadActivities();
     await loadTable();
 
     btnPrevPage?.addEventListener('click', () => renderProgrammesPage(programmesPage - 1));
@@ -681,12 +799,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
         initFormPickersOnce();
         if (!validateProgrammeForm()) {
-            alert('Veuillez compléter tous les champs obligatoires');
+            alert('الرجاء تعمير جميع الخانات وبشكل صحيح');
             return;
         }
 
         const btnText = document.getElementById('btn-text');
-        btnText.textContent = 'جاري الإضافة...';
+        const btnSpinner = document.getElementById('btn-submit-spinner');
+        btnText.textContent = 'جاري الإضافة';
+        btnSpinner.classList.remove('d-none');
 
         const newEntry = [
             'P' + Date.now(),
@@ -709,10 +829,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             choicesCampagne.setChoiceByValue(typeCampagne.value);
             updateZoneActiviteUI();
             btnText.textContent = 'إضافة إلى البرنامج';
+            btnSpinner.classList.add('d-none');
             await loadTable();
         } else {
             alert('خطأ أثناء إضافة البرنامج. حاول مرة أخرى');
             btnText.textContent = 'إضافة إلى البرنامج';
+            btnSpinner.classList.add('d-none');
         }
     });
 });

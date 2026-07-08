@@ -37,6 +37,12 @@ function parseMaybeAmount(v) {
     return Number.isFinite(n) ? n : null;
 }
 
+function formatMontant(v) {
+    const n = parseMaybeAmount(v);
+    if (n === null) return '';
+    return String(n);
+}
+
 function sanitizeAmountText(v) {
     const raw = String(v === undefined || v === null ? '' : v);
     const normalizedSep = raw.replace(/[.;:،؛'"’‘“”]/g, ',');
@@ -60,6 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const theadEl = document.getElementById('results-thead');
     const tbodyEl = document.getElementById('results-tbody');
+    const tfootEl = document.getElementById('results-tfoot');
     const resultsTotalEl = document.getElementById('results-total');
     const resultsTableWrap = document.getElementById('results-table-wrap');
     const resultsTableLoader = document.getElementById('results-table-loader');
@@ -91,6 +98,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // Redirect admins away from bureau pages
+    if ((user.userType || '').trim().toLowerCase() === 'admin') {
+        window.location.href = 'admin-main-page.html';
+        return;
+    }
+
     // Auto logout when session TTL is reached (token expires server-side after ~6h)
     if (typeof window !== 'undefined' && typeof window.isSessionExpired === 'function' && window.isSessionExpired()) {
         if (typeof window.logoutToLogin === 'function') window.logoutToLogin();
@@ -113,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function setResultsLoading(isLoading) {
         if (resultsTableWrap) resultsTableWrap.classList.toggle('is-loading', Boolean(isLoading));
-        if (resultsTableLoader) resultsTableLoader.setAttribute('aria-hidden', isLoading ? 'false' : 'true');
+        if (tfootEl && isLoading) tfootEl.classList.add('d-none');
     }
 
     // ----- Modal edit (reuses Interface1 IDs/logic)
@@ -165,14 +178,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             setStatVal('res-emp-dec', data[6]);
             setStatVal('res-emp-ndec', data[7]);
             if (data.length >= 12) {
-                setStatVal('res-manq-tot', sanitizeAmountText(data[8]));
-                setStatVal('res-manq-ok', sanitizeAmountText(data[9]));
-                setStatVal('res-manq-nok', sanitizeAmountText(data[10]));
+                setStatVal('res-manq-tot', formatMontant(data[8]));
+                setStatVal('res-manq-ok', formatMontant(data[9]));
+                setStatVal('res-manq-nok', formatMontant(data[10]));
                 setStatVal('res-participants', data[11]);
             } else {
                 setStatVal('res-manq-tot', '');
-                setStatVal('res-manq-ok', sanitizeAmountText(data[8]));
-                setStatVal('res-manq-nok', sanitizeAmountText(data[9]));
+                setStatVal('res-manq-ok', formatMontant(data[8]));
+                setStatVal('res-manq-nok', formatMontant(data[9]));
                 setStatVal('res-participants', data.length > 10 ? data[10] : '');
             }
         } else {
@@ -196,9 +209,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         currentProgrammeRow = programmeRow;
         const pid = String(programmeRow[0] ?? '').trim();
-        document.querySelectorAll('.modal-stats-pid').forEach((el) => {
-            el.textContent = pid;
-        });
         const elType = document.getElementById('modal-prog-type');
         const elZone = document.getElementById('modal-prog-zone');
         const elPeriod = document.getElementById('modal-prog-period');
@@ -236,6 +246,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     btnStatsSave?.addEventListener('click', async () => {
+        const statsFieldIds = ['res-w-in','res-w-ni','res-nw-in','res-nw-ni','res-emp-dec','res-emp-ndec','res-manq-tot','res-manq-ok','res-manq-nok','res-participants'];
+        for (const id of statsFieldIds) {
+            const el = document.getElementById(id);
+            if (!el || el.value.trim() === '') {
+                el?.focus();
+                el?.select();
+                alert('الرجاء تعمير جميع الخانات وبشكل صحيح');
+                return;
+            }
+        }
         const payload = buildResultatsRow();
         if (!payload) return;
         btnStatsSave.disabled = true;
@@ -283,23 +303,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const columns = [
-        columnHelper.accessor('programmeId', {
-            id: 'programmeId',
-            header: () => 'ID',
-            cell: (info) => String(info.getValue() ?? '—'),
-            filterFn: 'includesString',
-            sortingFn: (a, b) => (parseMaybeNumber(a.getValue('programmeId')) ?? 0) - (parseMaybeNumber(b.getValue('programmeId')) ?? 0),
-        }),
         columnHelper.accessor('typeCampagne', {
             id: 'typeCampagne',
             header: () => 'نوع الحملة',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => {
+                const v = String(info.getValue() ?? '').trim();
+                let cls = 'badge campagne-type-badge';
+                if (v === 'لا شيء' || v === '') cls += ' campagne-type-badge--rien';
+                else if (v === 'جغرافية') cls += ' campagne-type-badge--geo';
+                return `<span class="${cls}">${v}</span>`;
+            },
             filterFn: 'includesString',
         }),
         columnHelper.accessor('zone', {
             id: 'zone',
             header: () => 'نوع النشاط / المنطقة الجغرافية',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => window.renderZoneActivity(info.getValue()),
             filterFn: 'includesString',
         }),
         // Employees (flat headers, no pre-header groups)
@@ -343,21 +362,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         columnHelper.accessor('insuffTotale', {
             id: 'insuffTotale',
             header: () => 'المبلغ الإجمالي للنقص',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => formatMontant(info.getValue()),
             filterFn: amountMinFilter,
             sortingFn: (a, b) => (parseMaybeAmount(a.getValue('insuffTotale')) ?? 0) - (parseMaybeAmount(b.getValue('insuffTotale')) ?? 0),
         }),
         columnHelper.accessor('mtReconnu', {
             id: 'mtReconnu',
             header: () => 'معترف به',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => formatMontant(info.getValue()),
             filterFn: amountMinFilter,
             sortingFn: (a, b) => (parseMaybeAmount(a.getValue('mtReconnu')) ?? 0) - (parseMaybeAmount(b.getValue('mtReconnu')) ?? 0),
         }),
         columnHelper.accessor('mtNonReconnu', {
             id: 'mtNonReconnu',
             header: () => 'غير معترف به',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => formatMontant(info.getValue()),
             filterFn: amountMinFilter,
             sortingFn: (a, b) => (parseMaybeAmount(a.getValue('mtNonReconnu')) ?? 0) - (parseMaybeAmount(b.getValue('mtNonReconnu')) ?? 0),
         }),
@@ -375,7 +394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let table = null;
     let tableState = null;
     let rowsAll = [];
-    const RESULTS_PAGE_SIZE = 5;
+    const RESULTS_PAGE_SIZE = 10;
     let resultsPage = 1;
 
     function totalResultsPages(totalRows) {
@@ -524,7 +543,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rowModel = table.getRowModel();
         tbodyEl.innerHTML = '';
         if (!rowModel.rows.length) {
-            tbodyEl.innerHTML = `<tr><td colspan="12" class="text-center text-muted">القائمة فارغة</td></tr>`;
+            tbodyEl.innerHTML = `<tr><td colspan="11" class="text-center text-muted">القائمة فارغة</td></tr>`;
+            if (tfootEl) tfootEl.classList.add('d-none');
             updateTotalUI(rowsAll.length, 0);
             updateResultsPaginationUI(0);
             return;
@@ -564,6 +584,53 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             tbodyEl.appendChild(tr);
         });
+
+        // Footer totals
+        if (tfootEl) {
+            const sumFields = ['salAff', 'salNonAff', 'nonSalAff', 'nonSalNonAff', 'travTotal', 'insuffTotale', 'mtReconnu', 'mtNonReconnu', 'controleursParticipants'];
+            const amounts = ['insuffTotale', 'mtReconnu', 'mtNonReconnu'];
+            const sums = {};
+            const hasData = {};
+            sumFields.forEach((f) => { sums[f] = 0; hasData[f] = false; });
+            rowModel.rows.forEach((row) => {
+                const o = row.original;
+                sumFields.forEach((f) => {
+                    const v = parseMaybeNumber(o[f]) ?? 0;
+                    sums[f] += v;
+                    if (v !== 0 || String(o[f] ?? '').trim() !== '') hasData[f] = true;
+                });
+            });
+            const fieldsOrder = sumFields;
+            let fi = 0;
+            tfootEl.innerHTML = '';
+            const tr = document.createElement('tr');
+            rowModel.rows[0].getVisibleCells().forEach((cell, ci) => {
+                if (ci > 0 && ci < 2) return;
+                const td = document.createElement('td');
+                const colId = cell.column.id;
+                if (ci === 0) {
+                    td.textContent = 'المجموع الكلي';
+                    td.style.fontWeight = '700';
+                    td.colSpan = 2;
+                } else if (fieldsOrder.includes(colId)) {
+                    if (amounts.includes(colId)) {
+                        td.textContent = hasData[colId] ? formatMontant(sums[colId]) : '';
+                    } else {
+                        td.textContent = String(sums[colId] || '—');
+                    }
+                    td.style.fontWeight = '700';
+                } else {
+                    td.textContent = '';
+                }
+                tr.appendChild(td);
+            });
+            tfootEl.appendChild(tr);
+            if (resultsPage === pages) {
+                tfootEl.classList.remove('d-none');
+            } else {
+                tfootEl.classList.add('d-none');
+            }
+        }
     }
 
     function applyFiltersToState() {
@@ -600,7 +667,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ...prev.state,
                     globalFilter: '',
                     columnFilters: [],
-                    sorting: [{ id: 'programmeId', desc: false }],
+                    sorting: [{ id: 'typeCampagne', desc: false }],
                 },
             }));
             resultsPage = 1;
@@ -624,7 +691,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const data = buildExportRowsFromTable();
         const headers = [
-            'ID',
             'نوع الحملة',
             'نوع النشاط / المنطقة الجغرافية',
             'عدد المنخرطين (الأجراء)',
@@ -640,7 +706,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const aoa = [
             headers,
             ...data.map((r) => [
-                r.programmeId ?? '',
                 r.typeCampagne ?? '',
                 r.zone ?? '',
                 r.salAff ?? '',
@@ -684,7 +749,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rows = rowModel?.rows || [];
         const tbodyHtml =
             rows.length === 0
-                ? `<tbody><tr><td colspan="12" style="text-align:center;color:#777;">Aucun résultat.</td></tr></tbody>`
+                ? `<tbody><tr><td colspan="11" style="text-align:center;color:#777;">Aucun résultat.</td></tr></tbody>`
                 : `<tbody>${rows
                       .map((row) => {
                           const tds = row
@@ -695,7 +760,45 @@ document.addEventListener('DOMContentLoaded', async () => {
                       })
                       .join('')}</tbody>`;
 
-        const tableHtml = `<table class="${tableEl.className}" dir="rtl">${theadHtml}${tbodyHtml}</table>`;
+        // Build tfoot for PDF (same sums as visible table)
+        const pdfAmounts = ['insuffTotale', 'mtReconnu', 'mtNonReconnu'];
+        const pdfSumFields = ['salAff', 'salNonAff', 'nonSalAff', 'nonSalNonAff', 'travTotal', 'insuffTotale', 'mtReconnu', 'mtNonReconnu', 'controleursParticipants'];
+        const pdfSums = {};
+        const pdfHasData = {};
+        pdfSumFields.forEach((f) => { pdfSums[f] = 0; pdfHasData[f] = false; });
+        rows.forEach((row) => {
+            const o = row.original;
+            pdfSumFields.forEach((f) => {
+                const v = parseMaybeNumber(o[f]) ?? 0;
+                pdfSums[f] += v;
+                if (v !== 0 || String(o[f] ?? '').trim() !== '') pdfHasData[f] = true;
+            });
+        });
+        let tfootHtml = '';
+        if (rows.length > 0) {
+            const fc = rows[0].getVisibleCells();
+            tfootHtml = '<tfoot><tr>';
+            fc.forEach((cell, ci) => {
+                const colId = cell.column.id;
+                if (ci === 0) {
+                    tfootHtml += '<td colspan="2" style="font-weight:700;">المجموع الكلي</td>';
+                } else if (ci > 0 && ci < 2) {
+                    return;
+                } else if (pdfSumFields.includes(colId)) {
+                    if (pdfAmounts.includes(colId)) {
+                        const val = pdfHasData[colId] ? formatMontant(pdfSums[colId]) : '';
+                        tfootHtml += `<td style="font-weight:700;">${val}</td>`;
+                    } else {
+                        tfootHtml += `<td style="font-weight:700;">${String(pdfSums[colId] || '—')}</td>`;
+                    }
+                } else {
+                    tfootHtml += '<td></td>';
+                }
+            });
+            tfootHtml += '</tr></tfoot>';
+        }
+
+        const tableHtml = `<table class="${tableEl.className}" dir="rtl">${theadHtml}${tbodyHtml}${tfootHtml}</table>`;
 
         const totalCount = rows.length;
         const totalLabel = totalCount === 1 ? 'حملة' : 'حملات';
@@ -780,7 +883,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (tbodyEl) tbodyEl.innerHTML = '';
         if (typeof navigator !== 'undefined' && navigator.onLine === false) {
             setResultsLoading(false);
-            if (tbodyEl) tbodyEl.innerHTML = `<tr><td colspan="12" class="text-center text-muted">Pas de connexion internet</td></tr>`;
+            if (tbodyEl) tbodyEl.innerHTML = `<tr><td colspan="11" class="text-center text-muted">Pas de connexion internet</td></tr>`;
             return;
         }
         let progRes = null;
@@ -792,7 +895,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ]);
         } catch (e) {
             setResultsLoading(false);
-            if (tbodyEl) tbodyEl.innerHTML = `<tr><td colspan="12" class="text-center text-muted">Erreur réseau</td></tr>`;
+            if (tbodyEl) tbodyEl.innerHTML = `<tr><td colspan="11" class="text-center text-muted">Erreur réseau</td></tr>`;
             return;
         }
 
@@ -808,7 +911,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 !progRes ||
                 (progRes && (progRes.error === 'network_error' || progRes.error === 'http_error'));
             if (tbodyEl) {
-                tbodyEl.innerHTML = `<tr><td colspan="12" class="text-center text-muted">${
+                tbodyEl.innerHTML = `<tr><td colspan="11" class="text-center text-muted">${
                     isOffline
                         ? 'Pas de connexion internet'
                         : 'Impossible de charger les programmes (API).'
@@ -912,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             state: {
                 ...tableState,
                 // Default sort by Programme ID (ascending)
-                sorting: [{ id: 'programmeId', desc: false }],
+                sorting: [{ id: 'typeCampagne', desc: false }],
                 columnFilters: [],
                 globalFilter: '',
             },

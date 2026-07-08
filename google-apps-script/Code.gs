@@ -211,7 +211,8 @@ function doPost(e) {
           codeBr: codeBr,
           bureauName: bureau ? String(bureau.nom_bureau || "").trim() : "",
           bureauNameAr: bureau ? String(bureau.nom_bureau_ar || "").trim() : "",
-          bureauRegion: bureau ? String(bureau.region || "").trim() : ""
+          bureauRegion: bureau ? String(bureau.region || "").trim() : "",
+          userType: String(found.user_type || "").trim()
         }
       });
     }

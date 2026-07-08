@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/interface4.css" />
+    <script>try{var u=JSON.parse(localStorage.getItem('currentUser'));if(!u||!u.token){window.location.href='index.html'}else if((u.userType||'').trim().toLowerCase()!=='admin'){window.location.href='main-page.html'}}catch(e){window.location.href='index.html'}</script>
   </head>
   <body class="page-results page-admin">
     <div class="composed-backdrop" aria-hidden="true"></div>
@@ -21,8 +22,11 @@
       <nav class="navbar composed-nav py-2" dir="rtl">
         <div class="container composed-nav-inner">
           <div class="composed-brand">
-            <img src="images/cnss_logo.svg" alt="" class="composed-brand-logo" width="44" height="44" decoding="async" />
+            <img src="images/cnss_logo.svg" alt="" class="composed-brand-logo" width="34" height="34" decoding="async" />
             <div class="brand-mini-menu" aria-label="Menu">
+              <a href="admin-main-page.html" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="nav-home">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+              </a>
               <a href="interface3.html" class="btn btn-outline-secondary btn-sm composed-menu-btn">البرامج</a>
               <a href="#" class="btn btn-outline-secondary btn-sm composed-menu-btn is-active" aria-current="page">الإحصائيات</a>
             </div>
@@ -31,11 +35,12 @@
             <div class="composed-user-lines">
               <div id="user-info" class="composed-user-line">--</div>
             </div>
-            <a href="my-account.html" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="btn-account"> حسابي </a>
-            <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn p-0" id="btn-logout"><img src="images/off_icon.svg" alt="Déconnexion" width="32" height="32" /></button>
+            <a href="my-account.html" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="btn-account">حساب المستعمل</a>
+            <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn p-0" id="btn-logout"><img src="images/off_icon.svg" alt="Déconnexion" width="24" height="24" /></button>
           </div>
-        </div>
-      </nav>
+          </div>
+          <div class="dev-credit">أحمد الزكراوي - إدارة المراقبة</div>
+        </nav>
     </header>
 
     <main class="container-fluid composed-main results-main-fluid">
@@ -93,6 +98,7 @@
                 <table class="table table-hover align-middle composed-table results-table mb-0" dir="rtl">
                   <thead id="results-thead"></thead>
                   <tbody id="results-tbody"></tbody>
+                  <tfoot id="results-tfoot" class="results-tfoot d-none"></tfoot>
                 </table>
                 <div class="results-table-loader" id="results-table-loader" aria-hidden="false">
                   <div class="spinner-border text-success" role="status" aria-label="Chargement"></div>

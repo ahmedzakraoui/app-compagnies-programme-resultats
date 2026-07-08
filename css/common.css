@@ -38,6 +38,9 @@ body { background-color: var(--light-bg); font-family: 'Inter', sans-serif; }
 /* ------------------------------------------------------------------ */
 /* Top bar                                                             */
 /* ------------------------------------------------------------------ */
+.composed-nav {
+    position: relative;
+}
 .composed-topbar {
     position: sticky;
     top: 0;
@@ -104,8 +107,6 @@ body { background-color: var(--light-bg); font-family: 'Inter', sans-serif; }
     color: var(--cp-accent, #7c3aed);
 }
 .composed-brand-logo {
-    width: 2.75rem;
-    height: 2.75rem;
     object-fit: contain;
     flex-shrink: 0;
     border-radius: 5em;
@@ -378,7 +379,7 @@ table {
 /* Results table shared styles (interface2 & interface3)               */
 /* ------------------------------------------------------------------ */
 .results-main-fluid {
-    max-width: 1650px;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -817,4 +818,103 @@ table {
 div.modal.show {
     display: flex !important;
     align-items: center;
+}
+
+/* ------------------------------------------------------------------ */
+/* Campaign type badges (shared across all interfaces)                 */
+/* ------------------------------------------------------------------ */
+.composed-table .badge.campagne-type-badge {
+    background-color: rgba(4, 143, 64, 0.14) !important;
+    color: #0f2918 !important;
+    border: 1px solid rgba(4, 143, 64, 0.22);
+}
+.composed-table .badge.campagne-type-badge.campagne-type-badge--rien {
+    background: transparent !important;
+    color: #aaa !important;
+    border: 1px solid rgba(68, 68, 68, 0.15) !important;
+}
+.composed-table .badge.campagne-type-badge.campagne-type-badge--geo {
+    background: linear-gradient(135deg, rgba(4, 143, 64, 0.22), rgba(165, 202, 31, 0.28)) !important;
+    color: #048f40 !important;
+    border: 1px solid rgba(4, 143, 64, 0.35);
+}
+
+/* Zone activity hierarchy display */
+.zone-path {
+    display: inline;
+    line-height: 1.4;
+}
+.zone-path-segment {
+    white-space: nowrap;
+}
+.zone-path-sep {
+    color: #bbb;
+    margin: 0 0.15em;
+}
+
+/* Choices dropdown: word wrap, no word break across lines */
+#zone-sectorielle-wrap .choices__list--dropdown .choices__list {
+    max-height: min(12rem, 40vh) !important;
+}
+#zone-sectorielle-wrap .choices__list--dropdown .choices__item--choice {
+    padding: 0 !important;
+    margin: 0 !important;
+    border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+    font-size: 0.8rem !important;
+    white-space: normal !important;
+    word-break: keep-all !important;
+    overflow-wrap: break-word !important;
+    overflow: visible !important;
+    max-width: none !important;
+}
+#zone-sectorielle-wrap .choices__list--dropdown .choices__item--choice:last-child {
+    border-bottom: none !important;
+}
+
+/* Dev credit badge — hangs from nav on interface pages, floats on main pages */
+.dev-credit {
+    position: absolute;
+    bottom: 0;
+    right: 4rem;
+    transform: translateY(100%);
+    z-index: 101;
+    background: linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.65) 100%);
+    border: 1px solid var(--cp-border);
+    border-top: none;
+    border-radius: 0 0 1em 1em;
+    padding: 0.55rem 1rem 0.6rem;
+    font-size: 0.62rem;
+    font-weight: 500;
+    color: #036835;
+    direction: rtl;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.dev-credit::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #a5ca1f;
+    flex-shrink: 0;
+    animation: devCreditBlink 1.4s ease-in-out infinite;
+}
+@keyframes devCreditBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+}
+.page-main .dev-credit,
+.page-admin-main .dev-credit {
+    position: fixed;
+    top: 0.5rem;
+    right: 0.5rem;
+    transform: none;
+    border-top: 1px solid var(--cp-border);
+    border-radius: 10px;
+    pointer-events: auto;
 }

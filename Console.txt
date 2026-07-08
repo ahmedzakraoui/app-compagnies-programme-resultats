@@ -1,0 +1,364 @@
+interface1.js:50 Potential overlay: composed-topbar z-index: 100 pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: navbar composed-nav py-2 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: container composed-nav-inner z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-brand z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-brand-logo z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: brand-mini-menu z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: nav-home z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: SVGAnimatedString z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: SVGAnimatedString z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn btn-outline-secondary btn-sm composed-menu-btn is-active z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn btn-outline-secondary btn-sm composed-menu-btn z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-user-panel z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-account z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-logout z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: container composed-main z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: row g-4 composed-bento z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: col-md-4 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: card card-custom card-composed card-composed--form h-100 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: card-composed-accent z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: card-composed-body p-4 p-lg-4 z-index: 1 pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-card-head mb-4 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-card-icon z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: w-100 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: d-flex flex-wrap align-items-center justify-content-between gap-2 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: h5 fw-bold mb-0 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-close-form z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-campagne-panel z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-programme z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: mb-3 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__inner z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__list choices__list--single z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__item choices__item--selectable z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: zone-activite-block z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: zone-sectorielle-wrap z-index: 2 pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__inner z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__list choices__list--single z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__item choices__placeholder choices__item--selectable z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: row mb-3 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: col z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: date_debut z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: col z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: date_fin z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: mb-3 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: nb_controleurs z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-submit z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-text z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: col-md-8 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: card card-custom card-composed card-composed--wide h-100 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: card-composed-accent card-composed-accent--secondary z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: card-composed-body p-4 p-lg-4 d-flex flex-column z-index: 1 pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-card-head mb-2 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-card-icon composed-card-icon--table z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: w-100 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: d-flex flex-wrap align-items-start justify-content-between gap-2 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: h5 fw-bold mb-0 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filters mt-3 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filters-shell z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filters-section results-filters-section--primary z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filters-row z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filter-compact results-filter-compact--type z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label mb-1 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__inner z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__list choices__list--single z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__item choices__placeholder choices__item--selectable z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filter-compact z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label mb-1 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: filter-zone z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filter-compact results-filter-compact--type z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label mb-1 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__inner z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__list choices__list--single z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__item choices__placeholder choices__item--selectable z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filter-actions z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-filters-reset z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-export-toolbar z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-export-xlsx z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-export-pdf z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: table-responsive composed-table-wrap flex-grow-1 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: table table-hover align-middle composed-table mb-0 text-center z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: sort-trigger z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: sort-indicator z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: sort-trigger z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: sort-trigger z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: sort-trigger z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: table-body z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: programmes-loader-row z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: text-center py-4 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: spinner-border text-success z-index: NaN pointer-events: auto rect: DOMRect
+script.googleusercontent.com/macros/echo?user_content_key=AUkAhnQr_dNCZfGuN7KdmatI3nTvF6eWEE0iQmKoABf_PIlTxsZ7hmux4Qd4GdLnljJSzPIR0dKunqY_0qJd4Ljmc-2Z46FnHAXyxcLFCbaaU-US_RdHuodpRB88LrFwA_Rw7fiurrK-KzifYsoCQd5aW_jnlSj0zL7ncrENIsZ8kaa4y6md8oLxCTIaVYafVqjJp-0P9a2bI5UH95NpFb2wGjpO6ybqLPo0R2P1TqFHE-kFOtw84xVSbTtg3ZgGP6dfOue5EAUavlMsCDyCZgyX3II2Jt_Gfg&lib=M729LyhZKW3OnxALgdzfl8clmt3MTFDu5:1  Failed to load resource: the server responded with a status of 404 ()
+api.js:125 Action HTTP: 404 <!DOCTYPE html><html lang="fr"><head><meta name="description" content="Traitement de texte, présentations et feuilles de calcul en ligne"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0"><link rel="shortcut icon" href="//docs.google.com/favicon.ico"><title>Page introuvable</title><meta name="referrer" content="strict-origin-when-cross-origin"><link href="//fonts.googleapis.com/css?family=Product+Sans" rel="stylesheet" type="text/css" nonce="Ei7g11NjFWVgWvZD6L3TSQ"><style nonce="Ei7g11NjFWVgWvZD6L3TSQ">#drive-logo{margin:18px 0;position:absolute;white-space:nowrap}.docs-drivelogo-img{background-image:url(//ssl.gstatic.com/images/branding/googlelogo/1x/googlelogo_color_116x41dp.png);-webkit-background-size:116px 41px;background-size:116px 41px;display:inline-block;height:41px;vertical-align:bottom;width:116px}.docs-drivelogo-text{color:var(--gm3-sys-color-on-surface,#1f1f1f);display:inline-block;opacity:.54;text-decoration:none;font-family:Product Sans,Arial,Helvetica,sans-serif;font-size:32px;text-rendering:optimizeLegibility;position:relative;top:-6px;left:-7px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}@media (-webkit-min-device-pixel-ratio:1.5),(min-resolution:144dpi){.docs-drivelogo-img{background-image:url(//ssl.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_116x41dp.png)}}.goog-inline-block{position:relative;display:-moz-inline-box;display:inline-block}* html .goog-inline-block{display:inline}:first-child+html .goog-inline-block{display:inline}sentinel{}</style><style type="text/css" nonce="Ei7g11NjFWVgWvZD6L3TSQ">body {background-color: #fff; font-family: Arial,sans-serif; font-size: 13px; margin: 0; padding: 0;}a, a:link, a:visited {color: #112ABB;}</style><style type="text/css" nonce="Ei7g11NjFWVgWvZD6L3TSQ">.errorMessage {font-size: 12pt; font-weight: bold; line-height: 150%;}</style></head><body><div id="outerContainer"><div id="innerContainer"><div style="position: absolute; top: -80px;"><div id="drive-logo"><a href="/"><span class="docs-drivelogo-img" title="Logo Google"></span><span class="docs-drivelogo-text">&nbsp;Drive</span></a></div></div><div align="center"><p class="errorMessage" style="padding-top: 50px">Impossible d'ouvrir le fichier pour le moment.</p><p> Vérifiez l'adresse, puis réessayez.</p><div style="background: #F0F6FF; border: 1px solid black; margin-top: 35px; padding: 10px 125px; width: 300px;"><p><strong>Gagnez en efficacité avec Google Drive</strong></p><p>Grâce aux applications dans Google Drive, vous pouvez facilement créer, stocker et partager en ligne des documents, feuilles de calcul, présentations et bien plus.</p><p>Pour plus d'informations, consultez la page <a href="https://drive.google.com/start/apps">drive.google.com/start/apps</a>.</p></div></div></div></div></body><style nonce="Ei7g11NjFWVgWvZD6L3TSQ">html {height: 100%; overflow: auto;}body {height: 100%; overflow: auto;}#outerContainer {margin: auto; max-width: 750px;}#innerContainer {margin-bottom: 20px; margin-left: 40px; margin-right: 40px; margin-top: 80px; position: relative;}</style></html>
+postAction @ api.js:125
+interface1.js:50 Potential overlay: composed-topbar z-index: 100 pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: navbar composed-nav py-2 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: container composed-nav-inner z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-brand z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-brand-logo z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: brand-mini-menu z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: nav-home z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: SVGAnimatedString z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: SVGAnimatedString z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn btn-outline-secondary btn-sm composed-menu-btn is-active z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn btn-outline-secondary btn-sm composed-menu-btn z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-user-panel z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-account z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-logout z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: container composed-main z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: row g-4 composed-bento z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: col-md-4 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: card card-custom card-composed card-composed--form h-100 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: card-composed-accent z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: card-composed-body p-4 p-lg-4 z-index: 1 pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-card-head mb-4 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-card-icon z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: w-100 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: d-flex flex-wrap align-items-center justify-content-between gap-2 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: h5 fw-bold mb-0 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-close-form z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-campagne-panel z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-programme z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: mb-3 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__inner z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__list choices__list--single z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__item choices__item--selectable z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: zone-activite-block z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: zone-sectorielle-wrap z-index: 2 pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__inner z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__list choices__list--single z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__item choices__placeholder choices__item--selectable z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: row mb-3 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: col z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: date_debut z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: col z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: date_fin z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: mb-3 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: nb_controleurs z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-submit z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-text z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: col-md-8 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: card card-custom card-composed card-composed--wide h-100 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: card-composed-accent card-composed-accent--secondary z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: card-composed-body p-4 p-lg-4 d-flex flex-column z-index: 1 pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-card-head mb-2 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: composed-card-icon composed-card-icon--table z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: w-100 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: d-flex flex-wrap align-items-start justify-content-between gap-2 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: h5 fw-bold mb-0 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: prog-total z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filters mt-3 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filters-shell z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filters-section results-filters-section--primary z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filters-row z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filter-compact results-filter-compact--type z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label mb-1 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__inner z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__list choices__list--single z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__item choices__placeholder choices__item--selectable z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filter-compact z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label mb-1 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: filter-zone z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filter-compact results-filter-compact--type z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: form-label mb-1 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__inner z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__list choices__list--single z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: choices__item choices__placeholder choices__item--selectable z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-filter-actions z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-filters-reset z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: results-export-toolbar z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-export-xlsx z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-export-pdf z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: table-responsive composed-table-wrap flex-grow-1 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: table table-hover align-middle composed-table mb-0 text-center z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: sort-trigger z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: sort-indicator z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: sort-trigger z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: sort-trigger z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: sort-trigger z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: table-body z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: programme-row-clickable programme-row-with-resultats z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: badge campagne-type-badge z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: text-center z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: programme-row-clickable programme-row-with-resultats z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: badge campagne-type-badge z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: text-center z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: programme-row-clickable programme-row-with-resultats z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: badge campagne-type-badge z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: text-center z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: programme-row-clickable z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: badge campagne-type-badge z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: text-center z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: programme-row-clickable z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: badge campagne-type-badge z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: text-center z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: programme-row-clickable programme-row-with-resultats z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: badge campagne-type-badge campagne-type-badge--rien z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: text-center z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: programmes-pagination z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: programmes-pagination-row z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: prog-prev z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: prog-pages z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: programmes-page-number z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: programmes-page-number is-active z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: modal-stats-campagne z-index: 1055 pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: modal-content stats-modal-content z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: modal-header border-0 py-2 px-3 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn-close z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: modal-body pt-0 px-3 pb-1 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: modal-stats-title z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: ms-2 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-programme-box z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-programme-line-table z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: text-center z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: modal-prog-type z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: modal-prog-zone z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: modal-prog-period z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: modal-prog-effectif z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-popup-section-title h6 fw-bold mb-2 pe-3 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: ms-2 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-table-panel z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-table-layout z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-split-top z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-block z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-block-title z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: table table-bordered align-middle mb-0 stats-block-table z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-block-thead z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-main z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-main z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: res-type-hamla z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: res-activite-zone z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-block z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-block-title z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: table table-bordered align-middle mb-0 stats-block-table z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-block-thead z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-group z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-group z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-group z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-sub z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-sub z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-sub z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-sub z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-sub z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-sub z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: res-w-in z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: res-w-ni z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: res-nw-in z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: res-nw-ni z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: res-emp-dec z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: res-emp-ndec z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-split-bottom z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-block z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-block-title z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: table table-bordered align-middle mb-0 stats-block-table z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-block-thead z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-main z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-main z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-main z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: res-manq-tot z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: res-manq-ok z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: res-manq-nok z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-block z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-block-title z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: table table-bordered align-middle mb-0 stats-block-table z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-block-thead z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: stats-th-main z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay:  z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: res-participants z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: modal-footer border-0 z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: btn btn-outline-secondary z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: modal-stats-save z-index: NaN pointer-events: auto rect: DOMRect
+interface1.js:50 Potential overlay: modal-backdrop show z-index: 1050 pointer-events: auto rect: DOMRect
+interface1.html:1 Unsafe attempt to load URL file:///C:/Users/Administrateur/Downloads/App%20des%20compagnies%20(Programme%20&%20r%C3%A9sultats)/interface1.html from frame with URL file:///C:/Users/Administrateur/Downloads/App%20des%20compagnies%20(Programme%20&%20r%C3%A9sultats)/interface1.html. 'file:' URLs are treated as unique security origins.
+

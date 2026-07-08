@@ -34,6 +34,16 @@ function parseMaybeAmount(v) {
     return Number.isFinite(n) ? n : null;
 }
 
+function formatMontant(v) {
+    const n = parseMaybeAmount(v);
+    if (n === null) return '';
+    const parts = n.toFixed(3).split('.');
+    const intPart = parts[0];
+    const decPart = parts[1];
+    const sep = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return sep + ',' + decPart;
+}
+
 function sanitizeAmountText(v) {
     const raw = String(v === undefined || v === null ? '' : v);
     const normalizedSep = raw.replace(/[.;:،؛'"’‘“”]/g, ',');
@@ -85,6 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnPrevPage = document.getElementById('res-prev');
     const btnNextPage = document.getElementById('res-next');
     const resPages = document.getElementById('res-pages');
+    const tfootEl = document.getElementById('results-tfoot');
 
     const statsModalEl = document.getElementById('modal-stats-campagne');
     const statsModal = bootstrap ? bootstrap.Modal.getOrCreateInstance(statsModalEl) : null;
@@ -98,6 +109,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.setItem('postLoginRedirect', 'interface4.html');
         } catch {}
         window.location.href = 'index.html';
+        return;
+    }
+
+    // Redirect normal users away from admin pages
+    if ((user.userType || '').trim().toLowerCase() !== 'admin') {
+        window.location.href = 'main-page.html';
         return;
     }
 
@@ -123,6 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function setResultsLoading(isLoading) {
         if (resultsTableWrap) resultsTableWrap.classList.toggle('is-loading', Boolean(isLoading));
         if (resultsTableLoader) resultsTableLoader.setAttribute('aria-hidden', isLoading ? 'false' : 'true');
+        if (isLoading && tfootEl) tfootEl.classList.add('d-none');
     }
 
 
@@ -235,13 +253,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const columns = [
-        columnHelper.accessor('programmeId', {
-            id: 'programmeId',
-            header: () => 'ID',
-            cell: (info) => String(info.getValue() ?? '—'),
-            filterFn: 'includesString',
-            sortingFn: (a, b) => (parseMaybeNumber(a.getValue('programmeId')) ?? 0) - (parseMaybeNumber(b.getValue('programmeId')) ?? 0),
-        }),
         columnHelper.accessor('br', {
             id: 'br',
             header: () => 'BR',
@@ -251,13 +262,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         columnHelper.accessor('typeCampagne', {
             id: 'typeCampagne',
             header: () => 'نوع الحملة',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => {
+                const v = String(info.getValue() ?? '').trim();
+                let cls = 'badge campagne-type-badge';
+                if (v === 'لا شيء' || v === '') cls += ' campagne-type-badge--rien';
+                else if (v === 'جغرافية') cls += ' campagne-type-badge--geo';
+                return `<span class="${cls}">${v}</span>`;
+            },
             filterFn: 'includesString',
         }),
         columnHelper.accessor('zone', {
             id: 'zone',
             header: () => 'نوع النشاط / المنطقة الجغرافية',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => window.renderZoneActivity(info.getValue()),
             filterFn: 'includesString',
         }),
         columnHelper.accessor('salAff', {
@@ -298,21 +315,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         columnHelper.accessor('insuffTotale', {
             id: 'insuffTotale',
             header: () => 'المبلغ الإجمالي للنقص',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => formatMontant(info.getValue()),
             filterFn: amountMinFilter,
             sortingFn: (a, b) => (parseMaybeAmount(a.getValue('insuffTotale')) ?? 0) - (parseMaybeAmount(b.getValue('insuffTotale')) ?? 0),
         }),
         columnHelper.accessor('mtReconnu', {
             id: 'mtReconnu',
             header: () => 'معترف به',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => formatMontant(info.getValue()),
             filterFn: amountMinFilter,
             sortingFn: (a, b) => (parseMaybeAmount(a.getValue('mtReconnu')) ?? 0) - (parseMaybeAmount(b.getValue('mtReconnu')) ?? 0),
         }),
         columnHelper.accessor('mtNonReconnu', {
             id: 'mtNonReconnu',
             header: () => 'غير معترف به',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => formatMontant(info.getValue()),
             filterFn: amountMinFilter,
             sortingFn: (a, b) => (parseMaybeAmount(a.getValue('mtNonReconnu')) ?? 0) - (parseMaybeAmount(b.getValue('mtNonReconnu')) ?? 0),
         }),
@@ -327,12 +344,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }),
     ];
 
-    const TABLE_COLS = 13;
+    const TABLE_COLS = 12;
 
     let table = null;
     let tableState = null;
     let rowsAll = [];
-    const RESULTS_PAGE_SIZE = 5;
+    const RESULTS_PAGE_SIZE = 7;
     let resultsPage = 1;
 
     function totalResultsPages(totalRows) {
@@ -406,7 +423,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         theadEl.innerHTML = '';
         const headerGroups = table.getHeaderGroups();
         const totalHeaderRows = headerGroups.length;
-        const fuseIds = ['programmeId', 'br', 'typeCampagne', 'zone', 'controleursParticipants'];
+        const fuseIds = ['br', 'typeCampagne', 'zone', 'controleursParticipants'];
         const nonSortableGroupIds = [];
 
         headerGroups.forEach((hg, idx) => {
@@ -468,7 +485,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rowModel = table.getRowModel();
         tbodyEl.innerHTML = '';
         if (!rowModel.rows.length) {
-            tbodyEl.innerHTML = `<tr><td colspan="${TABLE_COLS}" class="text-center text-muted">Aucun résultat.</td></tr>`;
+            tbodyEl.innerHTML = `<tr><td colspan="${TABLE_COLS}" class="text-center text-muted">القائمة فارغة</td></tr>`;
+            if (tfootEl) tfootEl.classList.add('d-none');
             updateTotalUI(rowsAll.length, 0);
             updateResultsPaginationUI(0);
             return;
@@ -505,6 +523,52 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             tbodyEl.appendChild(tr);
         });
+
+        // Footer totals
+        if (tfootEl) {
+            const sumFields = ['salAff', 'salNonAff', 'nonSalAff', 'nonSalNonAff', 'travTotal', 'insuffTotale', 'mtReconnu', 'mtNonReconnu', 'controleursParticipants'];
+            const amounts = ['insuffTotale', 'mtReconnu', 'mtNonReconnu'];
+            const sums = {};
+            const hasData = {};
+            sumFields.forEach((f) => { sums[f] = 0; hasData[f] = false; });
+            rowModel.rows.forEach((row) => {
+                const o = row.original;
+                sumFields.forEach((f) => {
+                    const v = parseMaybeNumber(o[f]) ?? 0;
+                    sums[f] += v;
+                    if (v !== 0 || String(o[f] ?? '').trim() !== '') hasData[f] = true;
+                });
+            });
+            const fieldsOrder = sumFields;
+            tfootEl.innerHTML = '';
+            const tr = document.createElement('tr');
+            rowModel.rows[0].getVisibleCells().forEach((cell, ci) => {
+                if (ci > 0 && ci < 3) return;
+                const td = document.createElement('td');
+                const colId = cell.column.id;
+                if (ci === 0) {
+                    td.textContent = 'المجموع الكلي';
+                    td.style.fontWeight = '700';
+                    td.colSpan = 3;
+                } else if (fieldsOrder.includes(colId)) {
+                    if (amounts.includes(colId)) {
+                        td.textContent = hasData[colId] ? formatMontant(sums[colId]) : '';
+                    } else {
+                        td.textContent = String(sums[colId] || '—');
+                    }
+                    td.style.fontWeight = '700';
+                } else {
+                    td.textContent = '';
+                }
+                tr.appendChild(td);
+            });
+            tfootEl.appendChild(tr);
+            if (resultsPage === pages) {
+                tfootEl.classList.remove('d-none');
+            } else {
+                tfootEl.classList.add('d-none');
+            }
+        }
     }
 
     function applyFiltersToState() {
@@ -545,7 +609,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ...prev.state,
                     globalFilter: '',
                     columnFilters: [],
-                    sorting: [{ id: 'programmeId', desc: false }],
+                    sorting: [{ id: 'br', desc: false }],
                 },
             }));
             resultsPage = 1;
@@ -569,7 +633,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const data = buildExportRowsFromTable();
         const headers = [
-            'ID',
             'BR',
             'نوع الحملة',
             'نوع النشاط / المنطقة الجغرافية',
@@ -586,7 +649,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const aoa = [
             headers,
             ...data.map((r) => [
-                r.programmeId ?? '',
                 r.br ?? '',
                 r.typeCampagne ?? '',
                 r.zone ?? '',
@@ -638,7 +700,45 @@ document.addEventListener('DOMContentLoaded', async () => {
                       })
                       .join('')}</tbody>`;
 
-        const tableHtml = `<table class="${tableEl.className}" dir="rtl">${theadHtml}${tbodyHtml}</table>`;
+        // Build tfoot for PDF
+        const pdfSumFields = ['salAff', 'salNonAff', 'nonSalAff', 'nonSalNonAff', 'travTotal', 'insuffTotale', 'mtReconnu', 'mtNonReconnu', 'controleursParticipants'];
+        const pdfAmounts = ['insuffTotale', 'mtReconnu', 'mtNonReconnu'];
+        const pdfSums = {};
+        const pdfHasData = {};
+        pdfSumFields.forEach((f) => { pdfSums[f] = 0; pdfHasData[f] = false; });
+        rows.forEach((row) => {
+            const o = row.original;
+            pdfSumFields.forEach((f) => {
+                const v = parseMaybeNumber(o[f]) ?? 0;
+                pdfSums[f] += v;
+                if (v !== 0 || String(o[f] ?? '').trim() !== '') pdfHasData[f] = true;
+            });
+        });
+        let tfootHtml = '';
+        if (rows.length > 0) {
+            const fc = rows[0].getVisibleCells();
+            tfootHtml = '<tfoot><tr>';
+            fc.forEach((cell, ci) => {
+                const colId = cell.column.id;
+                if (ci === 0) {
+                    tfootHtml += '<td colspan="3" style="font-weight:700;">المجموع الكلي</td>';
+                } else if (ci > 0 && ci < 3) {
+                    return;
+                } else if (pdfSumFields.includes(colId)) {
+                    if (pdfAmounts.includes(colId)) {
+                        const val = pdfHasData[colId] ? formatMontant(pdfSums[colId]) : '';
+                        tfootHtml += `<td style="font-weight:700;">${val}</td>`;
+                    } else {
+                        tfootHtml += `<td style="font-weight:700;">${String(pdfSums[colId] || '—')}</td>`;
+                    }
+                } else {
+                    tfootHtml += '<td></td>';
+                }
+            });
+            tfootHtml += '</tr></tfoot>';
+        }
+
+        const tableHtml = `<table class="${tableEl.className}" dir="rtl">${theadHtml}${tbodyHtml}${tfootHtml}</table>`;
 
         const totalCount = rows.length;
         const totalLabel = totalCount === 1 ? 'حملة' : 'حملات';
@@ -827,7 +927,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!q) return true;
                 const r = row.original;
                 const hay = [
-                    r.programmeId, r.br, r.typeCampagne, r.zone,
+                    r.br, r.typeCampagne, r.zone,
                     r.salAff, r.salNonAff, r.nonSalAff, r.nonSalNonAff,
                     r.travTotal, r.insuffTotale, r.mtReconnu, r.mtNonReconnu,
                     r.controleursParticipants,
@@ -851,7 +951,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ...resolvedOptions,
             state: {
                 ...tableState,
-                sorting: [{ id: 'programmeId', desc: false }],
+                sorting: [{ id: 'br', desc: false }],
                 columnFilters: [],
                 globalFilter: '',
             },

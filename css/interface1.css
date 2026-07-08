@@ -18,6 +18,10 @@
     background-color: #e4f0e8;
     position: relative;
 }
+body.page-programme main.container.composed-main {
+    margin-top: 2em;
+    padding-bottom: 0;
+}
 
 /* Form */
 .page-programme .form-label {
@@ -77,6 +81,13 @@
     color: var(--cp-accent);
     letter-spacing: 0.01em;
 }
+.page-programme .composed-table tbody td:nth-child(2) {
+    max-width: 15rem;
+    white-space: normal;
+    word-break: break-word;
+    font-size: 0.63rem;
+    text-align: right;
+}
 .page-programme .composed-table tbody tr.programme-row-with-resultats td:nth-child(2) {
     color: var(--cp-accent-mid);
 }
@@ -88,12 +99,7 @@
     color: var(--cp-accent-lime);
     font-weight: 800;
 }
-.page-programme .composed-table tbody tr.programme-row-with-resultats .programme-type-badge {
-    background: linear-gradient(135deg, rgba(4, 143, 64, 0.22), rgba(165, 202, 31, 0.28)) !important;
-    color: var(--cp-accent) !important;
-    border: 1px solid rgba(4, 143, 64, 0.35);
-    font-weight: 800;
-}
+
 .page-programme .composed-table tbody tr.programme-row-with-resultats:hover td {
     color: var(--cp-accent);
 }
@@ -105,11 +111,6 @@
 }
 .page-programme .composed-table tbody tr.programme-row-with-resultats:hover td.text-center {
     color: #8fb018;
-}
-.page-programme .composed-table .badge.bg-info {
-    background-color: rgba(4, 143, 64, 0.14) !important;
-    color: var(--cp-ink) !important;
-    border: 1px solid rgba(4, 143, 64, 0.22);
 }
 
 /* Flatpickr */

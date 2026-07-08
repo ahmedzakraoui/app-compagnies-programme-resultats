@@ -22,13 +22,13 @@ Le super admin voit un tableau qui collecte toutes les info et résultats de cha
 
 Appscript
 
-Mise à jour du déploiement effectuée.
-Version 10 du 12 juin 2026, 14:46
+MMise à jour du déploiement effectuée.
+Version 11 du 25 juin 2026, 10:09
 ID de déploiement
-AKfycbztXxU6nuuIEkCL2sBxU6QNFvcDLv1nWiVU7Woa_6Mc7iXbkcC2jxdVhxGwTVQaQ8Iv
+AKfycby9e3iTBoUgGW3B7giCIelDpFZNFLIGEoDUyPpYF6MLMfj1bXSIgKcWWuw-sLSaR11P
 Application Web
 URL
-https://script.google.com/macros/s/AKfycbztXxU6nuuIEkCL2sBxU6QNFvcDLv1nWiVU7Woa_6Mc7iXbkcC2jxdVhxGwTVQaQ8Iv/exec
+https://script.google.com/macros/s/AKfycby9e3iTBoUgGW3B7giCIelDpFZNFLIGEoDUyPpYF6MLMfj1bXSIgKcWWuw-sLSaR11P/exec
 
 google sheets tables structure:
 
@@ -45,6 +45,7 @@ AR_Name -> column C
 Grade -> column D
 Code_BR -> column E
 Pw -> column F
+user_type -> column G
 
 Programmes (sheet):
 ID_Programme -> column A
