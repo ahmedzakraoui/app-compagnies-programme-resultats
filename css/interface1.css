@@ -82,11 +82,11 @@ body.page-programme main.container.composed-main {
     letter-spacing: 0.01em;
 }
 .page-programme .composed-table tbody td:nth-child(2) {
-    max-width: 15rem;
+    max-width: 18rem;
     white-space: normal;
     word-break: break-word;
     font-size: 0.63rem;
-    text-align: right;
+    text-align: center;
 }
 .page-programme .composed-table tbody tr.programme-row-with-resultats td:nth-child(2) {
     color: var(--cp-accent-mid);
@@ -389,4 +389,58 @@ section.results-filters.mt-3 {
 }
 .page-programme .composed-table-wrap {
     min-height: 12.146em;;
+}
+.btn-custom-activity-btn {
+    position: absolute;
+    left: 0.3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    border: none;
+    border-right: 1px solid #bbb;
+    background: transparent;
+    color: #048f40;
+    font-size: 0.65rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0.1rem 0.25rem 0.1rem 0.4rem;
+    border-radius: 0;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: color 0.15s;
+    pointer-events: auto;
+}
+.btn-custom-activity-btn:hover {
+    color: #a5ca1f;
+}
+.sector-clear-badge {
+    position: absolute;
+    left: 0.1rem;
+    top: 0.1rem;
+    z-index: 11;
+    border: none;
+    background: transparent;
+    color: #999;
+    font-size: 0.65rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.15s;
+}
+.sector-clear-badge:hover {
+    color: #dc3545;
+}
+.btn-back-to-list {
+    border: 1px solid #d0d0d0;
+    background: #fff;
+    color: #888;
+    font-size: 0.65rem;
+    padding: 0 0.55rem;
+    line-height: 1;
+    transition: all 0.15s;
+}
+.btn-back-to-list:hover {
+    color: #048f40;
+    border-color: #048f40;
+    background: #f0faf3;
 }

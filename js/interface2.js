@@ -110,7 +110,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         else window.location.href = 'index.html';
         return;
     }
-    if (typeof window !== 'undefined' && typeof window.scheduleAutoLogout === 'function') window.scheduleAutoLogout();
 
     const userInfoEl = document.getElementById('user-info');
     if (userInfoEl) {
@@ -394,7 +393,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let table = null;
     let tableState = null;
     let rowsAll = [];
-    const RESULTS_PAGE_SIZE = 10;
+    const RESULTS_PAGE_SIZE = 7;
     let resultsPage = 1;
 
     function totalResultsPages(totalRows) {

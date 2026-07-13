@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
         else window.location.href = 'index.html';
         return;
     }
-    if (typeof window !== 'undefined' && typeof window.scheduleAutoLogout === 'function') window.scheduleAutoLogout();
 
     const displayName = user.arName || user.frName || '';
     nameEls.forEach((el) => {
@@ -101,15 +100,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const newPw2 = newPw2El?.value || '';
 
         if (!oldPw.trim() || !newPw.trim() || !newPw2.trim()) {
-            showAlert('warning', 'Veuillez remplir tous les champs.');
+            showAlert('warning', 'الرجاء ملء جميع الحقول');
             return;
         }
         if (newPw !== newPw2) {
-            showAlert('warning', 'La confirmation ne correspond pas.');
+            showAlert('warning', 'كلمتا المرور الجديدتان غير متطابقتين');
             return;
         }
         if (newPw.trim().length < 4) {
-            showAlert('warning', 'Le nouveau mot de passe est trop court.');
+            showAlert('warning', 'كلمة المرور الجديدة يجب أن تكون على الأقل 4 أحرف');
             return;
         }
 
@@ -119,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!res || !res.ok) {
             const err = res && res.error ? String(res.error) : 'unknown_error';
-            showAlert('danger', err === 'invalid_old_password' ? "L'ancien mot de passe est incorrect." : 'Impossible de modifier le mot de passe.');
+            showAlert('danger', err === 'invalid_old_password' ? "كلمة المرور القديمة غير صحيحة" : 'حدث خطأ أثناء تغيير كلمة المرور. حاول مرة أخرى.');
             if (panelEl) panelEl.classList.remove('d-none');
             if (loaderEl) loaderEl.classList.add('d-none');
             return;
@@ -128,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (oldPwEl) oldPwEl.value = '';
         if (newPwEl) newPwEl.value = '';
         if (newPw2El) newPw2El.value = '';
-        showAlert('success', 'Mot de passe mis à jour.');
+        showAlert('success', 'تم تغيير كلمة المرور بنجاح');
         if (panelEl) panelEl.classList.add('d-none');
         if (loaderEl) loaderEl.classList.add('d-none');
     });

@@ -1,8 +1,7 @@
 const SCRIPT_URL ="https://script.google.com/macros/s/AKfycby9e3iTBoUgGW3B7giCIelDpFZNFLIGEoDUyPpYF6MLMfj1bXSIgKcWWuw-sLSaR11P/exec";
 
-// Session TTL must match Google Apps Script cache duration (see Code.gs createSession_()).
-// Currently: 7200 seconds = 2 hours.
-const SESSION_TTL_MS = 7200 * 1000;
+// Session duration: 120 minutes (client-only countdown)
+const SESSION_TTL_MS = 120 * 60 * 1000;
 // Expose for other scripts (login.js / interface pages)
 try {
     window.SESSION_TTL_MS = SESSION_TTL_MS;
@@ -70,6 +69,9 @@ function scheduleAutoLogout() {
         setTimeout(logoutToLogin, delay);
     }
 }
+
+// Auto-init logout timer on every page
+document.addEventListener('DOMContentLoaded', scheduleAutoLogout);
 
 // Expose helpers
 try {

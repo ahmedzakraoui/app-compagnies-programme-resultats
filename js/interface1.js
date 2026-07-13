@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const wrapGeographique = document.getElementById('zone-geographique-wrap');
     const activiteSectorielle = document.getElementById('activite_sectorielle');
     const activiteZoneGeo = document.getElementById('activite_zone_geo');
+    const btnCustomActivity = document.getElementById('btn-custom-activity');
+    const wrapSectorielleCustom = document.getElementById('zone-sectorielle-custom-wrap');
+    const activiteSectorielleCustom = document.getElementById('activite_sectorielle_custom');
+    const btnBackToList = document.getElementById('btn-back-to-list');
+    const sectorClearBadge = document.getElementById('sector-clear-badge');
     const inputDateDebut = document.getElementById('date_debut');
     const inputDateFin = document.getElementById('date_fin');
 
@@ -347,6 +352,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (selected || resetting) return;
         resetSectorChoices();
     }
+    function resetSectorUI() {
+        wrapSectorielleCustom.classList.add('d-none');
+        activiteSectorielleCustom.removeAttribute('required');
+        activiteSectorielleCustom.disabled = true;
+        btnCustomActivity.classList.remove('d-none');
+        wrapSectorielle.classList.remove('d-none');
+        activiteSectorielle.disabled = false;
+        activiteSectorielle.setAttribute('required', 'required');
+        initSectorChoices();
+    }
+
     function resetSectorChoices() {
         resetting = true;
         destroySectorChoices();
@@ -360,10 +376,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         destroySectorChoices();
         activiteSectorielle.removeAttribute('required');
         activiteZoneGeo.removeAttribute('required');
+        activiteSectorielleCustom.removeAttribute('required');
         activiteSectorielle.disabled = true;
         activiteZoneGeo.disabled = true;
+        activiteSectorielleCustom.disabled = true;
         wrapSectorielle.classList.add('d-none');
         wrapGeographique.classList.add('d-none');
+        wrapSectorielleCustom.classList.add('d-none');
+        btnCustomActivity.classList.remove('d-none');
         zoneBlock.hidden = true;
 
         if (type === 'قطاعية') {
@@ -379,6 +399,41 @@ document.addEventListener('DOMContentLoaded', async () => {
             activiteZoneGeo.setAttribute('required', 'required');
         }
     }
+
+    btnCustomActivity.addEventListener('click', () => {
+        destroySectorChoices();
+        wrapSectorielle.classList.add('d-none');
+        activiteSectorielle.removeAttribute('required');
+        activiteSectorielle.disabled = true;
+        btnCustomActivity.classList.add('d-none');
+        wrapSectorielleCustom.classList.remove('d-none');
+        activiteSectorielleCustom.disabled = false;
+        activiteSectorielleCustom.setAttribute('required', 'required');
+        activiteSectorielleCustom.focus();
+    });
+
+    btnBackToList.addEventListener('click', () => {
+        resetSectorUI();
+    });
+
+    function updateSectorClearBadge() {
+        const hasValue = activiteSectorielle.value && activiteSectorielle.value !== '';
+        btnCustomActivity.classList.toggle('d-none', hasValue);
+        sectorClearBadge.classList.toggle('d-none', !hasValue);
+    }
+
+    function clearSectorSelection() {
+        destroySectorChoices();
+        activiteSectorielle.value = '';
+        initSectorChoices();
+        updateSectorClearBadge();
+    }
+
+    activiteSectorielle.addEventListener('change', updateSectorClearBadge);
+    sectorClearBadge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        clearSectorSelection();
+    });
 
     function initFormPickersOnce() {
         if (formPickersReady) return;
@@ -413,7 +468,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function getZoneActiviteValue() {
         const type = typeCampagne.value;
-        if (type === 'قطاعية') return activiteSectorielle.value;
+        if (type === 'قطاعية') {
+            return wrapSectorielleCustom.classList.contains('d-none') ? activiteSectorielle.value : activiteSectorielleCustom.value.trim();
+        }
         if (type === 'جغرافية') return activiteZoneGeo.value.trim();
         return '';
     }
@@ -421,7 +478,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     function validateProgrammeForm() {
         const type = typeCampagne.value;
         if (!type) return false;
-        if (type === 'قطاعية' && !activiteSectorielle.value) return false;
+        if (type === 'قطاعية') {
+            const usingCustom = !wrapSectorielleCustom.classList.contains('d-none');
+            if (usingCustom) {
+                if (!activiteSectorielleCustom.value.trim()) return false;
+            } else {
+                if (!activiteSectorielle.value) return false;
+            }
+        }
         if (type === 'جغرافية' && !activiteZoneGeo.value.trim()) return false;
         if (!inputDateDebut.value || !inputDateFin.value) return false;
         const nb = document.getElementById('nb_controleurs').value;
@@ -564,6 +628,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         reveal.hidden = false;
         btnOpenForm.setAttribute('aria-expanded', 'false');
         if (btnCloseForm) btnCloseForm.hidden = true;
+
+        form.reset();
+        if (fpDebut) { fpDebut.destroy(); fpDebut = null; }
+        if (fpFin) { fpFin.destroy(); fpFin = null; }
+
+        wrapSectorielleCustom.classList.add('d-none');
+        activiteSectorielleCustom.removeAttribute('required');
+        activiteSectorielleCustom.disabled = true;
+        activiteSectorielleCustom.value = '';
+
+        sectorClearBadge.classList.add('d-none');
+        btnCustomActivity.classList.remove('d-none');
+
+        if (choicesCampagne) { choicesCampagne.destroy(); choicesCampagne = null; }
+        destroySectorChoices();
+        typeCampagne.removeEventListener('change', updateZoneActiviteUI);
+        formPickersReady = false;
     }
 
     if (btnCloseForm) {
@@ -624,7 +705,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         else window.location.href = 'index.html';
         return;
     }
-    if (typeof window !== 'undefined' && typeof window.scheduleAutoLogout === 'function') window.scheduleAutoLogout();
     const userInfoEl = document.getElementById('user-info');
     if (userInfoEl) {
         const name = user.frName || user.arName || '';

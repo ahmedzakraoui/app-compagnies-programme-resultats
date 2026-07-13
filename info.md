@@ -20,6 +20,12 @@ Le super admin voit un tableau qui collecte toutes les info et résultats de cha
 
 ---
 
+test credentials:
+login: 61416
+pw: 61416
+
+---
+
 Appscript
 
 MMise à jour du déploiement effectuée.

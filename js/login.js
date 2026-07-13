@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const startedAt = Date.now();
-            const ttl = typeof window !== 'undefined' && typeof window.SESSION_TTL_MS === 'number' ? window.SESSION_TTL_MS : 21600 * 1000;
+            const ttl = typeof window !== 'undefined' && typeof window.SESSION_TTL_MS === 'number' ? window.SESSION_TTL_MS : 7200 * 1000;
             localStorage.setItem(
                 'currentUser',
                 JSON.stringify({ ...res.user, token: res.token, sessionStartedAt: startedAt, sessionExpiresAt: startedAt + ttl }),

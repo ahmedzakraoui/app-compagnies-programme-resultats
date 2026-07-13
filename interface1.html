@@ -13,7 +13,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/interface1.css" />
-    <script>try{var u=JSON.parse(localStorage.getItem('currentUser'));if(!u||!u.token){window.location.href='index.html'}else if((u.userType||'').trim().toLowerCase()==='admin'){window.location.href='admin-main-page.html'}}catch(e){window.location.href='index.html'}</script>
+    <script>
+      try {
+        var u = JSON.parse(localStorage.getItem("currentUser"));
+        if (!u || !u.token) {
+          window.location.href = "index.html";
+        } else if ((u.userType || "").trim().toLowerCase() === "admin") {
+          window.location.href = "admin-main-page.html";
+        }
+      } catch (e) {
+        window.location.href = "index.html";
+      }
+    </script>
   </head>
   <body class="page-programme">
     <div class="composed-backdrop" aria-hidden="true"></div>
@@ -39,8 +50,8 @@
             <a href="my-account.html" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="btn-account">حساب المستعمل</a>
             <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn p-0" id="btn-logout"><img src="images/off_icon.svg" alt="Déconnexion" width="24" height="24" /></button>
           </div>
-          </div>
-        </nav>
+        </div>
+      </nav>
     </header>
 
     <main class="container composed-main" dir="rtl">
@@ -83,10 +94,18 @@
                   </div>
                   <div class="mb-3" id="zone-activite-block" hidden>
                     <label class="form-label">نوع النشاط / المنطقة الجغرافية</label>
-                    <div id="zone-sectorielle-wrap" class="d-none">
+                    <div id="zone-sectorielle-wrap" class="d-none" style="position: relative;">
                       <select id="activite_sectorielle" class="form-select">
                         <option value="">تحميل...</option>
                       </select>
+                      <button type="button" id="btn-custom-activity" class="btn-custom-activity-btn">+ نشاط جديد</button>
+                      <button type="button" id="sector-clear-badge" class="sector-clear-badge d-none">✕</button>
+                    </div>
+                    <div id="zone-sectorielle-custom-wrap" class="d-none">
+                      <div class="input-group">
+                        <input type="text" id="activite_sectorielle_custom" class="form-control" placeholder="أدخل النشاط الجديد" />
+                        <button type="button" id="btn-back-to-list" class="btn btn-outline-secondary btn-back-to-list" title="الرجوع إلى القائمة">✕</button>
+                      </div>
                     </div>
                     <div id="zone-geographique-wrap" class="d-none">
                       <input type="text" id="activite_zone_geo" class="form-control" placeholder="أدخل المنطقة الجغرافية" />
@@ -233,7 +252,7 @@
               </table>
             </div>
 
-            <h3 class="stats-popup-section-title h6 fw-bold mb-2 pe-3" style="margin-top: 2.5em">
+            <h3 class="stats-popup-section-title h6 fw-bold mb-2 mt-4 pe-3">
               <span class="ms-2">إحصائيات الحملة</span>
             </h3>
             <div class="table-responsive stats-table-scroll" id="stats-table-panel">

@@ -671,6 +671,10 @@ table {
     white-space: nowrap;
     text-align: center;
 }
+.stats-programme-line-table thead th:nth-child(1) { width: 10%; }
+.stats-programme-line-table thead th:nth-child(2) { width: 55%; }
+.stats-programme-line-table thead th:nth-child(3) { width: 25%; }
+.stats-programme-line-table thead th:nth-child(4) { width: 10%; }
 .stats-programme-line-table td {
     border: none !important;
     padding: 0.4rem 0;
@@ -690,6 +694,12 @@ table {
 #modal-prog-period {
     word-break: break-word;
     hyphens: auto;
+}
+#modal-prog-zone {
+    white-space: normal;
+    word-break: break-word;
+    font-size: 0.78rem;
+    font-weight: 400;
 }
 .stats-popup-stats-heading {
     margin-top: 0.65rem;

@@ -123,7 +123,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         else window.location.href = 'index.html';
         return;
     }
-    if (typeof window !== 'undefined' && typeof window.scheduleAutoLogout === 'function') window.scheduleAutoLogout();
 
     const userInfoEl = document.getElementById('user-info');
     if (userInfoEl) {
@@ -204,9 +203,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const programmeRow = rowOriginal.programmeRow;
         const resultatRow = rowOriginal.resultatRow;
         const pid = String(programmeRow[0] ?? '').trim();
-        document.querySelectorAll('.modal-stats-pid').forEach((el) => {
-            el.textContent = pid;
-        });
         const elType = document.getElementById('modal-prog-type');
         const elZone = document.getElementById('modal-prog-zone');
         const elPeriod = document.getElementById('modal-prog-period');
