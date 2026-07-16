@@ -53,6 +53,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Apply admin theme if user is admin
+    if (user.userType && String(user.userType).trim().toLowerCase() === 'admin') {
+        document.body.classList.add('page-admin');
+    }
+
     // Auto logout when session TTL is reached (token expires server-side after ~6h)
     if (typeof window !== 'undefined' && typeof window.isSessionExpired === 'function' && window.isSessionExpired()) {
         if (typeof window.logoutToLogin === 'function') window.logoutToLogin();

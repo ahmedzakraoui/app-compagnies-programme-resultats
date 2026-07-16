@@ -1,0 +1,508 @@
+// api_1.js — Firebase Firestore replacement for Google Apps Script backend
+// Drop-in replacement: exposes the same global functions as the old api.js
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBFe7MjZOUlUNgi18hBFHVNFPyVs95RALY",
+    authDomain: "app-des-compagnies.firebaseapp.com",
+    projectId: "app-des-compagnies",
+    storageBucket: "app-des-compagnies.firebasestorage.app",
+    messagingSenderId: "378629011040",
+    appId: "1:378629011040:web:5010e5d94b2152f8e5b505"
+};
+
+/* ── Load Firebase compat SDK dynamically ──────────────────────────── */
+function _loadScript(src) {
+    return new Promise((resolve, reject) => {
+        if (document.querySelector('script[src="' + src + '"]')) { resolve(); return; }
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+    });
+}
+
+const _fbReady = (async () => {
+    await _loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
+    await _loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js');
+    firebase.initializeApp(firebaseConfig);
+    return firebase.firestore();
+})();
+
+/* ── SHA-256 helper (matches Google Apps Script sha256Hex_) ────────── */
+async function _sha256Hex(text) {
+    const data = new TextEncoder().encode(String(text));
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function _passwordHashHex(matricule, pw) {
+    return _sha256Hex(String(matricule || '').trim() + ':' + String(pw || ''));
+}
+
+function _passwordHash(matricule, pw) {
+    return _passwordHashHex(matricule, pw).then(h => 'sha256:' + h);
+}
+
+function _isSha256Hex(s) {
+    return /^[0-9a-f]{64}$/i.test(String(s || '').trim());
+}
+
+async function _passwordMatches(matricule, inputPw, storedPw) {
+    const stored = String(storedPw || '').trim();
+    if (!stored) return false;
+    if (stored.indexOf('sha256:') === 0) {
+        const h = await _passwordHash(matricule, inputPw);
+        return h === stored;
+    }
+    if (_isSha256Hex(stored)) {
+        const h = await _sha256Hex(String(matricule || '').trim() + ':' + String(inputPw || ''));
+        return h === stored.toLowerCase();
+    }
+    return stored === String(inputPw || '').trim();
+}
+
+/* ── Session management (identical to old api.js) ──────────────────── */
+const SESSION_TTL_MS = 120 * 60 * 1000;
+try { window.SESSION_TTL_MS = SESSION_TTL_MS; } catch {}
+
+function getCurrentUser() {
+    try {
+        const raw = localStorage.getItem('currentUser');
+        if (!raw) return null;
+        const u = JSON.parse(raw);
+        return u && typeof u === 'object' ? u : null;
+    } catch { return null; }
+}
+
+function getToken() {
+    const u = getCurrentUser();
+    return u && u.token ? String(u.token) : '';
+}
+
+function getSessionExpiresAt() {
+    const u = getCurrentUser();
+    const v = u && u.sessionExpiresAt != null ? Number(u.sessionExpiresAt) : NaN;
+    return Number.isFinite(v) ? v : null;
+}
+
+function isSessionExpired() {
+    const exp = getSessionExpiresAt();
+    return exp != null ? Date.now() >= exp : false;
+}
+
+function rememberPostLoginRedirect() {
+    try {
+        const file = String(window.location.pathname || '').split('/').pop() || '';
+        if (file && file.endsWith('.html') && file !== 'index.html') {
+            localStorage.setItem('postLoginRedirect', file);
+        }
+    } catch {}
+}
+
+function logoutToLogin() {
+    rememberPostLoginRedirect();
+    try { localStorage.removeItem('currentUser'); } catch {}
+    window.location.href = 'index.html';
+}
+
+function scheduleAutoLogout() {
+    const exp = getSessionExpiresAt();
+    if (exp == null) return;
+    const delay = exp - Date.now();
+    if (delay <= 0) { logoutToLogin(); return; }
+    try {
+        if (window.__autoLogoutTimer) clearTimeout(window.__autoLogoutTimer);
+        window.__autoLogoutTimer = setTimeout(logoutToLogin, delay);
+    } catch { setTimeout(logoutToLogin, delay); }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    scheduleAutoLogout();
+    const el = document.getElementById('on-user-text');
+    if (el) {
+        const u = getCurrentUser();
+        if (u) {
+            const name = u.arName || u.frName || '';
+            const bureau = u.bureauNameAr || u.bureauName || '';
+            el.textContent = name + (bureau ? ' - ' + bureau : '');
+        }
+    }
+});
+
+try {
+    window.getSessionExpiresAt = getSessionExpiresAt;
+    window.isSessionExpired = isSessionExpired;
+    window.logoutToLogin = logoutToLogin;
+    window.scheduleAutoLogout = scheduleAutoLogout;
+} catch {}
+
+/* ── Collection helpers ────────────────────────────────────────────── */
+const COLLECTIONS = { programmes: 'programmes', resultats: 'resultats', bureaux: 'bureaux', users: 'users' };
+
+async function _getAllDocs(collectionName) {
+    const db = await _fbReady;
+    const snap = await db.collection(collectionName).get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+async function _getDocById(collectionName, docId) {
+    const db = await _fbReady;
+    const snap = await db.collection(collectionName).doc(String(docId)).get();
+    return snap.exists ? { id: snap.id, ...snap.data() } : null;
+}
+
+async function _addDoc(collectionName, data) {
+    const db = await _fbReady;
+    const ref = await db.collection(collectionName).add(data);
+    return ref.id;
+}
+
+async function _setDoc(collectionName, docId, data) {
+    const db = await _fbReady;
+    await db.collection(collectionName).doc(String(docId)).set(data, { merge: true });
+}
+
+/* ── Date formatting helper ──────────────────────────────────────────── */
+function _fmtDate(v) {
+    if (!v) return '';
+    let d;
+    if (typeof v === 'object' && v.toDate) {
+        // Firestore Timestamp
+        d = v.toDate();
+    } else {
+        const s = String(v).trim();
+        d = new Date(s);
+        if (isNaN(d.getTime())) return s;
+    }
+    // Return YYYY-MM-DD in LOCAL timezone (not UTC)
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+/* ── Data conversion: Firestore document ↔ array row ───────────────── */
+// Programmes: [ID_Programme, Code_Bureau, Type_Campagne, Activite_Zone, Date_Fin, Date_Debut, Nb_Controleurs]
+function _programmeToRow(doc) {
+    return [
+        doc.ID_Programme || doc.id || '',
+        doc.Code_Bureau != null ? doc.Code_Bureau : '',
+        doc.Type_Campagne || '',
+        doc.Activite_Zone || '',
+        _fmtDate(doc.Date_Fin),
+        _fmtDate(doc.Date_Debut),
+        doc.Nb_Controleurs != null ? doc.Nb_Controleurs : ''
+    ];
+}
+
+function _rowToProgramme(row) {
+    return {
+        ID_Programme: row[0] || '',
+        Code_Bureau: row[1] != null ? row[1] : '',
+        Type_Campagne: row[2] || '',
+        Activite_Zone: row[3] || '',
+        Date_Fin: row[4] || '',
+        Date_Debut: row[5] || '',
+        Nb_Controleurs: row[6] != null ? row[6] : ''
+    };
+}
+
+// Resultats: [ID_Resultat, ID_Programme, Sal_Aff, Sal_NonAff, NonSal_Aff, NonSal_NonAff,
+//             Trav_Declares, Trav_NonDeclares, insuff_totale, Mt_Reconnu, Mt_NonReconnu,
+//             Controleurs_participants, Code_br]
+function _resultatToRow(doc) {
+    return [
+        doc.ID_Resultat || doc.id || '',
+        doc.ID_Programme || '',
+        doc.Sal_Aff != null ? doc.Sal_Aff : 0,
+        doc.Sal_NonAff != null ? doc.Sal_NonAff : 0,
+        doc.NonSal_Aff != null ? doc.NonSal_Aff : 0,
+        doc.NonSal_NonAff != null ? doc.NonSal_NonAff : 0,
+        doc.Trav_Declares != null ? doc.Trav_Declares : 0,
+        doc.Trav_NonDeclares != null ? doc.Trav_NonDeclares : 0,
+        doc.insuff_totale != null ? doc.insuff_totale : 0,
+        doc.Mt_Reconnu != null ? doc.Mt_Reconnu : 0,
+        doc.Mt_NonReconnu != null ? doc.Mt_NonReconnu : 0,
+        doc.Controleurs_participants != null ? doc.Controleurs_participants : 0,
+        doc.Code_br != null ? doc.Code_br : ''
+    ];
+}
+
+function _rowToResultat(row) {
+    return {
+        ID_Resultat: row[0] || '',
+        ID_Programme: row[1] || '',
+        Sal_Aff: row[2] != null ? row[2] : 0,
+        Sal_NonAff: row[3] != null ? row[3] : 0,
+        NonSal_Aff: row[4] != null ? row[4] : 0,
+        NonSal_NonAff: row[5] != null ? row[5] : 0,
+        Trav_Declares: row[6] != null ? row[6] : 0,
+        Trav_NonDeclares: row[7] != null ? row[7] : 0,
+        insuff_totale: row[8] != null ? row[8] : 0,
+        Mt_Reconnu: row[9] != null ? row[9] : 0,
+        Mt_NonReconnu: row[10] != null ? row[10] : 0,
+        Controleurs_participants: row[11] != null ? row[11] : 0,
+        Code_br: row[12] != null ? row[12] : ''
+    };
+}
+
+// Bureaux: [Nom_Bureau, Code_Bureau, Region, Nom_Bureau_Ar]
+function _bureauToRow(doc) {
+    return [
+        doc.Nom_Bureau || '',
+        doc.Code_Bureau != null ? doc.Code_Bureau : '',
+        doc.Region || '',
+        doc.Nom_Bureau_Ar || ''
+    ];
+}
+
+/* ── Network check helper ───────────────────────────────────────────── */
+function _isOnline() {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return false;
+    return true;
+}
+
+/* ── User lookup helper ─────────────────────────────────────────────── */
+async function _findUser(matricule) {
+    const db = await _fbReady;
+    const snap = await db.collection('users').where('Matricule', '==', Number(matricule)).limit(1).get();
+    if (snap.empty) return null;
+    const d = snap.docs[0];
+    return { id: d.id, ...d.data() };
+}
+
+async function _findBureau(codeBr) {
+    const db = await _fbReady;
+    const snap = await db.collection('bureaux').where('Code_Bureau', '==', Number(codeBr)).limit(1).get();
+    if (snap.empty) return null;
+    const d = snap.docs[0];
+    return { id: d.id, ...d.data() };
+}
+
+async function _createToken(matricule, codeBr) {
+    const token = crypto.randomUUID ? crypto.randomUUID() :
+        'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = Math.random() * 16 | 0;
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+    const db = await _fbReady;
+    await db.collection('sessions').doc(token).set({
+        matricule: String(matricule || '').trim(),
+        codeBr: String(codeBr || '').trim(),
+        createdAt: Date.now()
+    });
+    return token;
+}
+
+async function _getSession(token) {
+    const t = String(token || '').trim();
+    if (!t) return null;
+    const db = await _fbReady;
+    const snap = await db.collection('sessions').doc(t).get();
+    if (!snap.exists) return null;
+    return snap.data();
+}
+
+/* ── Main API: postAction (drop-in replacement) ─────────────────────── */
+async function postAction(action, payload = {}) {
+    if (isSessionExpired()) { logoutToLogin(); return { ok: false, error: 'unauthorized' }; }
+
+    try {
+        /* ── login ── */
+        if (action === 'login') {
+            const matricule = String(payload.matricule || '').trim();
+            const pw = String(payload.pw || '').trim();
+            if (!matricule || !pw) return { ok: false, error: 'missing_credentials' };
+
+            const user = await _findUser(matricule);
+            if (!user) {
+                if (!_isOnline()) return { ok: false, error: 'network_error' };
+                return { ok: false, error: 'invalid_credentials' };
+            }
+
+            const storedPw = user.Pw || user.pw || user.password || '';
+            const matches = await _passwordMatches(matricule, pw, storedPw);
+            if (!matches) return { ok: false, error: 'invalid_credentials' };
+
+            const codeBr = String(user.Code_BR || user.code_br || '').trim();
+            const bureau = codeBr ? await _findBureau(codeBr) : null;
+            const token = await _createToken(matricule, codeBr);
+
+            return {
+                ok: true,
+                token: token,
+                user: {
+                    matricule: String(user.Matricule || '').trim(),
+                    frName: String(user.FR_Name || '').trim(),
+                    arName: String(user.AR_Name || '').trim(),
+                    grade: String(user.Grade || '').trim(),
+                    codeBr: codeBr,
+                    bureauName: bureau ? String(bureau.Nom_Bureau || '').trim() : '',
+                    bureauNameAr: bureau ? String(bureau.Nom_Bureau_Ar || '').trim() : '',
+                    bureauRegion: bureau ? String(bureau.Region || '').trim() : '',
+                    userType: String(user.user_type || '').trim()
+                }
+            };
+        }
+
+        /* ── changePassword ── */
+        if (action === 'changePassword') {
+            const sess = await _getSession(getToken());
+            if (!sess || !sess.matricule) return { ok: false, error: 'unauthorized' };
+            const oldPw = String(payload.oldPw || '').trim();
+            const newPw = String(payload.newPw || '').trim();
+            if (!oldPw || !newPw) return { ok: false, error: 'missing_fields' };
+
+            const user = await _findUser(sess.matricule);
+            if (!user) return { ok: false, error: 'user_not_found' };
+
+            const storedPw = user.Pw || user.pw || user.password || '';
+            const matches = await _passwordMatches(sess.matricule, oldPw, storedPw);
+            if (!matches) return { ok: false, error: 'invalid_old_password' };
+
+            const newHash = await _passwordHash(sess.matricule, newPw);
+            const db = await _fbReady;
+            await db.collection('users').doc(user.id).update({ Pw: newHash });
+            return { ok: true };
+        }
+
+        /* ── getAdminSheet (all data, no bureau filter) ── */
+        if (action === 'getAdminSheet') {
+            const sess = await _getSession(getToken());
+            if (!sess) return { ok: false, error: 'unauthorized' };
+            const sname = String(payload.sheet || '').trim();
+            if (!['Programmes', 'Resultats', 'Bureaux'].includes(sname)) return { ok: false, error: 'invalid_sheet' };
+
+            const docs = await _getAllDocs(sname.toLowerCase());
+            let rows;
+            if (sname === 'Programmes') rows = docs.map(_programmeToRow);
+            else if (sname === 'Resultats') rows = docs.map(_resultatToRow);
+            else rows = docs.map(_bureauToRow);
+
+            return { ok: true, rows: rows };
+        }
+
+        /* ── getSheet (user-scoped) ── */
+        if (action === 'getSheet') {
+            const sess = await _getSession(getToken());
+            if (!sess || !sess.codeBr) return { ok: false, error: 'unauthorized' };
+            const sname = String(payload.sheet || '').trim();
+            if (!['Programmes', 'Resultats', 'Bureaux'].includes(sname)) return { ok: false, error: 'invalid_sheet' };
+            const code = String(sess.codeBr).trim();
+
+            if (sname === 'Bureaux') {
+                const docs = await _getAllDocs('bureaux');
+                return { ok: true, rows: docs.map(_bureauToRow) };
+            }
+
+            if (sname === 'Programmes') {
+                const docs = await _getAllDocs('programmes');
+                const filtered = docs.filter(d => String(d.Code_Bureau || '').trim() === code);
+                return { ok: true, rows: filtered.map(_programmeToRow) };
+            }
+
+            if (sname === 'Resultats') {
+                const db = await _fbReady;
+                const [progSnap, resSnap] = await Promise.all([
+                    db.collection('programmes').where('Code_Bureau', '==', Number(code)).get(),
+                    db.collection('resultats').get()
+                ]);
+                const myProgIds = new Set();
+                progSnap.docs.forEach(d => {
+                    const pid = d.data().ID_Programme || d.id;
+                    if (pid) myProgIds.add(pid);
+                });
+                const rows = [];
+                resSnap.docs.forEach(d => {
+                    const r = { id: d.id, ...d.data() };
+                    const cbr = String(r.Code_br || '').trim();
+                    if (cbr === code) { rows.push(_resultatToRow(r)); return; }
+                    if (cbr) return;
+                    const pid = String(r.ID_Programme || '').trim();
+                    if (pid && myProgIds.has(pid)) rows.push(_resultatToRow(r));
+                });
+                return { ok: true, rows: rows };
+            }
+
+            return { ok: true, rows: [] };
+        }
+
+        return { ok: false, error: 'unknown_action' };
+    } catch (error) {
+        console.error('postAction error:', error);
+        return { ok: false, error: 'network_error' };
+    }
+}
+
+/* ── Main API: saveData (drop-in replacement) ───────────────────────── */
+async function saveData(sheetName, arrayValues) {
+    if (isSessionExpired()) { logoutToLogin(); return false; }
+
+    try {
+        const sess = await _getSession(getToken());
+        if (!sess || !sess.codeBr) return false;
+        const code = String(sess.codeBr).trim();
+
+        if (sheetName === 'Programmes') {
+            const doc = _rowToProgramme(arrayValues);
+            doc.Code_Bureau = code;
+            const id = doc.ID_Programme || ('P' + Date.now());
+            await _setDoc('programmes', id, doc);
+            return true;
+        }
+
+        if (sheetName === 'Resultats') {
+            const doc = _rowToResultat(arrayValues);
+            doc.Code_br = code;
+            const id = doc.ID_Resultat || null;
+            const existing = id ? await _getDocById('resultats', id) : null;
+            if (existing) {
+                const db = await _fbReady;
+                await db.collection('resultats').doc(existing.id).set(doc, { merge: true });
+            } else {
+                const db = await _fbReady;
+                const ref = await db.collection('resultats').add(doc);
+                // Update ID_Resultat to match Firestore doc ID
+                await db.collection('resultats').doc(ref.id).update({ ID_Resultat: ref.id });
+            }
+            return true;
+        }
+
+        return false;
+    } catch (error) {
+        console.error('saveData error:', error);
+        return false;
+    }
+}
+
+/* ── Main API: fetchData (drop-in replacement) ──────────────────────── */
+async function fetchData(sheetName) {
+    if (isSessionExpired()) { logoutToLogin(); return []; }
+    try {
+        if (sheetName === 'Programmes' || sheetName === 'Resultats') {
+            const res = await postAction('getSheet', { sheet: sheetName });
+            return res && res.ok && Array.isArray(res.rows) ? res.rows : [];
+        }
+        const docs = await _getAllDocs(sheetName.toLowerCase());
+        if (sheetName === 'Bureaux') return docs.map(_bureauToRow);
+        return docs.map(d => Object.values(d));
+    } catch (error) {
+        console.error('fetchData error:', error);
+        return [];
+    }
+}
+
+/* ── Helper: render zone activity with colored segments ─────────────── */
+window.renderZoneActivity = function (v) {
+    const raw = String(v ?? '').trim();
+    if (!raw || !raw.includes('\u203a')) return raw || '\u2014';
+    const parts = raw.split(/\s*\u203a\s*/);
+    const colors = ['#048f40', '#1b9f41', '#3da937', '#a5ca1f'];
+    return parts
+        .map((p, i) => {
+            const c = colors[i % colors.length];
+            return '<span style="color:' + c + ';font-weight:' + (i === parts.length - 1 ? '700' : '600') + ';white-space:nowrap">' + p + '</span>';
+        })
+        .join('<span style="display:inline-flex;align-items:center;margin:0 0.15em;color:#048f40;font-size:75%">\u25b6</span>');
+};

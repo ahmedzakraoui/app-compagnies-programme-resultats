@@ -71,7 +71,18 @@ function scheduleAutoLogout() {
 }
 
 // Auto-init logout timer on every page
-document.addEventListener('DOMContentLoaded', scheduleAutoLogout);
+document.addEventListener('DOMContentLoaded', () => {
+    scheduleAutoLogout();
+    const el = document.getElementById('on-user-text');
+    if (el) {
+        const u = getCurrentUser();
+        if (u) {
+            const name = u.arName || u.frName || '';
+            const bureau = u.bureauNameAr || u.bureauName || '';
+            el.textContent = name + (bureau ? ' - ' + bureau : '');
+        }
+    }
+});
 
 // Expose helpers
 try {

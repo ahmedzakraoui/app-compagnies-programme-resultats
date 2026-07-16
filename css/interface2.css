@@ -155,7 +155,6 @@
     max-width: min-content;
 }
 .page-results main.container-fluid.composed-main.results-main-fluid {
-    margin-top: 2em;
     padding-bottom: 0;
 }
 body.page-results tbody#results-tbody {

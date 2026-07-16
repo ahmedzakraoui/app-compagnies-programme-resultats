@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const activiteSectorielleCustom = document.getElementById('activite_sectorielle_custom');
     const btnBackToList = document.getElementById('btn-back-to-list');
     const sectorClearBadge = document.getElementById('sector-clear-badge');
+    const zoneLabel = document.getElementById('zone-activite-label');
     const inputDateDebut = document.getElementById('date_debut');
     const inputDateFin = document.getElementById('date_fin');
 
@@ -78,6 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let programmeIdsWithResultats = new Set();
     let programmesPage = 1;
     let goToLastPageOnce = false;
+    let goToNewCampagneId = '';
     let programmesMessage = '';
     let sortColIdx = 0;
     let sortDir = 'asc';
@@ -208,7 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tr.innerHTML = `
                 <td><span class="${badgeCls}">${typeV}</span></td>
                 <td>${window.renderZoneActivity(row[3])}</td>
-                <td><small>${row[5]} ⟻ ${row[4]}</small></td>
+                <td><small>${row[4]} ⟻ ${row[5]}</small></td>
                 <td class="text-center">${row[6]}</td>
             `;
             tr.addEventListener('click', () => openStatsModal(row));
@@ -239,8 +241,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const fpLocale =
-        typeof flatpickr !== 'undefined' && flatpickr.l10ns && flatpickr.l10ns.fr
-            ? flatpickr.l10ns.fr
+        typeof flatpickr !== 'undefined' && flatpickr.l10ns && flatpickr.l10ns.ar
+            ? flatpickr.l10ns.ar
             : undefined;
 
     let choicesCampagne = null;
@@ -350,6 +352,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     function onSectorChange() { selected = true; }
     function onSectorHide() {
         if (selected || resetting) return;
+        const hasValue = activiteSectorielle.value && activiteSectorielle.value.trim() !== '';
+        if (hasValue) return;
         resetSectorChoices();
     }
     function resetSectorUI() {
@@ -388,12 +392,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (type === 'قطاعية') {
             zoneBlock.hidden = false;
+            zoneLabel.textContent = 'نوع النشاط';
             wrapSectorielle.classList.remove('d-none');
             activiteSectorielle.disabled = false;
             activiteSectorielle.setAttribute('required', 'required');
             initSectorChoices();
         } else if (type === 'جغرافية') {
             zoneBlock.hidden = false;
+            zoneLabel.textContent = 'المنطقة الجغرافية';
             wrapGeographique.classList.remove('d-none');
             activiteZoneGeo.disabled = false;
             activiteZoneGeo.setAttribute('required', 'required');
@@ -413,6 +419,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     btnBackToList.addEventListener('click', () => {
+        activiteSectorielleCustom.value = '';
         resetSectorUI();
     });
 
@@ -765,7 +772,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const headers = ['ID', 'BR', 'نوع الحملة', 'نوع النشاط / المنطقة الجغرافية', 'الفترة الزمنية', 'عدد المراقبين'];
         const aoa = [
             headers,
-            ...data.map((r) => [r[0] ?? '', r[1] ?? '', r[2] ?? '', r[3] ?? '', `${r[5] ?? ''} ⟻ ${r[4] ?? ''}`, r[6] ?? '']),
+            ...data.map((r) => [r[0] ?? '', r[1] ?? '', r[2] ?? '', r[3] ?? '', `${r[4] ?? ''} ⟻ ${r[5] ?? ''}`, r[6] ?? '']),
         ];
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(aoa);
@@ -785,7 +792,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const theadCustom = `<thead><tr><th>نوع الحملة</th><th>نوع النشاط / المنطقة الجغرافية</th><th>الفترة الزمنية</th><th>عدد المراقبين</th></tr></thead>`;
         const tbodyHtml = rows.length === 0
             ? `<tbody><tr><td colspan="4" style="text-align:center;color:#777;">Aucun résultat.</td></tr></tbody>`
-            : `<tbody>${rows.map((r) => `<tr><td>${r[2] ?? ''}</td><td>${r[3] ?? ''}</td><td>${r[5] ?? ''} ⟻ ${r[4] ?? ''}</td><td>${r[6] ?? ''}</td></tr>`).join('')}</tbody>`;
+            : `<tbody>${rows.map((r) => `<tr><td>${r[2] ?? ''}</td><td>${r[3] ?? ''}</td><td>${r[4] ?? ''} ⟻ ${r[5] ?? ''}</td><td>${r[6] ?? ''}</td></tr>`).join('')}</tbody>`;
         const tableHtml = `<table class="${tableEl.className}" dir="rtl">${theadCustom}${tbodyHtml}</table>`;
         const totalCount = rows.length;
         const totalLabel = totalCount === 1 ? 'حملة' : 'حملات';
@@ -862,9 +869,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         programmesAllRows = myData;
         applyFilters();
-        if (goToLastPageOnce) {
-            programmesPage = totalProgrammesPages();
+        if (goToLastPageOnce && goToNewCampagneId) {
+            const idx = programmesFilteredRows.findIndex(r => String(r[0]).trim() === goToNewCampagneId);
+            if (idx !== -1) {
+                programmesPage = Math.floor(idx / PROGRAMMES_PAGE_SIZE) + 1;
+            } else {
+                programmesPage = totalProgrammesPages();
+            }
             goToLastPageOnce = false;
+            goToNewCampagneId = '';
             renderProgrammesPage(programmesPage);
         }
     }
@@ -902,12 +915,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (success) {
             goToLastPageOnce = true;
+            goToNewCampagneId = newEntry[0];
             form.reset();
             fpDebut.clear();
             fpFin.clear();
             fpFin.set('minDate', null);
             choicesCampagne.setChoiceByValue(typeCampagne.value);
             updateZoneActiviteUI();
+            updateSectorClearBadge();
             btnText.textContent = 'إضافة إلى البرنامج';
             btnSpinner.classList.add('d-none');
             await loadTable();

@@ -1,3 +1,21 @@
+/* ── Admin variant (purple theme, like interface3) ──────────────── */
+.page-account.page-admin {
+    --cp-surface: rgba(255, 255, 255, 0.82);
+    --cp-surface-2: rgba(245, 243, 255, 0.94);
+    --cp-border: rgba(124, 58, 237, 0.08);
+    --cp-border-strong: rgba(124, 58, 237, 0.14);
+    --cp-shadow: 0 1px 2px rgba(74, 29, 150, 0.05), 0 24px 48px -12px rgba(74, 29, 150, 0.1);
+    --cp-shadow-soft: 0 18px 40px -20px rgba(124, 58, 237, 0.28);
+    --cp-accent: #7c3aed;
+    --cp-accent-mid: #8b5cf6;
+    --cp-accent-2: #a78bfa;
+    --cp-accent-lime: #c4b5fd;
+    --cp-ink: #1e0f29;
+    --cp-muted: #5c3d6e;
+    --cp-focus-ring: rgba(124, 58, 237, 0.22);
+    background-color: #ede9fe;
+}
+
 .page-account .account-card {
   overflow: hidden;
 }

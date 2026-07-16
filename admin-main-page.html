@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/main-page.css" />
     <link rel="stylesheet" href="css/admin-main-page.css" />
+    <script src="js/api_1.js"></script>
     <script>
       try {
         var u = JSON.parse(localStorage.getItem("currentUser"));
@@ -37,7 +38,7 @@
         <div id="user-info" class="composed-user-line">--</div>
       </div>
       <a href="my-account.html" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="btn-account">حساب المستعمل</a>
-      <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn p-0" id="btn-logout"><img src="images/off_icon.svg" alt="Déconnexion" width="32" height="32" /></button>
+      <button type="button" class="btn btn-outline-secondary btn-sm composed-menu-btn p-0" id="btn-logout"><img src="images/off_icon.svg" alt="خروج" width="32" height="32" /></button>
     </div>
 
     <div class="page-main-inner">
@@ -121,6 +122,7 @@
         });
       });
     </script>
-    <div class="dev-credit"><span class="dot"></span>أحمد الزكراوي - إدارة المراقبة</div>
+    <div class="on-user"><span class="dot"></span><span id="on-user-text">...</span></div>
+    <div class="dev-credit">تصميم وتطوير: إدارة المراقبة - أحمد الزكراوي</div>
   </body>
 </html>
