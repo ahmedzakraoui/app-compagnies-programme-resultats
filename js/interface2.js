@@ -748,7 +748,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rows = rowModel?.rows || [];
         const tbodyHtml =
             rows.length === 0
-                ? `<tbody><tr><td colspan="11" style="text-align:center;color:#777;">Aucun résultat.</td></tr></tbody>`
+                ? `<tbody><tr><td colspan="11" style="text-align:center;color:#777;">لا توجد نتائج</td></tr></tbody>`
                 : `<tbody>${rows
                       .map((row) => {
                           const tds = row

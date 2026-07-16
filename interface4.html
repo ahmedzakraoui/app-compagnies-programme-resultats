@@ -35,11 +35,11 @@
           <div class="composed-brand">
             <img src="images/cnss_logo.svg" alt="" class="composed-brand-logo" width="34" height="34" decoding="async" />
             <div class="brand-mini-menu" aria-label="Menu">
-              <a href="admin-main-page.html" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="nav-home">
+              <a href="main-page.html" class="btn btn-outline-secondary btn-sm composed-menu-btn" id="nav-home">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
               </a>
               <a href="interface3.html" class="btn btn-outline-secondary btn-sm composed-menu-btn">البرامج</a>
-              <a href="#" class="btn btn-outline-secondary btn-sm composed-menu-btn is-active" aria-current="page">الإحصائيات</a>
+              <a href="interface4.html" class="btn btn-outline-secondary btn-sm composed-menu-btn is-active" aria-current="page">الإحصائيات</a>
             </div>
           </div>
           <div class="composed-user-panel">
@@ -276,6 +276,26 @@
     <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
     <script src="js/api_1.js"></script>
     <script src="js/interface4.js?v=20260604"></script>
+    <script>
+    (function() {
+        var user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        var is_admin = (user.userType || '').trim().toLowerCase() === 'admin';
+        var links = document.querySelectorAll('.brand-mini-menu .composed-menu-btn:not(#nav-home)');
+        var page = window.location.pathname.split('/').pop() || '';
+        for (var i = 0; i < links.length; i++) {
+            var t = links[i].textContent.trim();
+            if (t === 'البرامج' || t === 'البرنامج') {
+                links[i].href = is_admin ? 'interface3.html' : 'interface1.html';
+            } else if (t === 'الإحصائيات') {
+                links[i].href = is_admin ? 'interface4.html' : 'interface2.html';
+            }
+            links[i].classList.remove('is-active');
+            if (links[i].getAttribute('href') === page) {
+                links[i].classList.add('is-active');
+            }
+        }
+    })();
+    </script>
     <div class="on-user"><span class="dot"></span><span id="on-user-text">...</span></div>
     <div class="dev-credit">تصميم وتطوير: إدارة المراقبة - أحمد الزكراوي</div>
   </body>

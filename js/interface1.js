@@ -791,7 +791,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rows = programmesFilteredRows;
         const theadCustom = `<thead><tr><th>نوع الحملة</th><th>نوع النشاط / المنطقة الجغرافية</th><th>الفترة الزمنية</th><th>عدد المراقبين</th></tr></thead>`;
         const tbodyHtml = rows.length === 0
-            ? `<tbody><tr><td colspan="4" style="text-align:center;color:#777;">Aucun résultat.</td></tr></tbody>`
+            ? `<tbody><tr><td colspan="4" style="text-align:center;color:#777;">لا توجد نتائج</td></tr></tbody>`
             : `<tbody>${rows.map((r) => `<tr><td>${r[2] ?? ''}</td><td>${r[3] ?? ''}</td><td>${r[4] ?? ''} ⟻ ${r[5] ?? ''}</td><td>${r[6] ?? ''}</td></tr>`).join('')}</tbody>`;
         const tableHtml = `<table class="${tableEl.className}" dir="rtl">${theadCustom}${tbodyHtml}</table>`;
         const totalCount = rows.length;
