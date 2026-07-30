@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const filterBrEl = document.getElementById('filter-br');
     const filterZoneEl = document.getElementById('filter-zone');
     const filterStatusEl = document.getElementById('filter-status');
+    const filterYearEl = document.getElementById('filter-year');
     const btnResetEl = document.getElementById('btn-filters-reset');
     const btnExportXlsx = document.getElementById('btn-export-xlsx');
     const btnExportPdf = document.getElementById('btn-export-pdf');
@@ -167,6 +168,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (filterStatusEl && typeof window !== 'undefined' && window.Choices) {
         try { new window.Choices(filterStatusEl, choiceSelectOpts); } catch {}
+    }
+    let choicesYear = null;
+    if (filterYearEl && typeof window !== 'undefined' && window.Choices) {
+        try { choicesYear = new window.Choices(filterYearEl, { ...choiceSelectOpts, searchEnabled: false }); } catch {}
+    }
+
+    let serverYear = null;
+    function extractYearFromDate(val) {
+        const s = String(val || '').trim();
+        return s.length >= 4 ? s.substring(0, 4) : '';
+    }
+    function populateYearFilter() {
+        if (!filterYearEl) return;
+        const years = new Set();
+        for (const row of rowsAll) {
+            const prog = row.programmeRow;
+            const y = extractYearFromDate(prog?.[5]) || extractYearFromDate(prog?.[4]);
+            if (y) years.add(y);
+        }
+        const sorted = [...years].sort((a, b) => b.localeCompare(a));
+        const prev = filterYearEl.value;
+        filterYearEl.innerHTML = '<option value="">الكل</option>';
+        for (const y of sorted) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            filterYearEl.appendChild(opt);
+        }
+        if (prev && sorted.includes(prev)) {
+            filterYearEl.value = prev;
+        } else if (serverYear && sorted.includes(String(serverYear))) {
+            filterYearEl.value = String(serverYear);
+        }
+        if (choicesYear) {
+            try { choicesYear.destroy(); } catch {}
+            choicesYear = null;
+        }
+        if (filterYearEl && typeof window !== 'undefined' && window.Choices) {
+            try { choicesYear = new window.Choices(filterYearEl, { ...choiceSelectOpts, searchEnabled: false }); } catch {}
+        }
     }
 
     function populateBrFilter() {
@@ -263,7 +304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         columnHelper.accessor('periode', {
             id: 'periode',
             header: () => 'الفترة الزمنية',
-            cell: (info) => String(info.getValue() ?? '—'),
+            cell: (info) => `<span dir="ltr">${info.getValue() ?? '—'}</span>`,
             filterFn: 'includesString',
         }),
         columnHelper.accessor('effectif', {
@@ -462,6 +503,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const br = (filterBrEl?.value || '').trim();
         const zone = (filterZoneEl?.value || '').trim();
         const status = (filterStatusEl?.value || '').trim();
+        const year = (filterYearEl?.value || '').trim();
 
         const nextColumnFilters = [];
         if (type) nextColumnFilters.push({ id: 'typeCampagne', value: type });
@@ -483,6 +525,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (zone) filtered = filtered.filter((r) => String(r.zone).toLowerCase().includes(zone.toLowerCase()));
         if (status === 'realized') filtered = filtered.filter((r) => programmeIdsWithResultats.has(String(r.programmeId).trim()));
         if (status === 'not-realized') filtered = filtered.filter((r) => !programmeIdsWithResultats.has(String(r.programmeId).trim()));
+        if (year) {
+            filtered = filtered.filter((r) => {
+                const prog = r.programmeRow;
+                const ry = extractYearFromDate(prog?.[5]) || extractYearFromDate(prog?.[4]);
+                return ry === year;
+            });
+        }
 
         table.setOptions((prev) => ({
             ...prev,
@@ -502,11 +551,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         filterBrEl?.addEventListener('input', applyFiltersToState);
         filterZoneEl?.addEventListener('input', applyFiltersToState);
         filterStatusEl?.addEventListener('change', applyFiltersToState);
+        filterYearEl?.addEventListener('change', applyFiltersToState);
         btnResetEl?.addEventListener('click', () => {
             if (filterTypeEl) filterTypeEl.value = '';
             if (filterBrEl) filterBrEl.value = '';
             if (filterZoneEl) filterZoneEl.value = '';
             if (filterStatusEl) filterStatusEl.value = '';
+            const resetYear = serverYear ? String(serverYear) : '';
+            if (filterYearEl) filterYearEl.value = resetYear;
+            if (choicesYear) {
+                try { choicesYear.setChoiceByValue(resetYear); } catch {}
+            }
             applyFiltersToState();
         });
     }
@@ -781,10 +836,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
         }));
 
+        populateYearFilter();
         applyFiltersToState();
         renderTanstackTable();
         setResultsLoading(false);
     }
 
+    if (typeof window.getServerYear === 'function') {
+        serverYear = await window.getServerYear();
+    }
     await loadAndBuildTable();
 });

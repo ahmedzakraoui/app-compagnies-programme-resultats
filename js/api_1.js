@@ -66,6 +66,31 @@ async function _passwordMatches(matricule, inputPw, storedPw) {
 const SESSION_TTL_MS = 120 * 60 * 1000;
 try { window.SESSION_TTL_MS = SESSION_TTL_MS; } catch {}
 
+/* ── Server time offset (for session based on server, not user machine) */
+let _serverTimeOffset = 0;
+
+async function _syncServerTime() {
+    try {
+        const db = await _fbReady;
+        const clientNow = Date.now();
+        const ref = db.collection('_meta').doc('servertime');
+        await ref.set({ ts: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+        const snap = await ref.get();
+        const data = snap.data();
+        if (data && data.ts && data.ts.toDate) {
+            const serverNow = data.ts.toDate().getTime();
+            _serverTimeOffset = serverNow - clientNow;
+        }
+    } catch {}
+}
+
+function getServerTime() {
+    return Date.now() + _serverTimeOffset;
+}
+try { window.getServerTime = getServerTime; } catch {}
+
+_syncServerTime();
+
 function getCurrentUser() {
     try {
         const raw = localStorage.getItem('currentUser');
@@ -88,7 +113,7 @@ function getSessionExpiresAt() {
 
 function isSessionExpired() {
     const exp = getSessionExpiresAt();
-    return exp != null ? Date.now() >= exp : false;
+    return exp != null ? getServerTime() >= exp : false;
 }
 
 function rememberPostLoginRedirect() {
@@ -109,7 +134,7 @@ function logoutToLogin() {
 function scheduleAutoLogout() {
     const exp = getSessionExpiresAt();
     if (exp == null) return;
-    const delay = exp - Date.now();
+    const delay = exp - getServerTime();
     if (delay <= 0) { logoutToLogin(); return; }
     try {
         if (window.__autoLogoutTimer) clearTimeout(window.__autoLogoutTimer);
@@ -185,13 +210,16 @@ function _fmtDate(v) {
 /* ── Data conversion: Firestore document ↔ array row ───────────────── */
 // Programmes: [ID_Programme, Code_Bureau, Type_Campagne, Activite_Zone, Date_Fin, Date_Debut, Nb_Controleurs]
 function _programmeToRow(doc) {
+    let fin = _fmtDate(doc.Date_Fin);
+    let debut = _fmtDate(doc.Date_Debut);
+    if (fin && debut && fin < debut) { const t = fin; fin = debut; debut = t; }
     return [
         doc.ID_Programme || doc.id || '',
         doc.Code_Bureau != null ? doc.Code_Bureau : '',
         doc.Type_Campagne || '',
         doc.Activite_Zone || '',
-        _fmtDate(doc.Date_Fin),
-        _fmtDate(doc.Date_Debut),
+        fin,
+        debut,
         doc.Nb_Controleurs != null ? doc.Nb_Controleurs : ''
     ];
 }
@@ -258,15 +286,38 @@ function _bureauToRow(doc) {
 }
 
 /* ── Network check helper ───────────────────────────────────────────── */
-function _isOnline() {
+async function _isOnline() {
     if (typeof navigator !== 'undefined' && navigator.onLine === false) return false;
-    return true;
+    try {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 2000);
+        await fetch('https://connectivitycheck.gstatic.com/generate_204', { mode: 'no-cors', signal: ctrl.signal });
+        clearTimeout(t);
+        return true;
+    } catch { return false; }
+}
+
+/* ── Firestore query with network error detection ───────────────────── */
+async function _safeFirestoreQuery(queryFn) {
+    if (!(await _isOnline())) throw new Error('network_error');
+    try {
+        return await queryFn();
+    } catch (err) {
+        const msg = String(err || '').toLowerCase();
+        const isNetworkError = msg.includes('offline') || msg.includes('network') || msg.includes('fetch') ||
+            msg.includes('failed to fetch') || msg.includes('status') || msg.includes('type') ||
+            msg.includes('connection') || msg.includes('abort') || msg.includes('timeout');
+        if (isNetworkError || typeof navigator !== 'undefined' && navigator.onLine === false) {
+            throw new Error('network_error');
+        }
+        throw err;
+    }
 }
 
 /* ── User lookup helper ─────────────────────────────────────────────── */
 async function _findUser(matricule) {
     const db = await _fbReady;
-    const snap = await db.collection('users').where('Matricule', '==', Number(matricule)).limit(1).get();
+    const snap = await _safeFirestoreQuery(() => db.collection('users').where('Matricule', '==', Number(matricule)).limit(1).get());
     if (snap.empty) return null;
     const d = snap.docs[0];
     return { id: d.id, ...d.data() };
@@ -274,7 +325,7 @@ async function _findUser(matricule) {
 
 async function _findBureau(codeBr) {
     const db = await _fbReady;
-    const snap = await db.collection('bureaux').where('Code_Bureau', '==', Number(codeBr)).limit(1).get();
+    const snap = await _safeFirestoreQuery(() => db.collection('bureaux').where('Code_Bureau', '==', Number(codeBr)).limit(1).get());
     if (snap.empty) return null;
     const d = snap.docs[0];
     return { id: d.id, ...d.data() };
@@ -315,9 +366,10 @@ async function postAction(action, payload = {}) {
             const pw = String(payload.pw || '').trim();
             if (!matricule || !pw) return { ok: false, error: 'missing_credentials' };
 
+            if (!(await _isOnline())) return { ok: false, error: 'network_error' };
+
             const user = await _findUser(matricule);
             if (!user) {
-                if (!_isOnline()) return { ok: false, error: 'network_error' };
                 return { ok: false, error: 'invalid_credentials' };
             }
 
@@ -504,5 +556,44 @@ window.renderZoneActivity = function (v) {
             const c = colors[i % colors.length];
             return '<span style="color:' + c + ';font-weight:' + (i === parts.length - 1 ? '700' : '600') + ';white-space:nowrap">' + p + '</span>';
         })
-        .join('<span style="display:inline-flex;align-items:center;margin:0 0.15em;color:#048f40;font-size:75%">\u25b6</span>');
+        .join('<span style="display:inline-flex;align-items:center;margin:0 0.15em;color:#048f40;font-size:75%">▶</span>');
+};
+
+/* ── Server time helper (for universal current year) ─────────────────── */
+let _serverYearPromise = null;
+
+function _getServerYear() {
+    try {
+        const cached = localStorage.getItem('_serverYear');
+        if (cached) {
+            const y = parseInt(cached, 10);
+            if (y > 2000) return Promise.resolve(y);
+        }
+    } catch {}
+    return (async () => {
+        try {
+            const db = await _fbReady;
+            const snap = await db.collection('_meta').doc('servertime').get();
+            let year = null;
+            if (snap.readTime && snap.readTime.toDate) {
+                year = snap.readTime.toDate().getFullYear();
+            }
+            if (year === null && snap.exists) {
+                const d = snap.data();
+                if (d && d.ts && d.ts.toDate) year = d.ts.toDate().getFullYear();
+            }
+            if (year !== null) {
+                try { localStorage.setItem('_serverYear', String(year)); } catch {}
+                return year;
+            }
+        } catch {}
+        return new Date().getFullYear();
+    })();
+}
+
+window.getServerYear = function () {
+    if (_serverYearPromise === null) {
+        _serverYearPromise = _getServerYear();
+    }
+    return _serverYearPromise;
 };

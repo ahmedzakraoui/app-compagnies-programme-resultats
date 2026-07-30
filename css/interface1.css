@@ -160,7 +160,7 @@ body.page-programme main.container.composed-main {
     padding: 0.22rem 2.1rem 0.22rem 0.55rem;
     border-radius: 10px;
     border: 1px solid rgba(12, 107, 47, 0.14);
-    background-color: rgba(255, 255, 255, 0.35);
+    background-color: rgba(255, 255, 255, 0.92);
     font-size: 0.78rem;
 }
 .page-programme .choices.is-focused .choices__inner,
@@ -346,18 +346,32 @@ body.page-programme main.container.composed-main {
         max-width: none;
     }
     .page-programme .results-filter-compact--type {
-        flex: 0 0 150px;
-        min-width: 150px;
+        flex: 0 0 120px;
+        min-width: 120px;
         max-width: none;
     }
-    .page-programme .results-filter-compact:not(.results-filter-compact--type):not(.results-filter-compact--status) {
+    .page-programme .results-filter-compact--year {
+        flex: 0 0 110px;
+        min-width: 100px;
+        max-width: 120px;
+    }
+    .page-programme .results-filter-compact:not(.results-filter-compact--type):not(.results-filter-compact--status):not(.results-filter-compact--year) {
         flex: 1 1 200px;
         min-width: 10em;
     }
 }
 .page-programme .results-filter-compact--type {
-    max-width: 160px;
-    min-width: 130px;
+    max-width: 130px;
+    min-width: 110px;
+}
+.page-programme .results-filter-compact--year {
+    flex: 0 0 110px;
+    min-width: 100px;
+    max-width: 120px;
+}
+.page-programme .results-filter-compact--year div.choices,
+.page-programme .results-filter-compact--year div.choices .choices__inner {
+    height: 32px;
 }
 .page-programme #filter-zone.form-control-sm {
     height: 39px;

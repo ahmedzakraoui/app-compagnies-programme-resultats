@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const filterTypeEl = document.getElementById('filter-type');
     const filterZoneEl = document.getElementById('filter-zone');
     const filterStatusEl = document.getElementById('filter-status');
+    const filterYearEl = document.getElementById('filter-year');
     const btnResetEl = document.getElementById('btn-filters-reset');
     const btnExportXlsx = document.getElementById('btn-export-xlsx');
     const btnExportPdf = document.getElementById('btn-export-pdf');
@@ -121,15 +122,57 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    let serverYear = null;
+
+    function extractYearFromDate(val) {
+        const s = String(val || '').trim();
+        return s.length >= 4 ? s.substring(0, 4) : '';
+    }
+
+    function populateYearFilter() {
+        if (!filterYearEl) return;
+        const years = new Set();
+        for (const row of programmesAllRows) {
+            const y = extractYearFromDate(row[5]) || extractYearFromDate(row[4]);
+            if (y) years.add(y);
+        }
+        const sorted = [...years].sort((a, b) => b.localeCompare(a));
+        const prev = filterYearEl.value;
+        filterYearEl.innerHTML = '<option value="">الكل</option>';
+        for (const y of sorted) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            filterYearEl.appendChild(opt);
+        }
+        if (prev && sorted.includes(prev)) {
+            filterYearEl.value = prev;
+        } else if (serverYear && sorted.includes(String(serverYear))) {
+            filterYearEl.value = String(serverYear);
+        }
+        if (choicesYear) {
+            try { choicesYear.destroy(); } catch {}
+            choicesYear = null;
+        }
+        if (filterYearEl && typeof window !== 'undefined' && window.Choices) {
+            try { choicesYear = new window.Choices(filterYearEl, { ...choiceSelectOpts, searchEnabled: false }); } catch {}
+        }
+    }
+
     function applyFilters() {
         const type = (filterTypeEl?.value || '').trim();
         const zone = (filterZoneEl?.value || '').trim().toLowerCase();
         const status = (filterStatusEl?.value || '').trim();
+        const year = (filterYearEl?.value || '').trim();
         programmesFilteredRows = programmesAllRows.filter((row) => {
             if (type && row[2] !== type) return false;
             if (zone && !String(row[3] || '').toLowerCase().includes(zone)) return false;
             if (status === 'realized' && !programmeIdsWithResultats.has(String(row[0]).trim())) return false;
             if (status === 'not-realized' && programmeIdsWithResultats.has(String(row[0]).trim())) return false;
+            if (year) {
+                const ry = extractYearFromDate(row[5]) || extractYearFromDate(row[4]);
+                if (ry !== year) return false;
+            }
             return true;
         });
         sortFilteredRows();
@@ -210,7 +253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tr.innerHTML = `
                 <td><span class="${badgeCls}">${typeV}</span></td>
                 <td>${window.renderZoneActivity(row[3])}</td>
-                <td><small>${row[4]} ⟻ ${row[5]}</small></td>
+                <td><small dir="ltr">${row[4]} ⟻ ${row[5]}</small></td>
                 <td class="text-center">${row[6]}</td>
             `;
             tr.addEventListener('click', () => openStatsModal(row));
@@ -238,6 +281,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (filterStatusEl && typeof window !== 'undefined' && window.Choices) {
         try { new window.Choices(filterStatusEl, choiceSelectOpts); } catch {}
+    }
+    let choicesYear = null;
+    if (filterYearEl && typeof window !== 'undefined' && window.Choices) {
+        try { choicesYear = new window.Choices(filterYearEl, { ...choiceSelectOpts, searchEnabled: false }); } catch {}
     }
 
     const fpLocale =
@@ -361,23 +408,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         activiteSectorielleCustom.removeAttribute('required');
         activiteSectorielleCustom.disabled = true;
         btnCustomActivity.classList.remove('d-none');
+        activiteSectorielle.value = '';
         wrapSectorielle.classList.remove('d-none');
         activiteSectorielle.disabled = false;
         activiteSectorielle.setAttribute('required', 'required');
         initSectorChoices();
+        updateSectorClearBadge();
     }
 
     function resetSectorChoices() {
         resetting = true;
         destroySectorChoices();
+        activiteSectorielle.value = '';
         loadActivities();
         initSectorChoices();
+        updateSectorClearBadge();
         setTimeout(() => { resetting = false; }, 0);
     }
 
     function updateZoneActiviteUI() {
         const type = typeCampagne.value;
         destroySectorChoices();
+        activiteSectorielle.value = '';
         activiteSectorielle.removeAttribute('required');
         activiteZoneGeo.removeAttribute('required');
         activiteSectorielleCustom.removeAttribute('required');
@@ -404,6 +456,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             activiteZoneGeo.disabled = false;
             activiteZoneGeo.setAttribute('required', 'required');
         }
+        updateSectorClearBadge();
     }
 
     btnCustomActivity.addEventListener('click', () => {
@@ -446,6 +499,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (formPickersReady) return;
         formPickersReady = true;
 
+        const curYear = new Date().getFullYear();
+        const yearMin = new Date(curYear, 0, 1);
+        const yearMax = new Date(curYear, 11, 31);
+
         choicesCampagne = new Choices(typeCampagne, choiceSelectOpts);
 
         fpDebut = flatpickr(inputDateDebut, {
@@ -453,13 +510,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             dateFormat: 'Y-m-d',
             disableMobile: true,
             allowInput: false,
+            minDate: yearMin,
+            maxDate: yearMax,
+            placeholder: "اختر...",
             onChange: (dates) => {
                 if (dates[0]) {
                     fpFin.set('minDate', dates[0]);
                 } else {
-                    fpFin.set('minDate', null);
+                    fpFin.set('minDate', yearMin);
                 }
             },
+            onYearChange: (sel, dt, inst) => { if (inst.currentYear !== curYear) inst.changeYear(curYear); },
+            onMonthChange: (sel, dt, inst) => { if (inst.currentYear !== curYear) inst.changeYear(curYear); },
         });
 
         fpFin = flatpickr(inputDateFin, {
@@ -467,10 +529,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             dateFormat: 'Y-m-d',
             disableMobile: true,
             allowInput: false,
+            minDate: yearMin,
+            maxDate: yearMax,
+            placeholder: "اختر...",
+            onYearChange: (sel, dt, inst) => { if (inst.currentYear !== curYear) inst.changeYear(curYear); },
+            onMonthChange: (sel, dt, inst) => { if (inst.currentYear !== curYear) inst.changeYear(curYear); },
         });
 
         typeCampagne.addEventListener('change', updateZoneActiviteUI);
         updateZoneActiviteUI();
+
+        if (window.getServerYear) window.getServerYear();
     }
 
     function getZoneActiviteValue() {
@@ -587,7 +656,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const elEff = document.getElementById('modal-prog-effectif');
         if (elType) elType.textContent = programmeRow[2] ?? '';
         if (elZone) elZone.textContent = programmeRow[3] ?? '';
-        if (elPeriod) elPeriod.textContent = `${programmeRow[4] ?? ''} ⟻ ${programmeRow[5] ?? ''}`;
+        if (elPeriod) elPeriod.innerHTML = `<span dir="ltr">${programmeRow[4] ?? ''} ⟻ ${programmeRow[5] ?? ''}</span>`;
         if (elEff) elEff.textContent = programmeRow[6] != null ? String(programmeRow[6]) : '';
         populateModalFromCache(programmeRow);
         statsModal.show();
@@ -729,10 +798,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     filterTypeEl?.addEventListener('change', applyFilters);
     filterZoneEl?.addEventListener('input', applyFilters);
     filterStatusEl?.addEventListener('change', applyFilters);
+    filterYearEl?.addEventListener('change', applyFilters);
     btnResetEl?.addEventListener('click', () => {
         if (filterTypeEl) filterTypeEl.value = '';
         if (filterZoneEl) filterZoneEl.value = '';
         if (filterStatusEl) filterStatusEl.value = '';
+        const resetYear = serverYear ? String(serverYear) : '';
+        if (filterYearEl) filterYearEl.value = resetYear;
+        if (choicesYear) {
+            try { choicesYear.setChoiceByValue(resetYear); } catch {}
+        }
         applyFilters();
     });
 
@@ -792,7 +867,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const theadCustom = `<thead><tr><th>نوع الحملة</th><th>نوع النشاط / المنطقة الجغرافية</th><th>الفترة الزمنية</th><th>عدد المراقبين</th></tr></thead>`;
         const tbodyHtml = rows.length === 0
             ? `<tbody><tr><td colspan="4" style="text-align:center;color:#777;">لا توجد نتائج</td></tr></tbody>`
-            : `<tbody>${rows.map((r) => `<tr><td>${r[2] ?? ''}</td><td>${r[3] ?? ''}</td><td>${r[4] ?? ''} ⟻ ${r[5] ?? ''}</td><td>${r[6] ?? ''}</td></tr>`).join('')}</tbody>`;
+            : `<tbody>${rows.map((r) => `<tr><td>${r[2] ?? ''}</td><td>${r[3] ?? ''}</td><td dir="ltr">${r[4] ?? ''} ⟻ ${r[5] ?? ''}</td><td>${r[6] ?? ''}</td></tr>`).join('')}</tbody>`;
         const tableHtml = `<table class="${tableEl.className}" dir="rtl">${theadCustom}${tbodyHtml}</table>`;
         const totalCount = rows.length;
         const totalLabel = totalCount === 1 ? 'حملة' : 'حملات';
@@ -868,6 +943,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         programmesAllRows = myData;
+        populateYearFilter();
         applyFilters();
         if (goToLastPageOnce && goToNewCampagneId) {
             const idx = programmesFilteredRows.findIndex(r => String(r[0]).trim() === goToNewCampagneId);
@@ -883,6 +959,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     loadActivities();
+    if (typeof window.getServerYear === 'function') {
+        serverYear = await window.getServerYear();
+    }
     await loadTable();
 
     btnPrevPage?.addEventListener('click', () => renderProgrammesPage(programmesPage - 1));
@@ -906,8 +985,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             user.codeBr,
             typeCampagne.value,
             getZoneActiviteValue(),
-            inputDateDebut.value,
             inputDateFin.value,
+            inputDateDebut.value,
             document.getElementById('nb_controleurs').value,
         ];
 
@@ -919,7 +998,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             form.reset();
             fpDebut.clear();
             fpFin.clear();
-            fpFin.set('minDate', null);
+            fpFin.set('minDate', new Date(new Date().getFullYear(), 0, 1));
             choicesCampagne.setChoiceByValue(typeCampagne.value);
             updateZoneActiviteUI();
             updateSectorClearBadge();

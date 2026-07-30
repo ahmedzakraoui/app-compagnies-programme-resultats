@@ -229,6 +229,7 @@ body { background-color: var(--light-bg); font-family: 'Inter', sans-serif; }
 .card-composed {
     position: relative;
     overflow: hidden;
+    isolation: isolate;
     border: 1px solid var(--cp-border) !important;
     border-radius: 20px !important;
     background: var(--cp-surface) !important;
@@ -259,6 +260,7 @@ body { background-color: var(--light-bg); font-family: 'Inter', sans-serif; }
 .card-composed-body {
     position: relative;
     z-index: 1;
+    isolation: isolate;
 }
 
 /* ------------------------------------------------------------------ */
@@ -630,6 +632,15 @@ table {
 }
 .results-filter-compact {
     max-width: 210px;
+}
+.results-filter-compact--year {
+    flex: 0 0 110px;
+    min-width: 100px;
+    max-width: 120px;
+}
+.results-filter-compact--year div.choices,
+.results-filter-compact--year div.choices .choices__inner {
+    height: 32px;
 }
 
 /* ------------------------------------------------------------------ */

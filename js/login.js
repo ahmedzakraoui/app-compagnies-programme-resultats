@@ -75,11 +75,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         setLoading(true);
-        const res = await postAction('login', { matricule, pw });
+        let res;
+        try {
+            res = await postAction('login', { matricule, pw });
+        } catch (err) {
+            res = { ok: false, error: 'network_error' };
+        }
         setLoading(false);
 
-        if (!res || !res.ok || !res.user || !res.token) {
-            if (res && (res.error === 'network_error' || res.error === 'http_error')) {
+        if (!res?.ok || !res?.user || !res?.token) {
+            if (res?.error === 'network_error' || res?.error === 'http_error' || res?.error === 'offline') {
+                setError('لا يوجد اتصال بالإنترنت');
+                return;
+            }
+            if (!res) {
                 setError('لا يوجد اتصال بالإنترنت');
                 return;
             }
@@ -88,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const startedAt = Date.now();
+            const startedAt = typeof window !== 'undefined' && typeof window.getServerTime === 'function' ? window.getServerTime() : Date.now();
             const ttl = typeof window !== 'undefined' && typeof window.SESSION_TTL_MS === 'number' ? window.SESSION_TTL_MS : 7200 * 1000;
             localStorage.setItem(
                 'currentUser',
